@@ -1,9 +1,11 @@
 <?php
+/**
+ * Copyright (c) 2018. Ghiya <ghiya@mikadze.me>
+ */
 
-namespace resource;
+namespace modular\resource;
 
 
-use modular\common\Dispatcher;
 use modular\common\models\ModuleInit;
 use modular\resource\models\ActionsIndex;
 use yii\helpers\ArrayHelper;
@@ -13,13 +15,15 @@ use yii\helpers\ArrayHelper;
  * Class Resource
  * Приложение модулей веб-ресурсов системы управления.
  *
- * @package resource
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
+ * @package modular\resource
  */
 final class Application extends \modular\common\Application
 {
 
 
+    /**
+     * {@inheritdoc}
+     */
     public function behaviors()
     {
         return ArrayHelper::merge(
@@ -32,7 +36,12 @@ final class Application extends \modular\common\Application
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\HttpException
+     * @throws \yii\web\NotFoundHttpException
      */
     public function bootstrap()
     {
@@ -43,8 +52,8 @@ final class Application extends \modular\common\Application
         $this->on(self::EVENT_AFTER_ACTION, function ($event) {
 
             // отправляет все уведомления ресурса
-            if (Dispatcher::tracker() !== null) {
-                Dispatcher::tracker()->sendNotices();
+            if (\Yii::$app->controller->module->has('tracker')) {
+                \Yii::$app->controller->module->get('tracker')->sendNotices();
             }
             // сохраняет активность модулей веб-ресурсов там где это возможно
             /** @var \modular\resource\modules\_default\Module $module */

@@ -1,4 +1,7 @@
 <?php
+/**
+ * Copyright (c) 2018. Ghiya <ghiya@mikadze.me>
+ */
 
 namespace modular\common;
 
@@ -23,7 +26,6 @@ use yii\web\HttpException;
  * @property bool         $isBackend       read-only если выполняется приложение административных панелей
  *
  * @package modular\common
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class Application extends \yii\web\Application
 {
@@ -151,7 +153,6 @@ class Application extends \yii\web\Application
                 'isService'   => $moduleInit->isService,
                 'isResource'  => $moduleInit->isResource,
             ]);
-            var_dump($moduleInit->resourceAlias);die;
             // configure module
             if (file_exists($moduleInit->resourceAlias . '/config/config.php')) {
                 $configCommon = require($moduleInit->resourceAlias . '/config/config.php');

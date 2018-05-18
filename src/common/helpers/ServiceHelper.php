@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\common\helpers;
@@ -13,7 +13,6 @@ use yii\helpers\ArrayHelper;
  * Class ServiceHelper вспомогательный класс ресурсов и административных панелей.
  *
  * @package modular\common\helpers
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ServiceHelper extends Object
 {
@@ -30,7 +29,8 @@ class ServiceHelper extends Object
     {
         if (is_string($allowedIps)) {
             return self::_match($allowedIps);
-        } else {
+        }
+        else {
             if (ArrayHelper::isIndexed($allowedIps)) {
                 foreach ($allowedIps as $ip) {
                     if (self::_match($ip)) {

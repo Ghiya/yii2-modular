@@ -1,21 +1,24 @@
 <?php
 /**
- * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\resource\modules\_default;
+namespace modular\resource\modules;
+
+use modular\resource\components\Tracker;
 
 
 /**
- * Class Module базовый класс модуля веб-ресурса системы.
+ * Class Module
+ * Базовый класс модуля веб-ресурса системы.
  *
- * @property string $index          read-only идентификатор абонента в зависимости от выполняемого веб-ресурса
- * @property int    $trackerState   read-only общее количество всех новых уведомлений модуля
+ * @property string       $index          read-only идентификатор абонента в зависимости от выполняемого веб-ресурса
+ * @property int          $trackerState   read-only общее количество всех новых уведомлений модуля
+ * @property-read Tracker $tracker
  *
- * @package modular\resource\modules\_default
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
+ * @package modular\resource\modules
  */
-class Module extends \modular\common\modules\_default\Module
+abstract class Module extends \modular\common\modules\Module
 {
 
 

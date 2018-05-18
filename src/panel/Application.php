@@ -1,6 +1,9 @@
 <?php
+/**
+ * Copyright (c) 2018. Ghiya <ghiya@mikadze.me>
+ */
 
-namespace panel;
+namespace modular\panel;
 
 
 use modular\common\models\ModuleInit;
@@ -14,15 +17,18 @@ use yii\helpers\ArrayHelper;
  * @property array $panelItems   read-only массив элементов меню модулей веб-ресурсов системы
  * @property array $serviceItems read-only массив элементов меню компонентов системы
  *
- * @package panel
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
+ * @package modular\panel
  */
 final class Application extends \modular\common\Application
 {
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\HttpException
      */
     public function bootstrap()
     {

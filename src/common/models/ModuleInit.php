@@ -1,13 +1,12 @@
 <?php
 /**
- * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\common\models;
 
 
 use modular\common\Application;
-use modular\common\Dispatcher;
 use modular\common\modules\_default\Module;
 use modular\resource\models\ActionsIndex;
 use yii\base\ErrorException;
@@ -46,7 +45,6 @@ use yii\web\NotFoundHttpException;
  * @property ModuleInit     $relatedResource read-only запись ресурса для панели администрирования
  *
  * @package modular\common\models
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ModuleInit extends ActiveRecord
 {
@@ -301,10 +299,12 @@ class ModuleInit extends ActiveRecord
         if (!empty($url)) {
             if ($url->init->is_active) {
                 return $url->init;
-            } else {
+            }
+            else {
                 throw new NotFoundHttpException('Пакет для указанного URL неактивен.');
             }
-        } else {
+        }
+        else {
             throw new NotFoundHttpException('Пакет не зарегистрирован или URL неактивен.');
         }
     }
@@ -354,7 +354,8 @@ class ModuleInit extends ActiveRecord
         if (empty($this->_resource)) {
             if (\Yii::$app->hasModule($this->moduleId)) {
                 $this->_resource = \Yii::$app->getModule($this->moduleId);
-            } else {
+            }
+            else {
                 throw new ErrorException("Не удалось идентифицировать модуль `$this->moduleId` приложения `$this->section_id`");
             }
         }
@@ -371,10 +372,11 @@ class ModuleInit extends ActiveRecord
         if (empty($this->_moduleId)) {
             if ($this->isProvider) {
                 $this->_moduleId = "$this->section_id.$this->module_id";
-            } else {
-                $this->_moduleId = (Dispatcher::app()->isBackend) ? $this->module_id : $this->version;
             }
-            $this->_moduleId = (Dispatcher::app()->isBackend) ? $this->module_id : $this->version;
+            else {
+                $this->_moduleId = (\Yii::$app->isBackend) ? $this->module_id : $this->version;
+            }
+            $this->_moduleId = (\Yii::$app->isBackend) ? $this->module_id : $this->version;
         }
         return $this->_moduleId;
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (c) 2017 Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\common\helpers;

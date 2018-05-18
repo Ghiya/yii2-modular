@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 
@@ -8,8 +8,7 @@ namespace modular\resource\models;
 
 
 use modular\common\models\ModuleInit;
-use modular\panel\models\UserRole;
-use modular\resource\modules\_default\Module;
+use modular\resource\modules\Module;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -160,10 +159,8 @@ class ActionsIndex extends ActiveRecord implements Linkable
                     /** @var ActionsIndex $model */
                     return \Yii::$app->formatter->asDatetime($model->created_at, "php:H:i:s");
                 },
-                'user_ip'     => (\Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA)) ?
-                    'user_ip' : new UnsetArrayValue(),
-                'user_agent'  => (\Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA)) ?
-                    'user_agent' : new UnsetArrayValue(),
+                'user_ip'     => 'user_ip',
+                'user_agent'  => 'user_agent',
             ]
         );
     }
@@ -251,7 +248,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
      */
     public function viewFields()
     {
-        return ArrayHelper::merge(
+        return
             [
                 [
                     'label'  => "Дата",
@@ -304,22 +301,17 @@ class ActionsIndex extends ActiveRecord implements Linkable
                         return $rendered;
                     },
                 ],
-            ],
-            \Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA) ?
                 [
-                    [
-                        'label'  => "IP",
-                        'format' => 'html',
-                        'value'  => $this->user_ip,
-                    ],
-                    [
-                        'label'  => "Веб-агент",
-                        'format' => 'html',
-                        'value'  => $this->user_agent,
-                    ],
-                ] :
-                []
-        );
+                    'label'  => "IP",
+                    'format' => 'html',
+                    'value'  => $this->user_ip,
+                ],
+                [
+                    'label'  => "Веб-агент",
+                    'format' => 'html',
+                    'value'  => $this->user_agent,
+                ],
+            ];
     }
 
 

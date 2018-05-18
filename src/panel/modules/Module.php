@@ -1,12 +1,10 @@
 <?php
 /**
- * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\panelmodules\_default;
+namespace modular\panel\modules;
 
-use modular\modular\commonDispatcher;
-use modular\panelmodels\UserRole;
 use yii\helpers\ArrayHelper;
 
 
@@ -16,10 +14,9 @@ use yii\helpers\ArrayHelper;
  * @property array $panelItems     массив элементов меню панели администрирования модуля
  * @property array $state          read-only данные статуса соединения провайдера с внешним сервисом
  *
- * @package modular\panelmodules\_default
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
+ * @package modular\panel\modules
  */
-class Module extends \modular\modular\commonmodules\_default\Module
+class Module extends \modular\common\modules\Module
 {
 
 
@@ -27,49 +24,6 @@ class Module extends \modular\modular\commonmodules\_default\Module
      * @var array $_panelItems
      */
     private $_panelItems = [];
-
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        parent::init();
-        // меню администрирования
-        if (\Yii::$app->user->can(UserRole::PM_ACCESS_LOGS) && $this->isProvider ) {
-            $this->panelItems = [
-                [
-                    'label'   => '<span class="pull-left"><i class="fa fa-code"></i></span><span class="pull-right">Логи запросов</span>',
-                    'url'     => ['/modules.logs/' . $this->id],
-                    'encode'  => false,
-                    'active'  => (boolean)preg_match("/modules.logs\/" . $this->id . "/i", \Yii::$app->request->url),
-                    'options' => ['class' => 'clearfix', 'data' => ['spinner' => 'true']],
-                ],
-            ];
-        }
-        if (\Yii::$app->user->can(UserRole::PM_ACCESS_TRACKS) && $this->isResource ) {
-            $this->panelItems = [
-                [
-                    'label'   => '<span class="pull-left"><i class="fa fa-envelope"></i></span><span class="pull-right">Уведомления</span>',
-                    'url'     => ['/modules.tracks/' . $this->id],
-                    'encode'  => false,
-                    'active'  => (boolean)preg_match("/modules.tracks\/" . $this->id . "/i", \Yii::$app->request->url),
-                    'options' => ['class' => 'clearfix', 'data' => ['spinner' => 'true']],
-                ],
-            ];
-        }
-        if (\Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA) && $this->isResource) {
-            $this->panelItems = [
-                [
-                    'label'   => '<span class="pull-left"><i class="fa fa-eye"></i></span><span class="pull-right">Активность</span>',
-                    'url'     => ['/' . $this->id . '/actions'],
-                    'encode'  => false,
-                    'active'  => (boolean)preg_match("/" . $this->id . "\/actions/i", \Yii::$app->request->url),
-                    'options' => ['class' => 'clearfix', 'data' => ['spinner' => 'true']],
-                ],
-            ];
-        }
-    }
 
 
     /**
@@ -152,7 +106,7 @@ class Module extends \modular\modular\commonmodules\_default\Module
      */
     public function getState()
     {
-        if (!empty($this->stateData())) {
+        if ($this->stateData() !== null) {
             if (time() < $this->stateTimestamp() + \Yii::$app->params['providerStateExpires']) {
                 return [
                     $this->stateData(),
@@ -168,7 +122,8 @@ class Module extends \modular\modular\commonmodules\_default\Module
                 $stateData,
                 $timestamp,
             ];
-        } else {
+        }
+        else {
             \Yii::error('Отсутствуют данные активности соединения для модуля `' . $this->id . '`', __METHOD__);
             return [];
         }

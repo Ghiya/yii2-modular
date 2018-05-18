@@ -7,7 +7,7 @@ namespace modular\common;
 
 
 use modular\common\models\ModuleInit;
-use modular\common\modules\_default\Module;
+use modular\common\modules\Module;
 use yii\base\ErrorException;
 use yii\helpers\ArrayHelper;
 use yii\log\FileTarget;

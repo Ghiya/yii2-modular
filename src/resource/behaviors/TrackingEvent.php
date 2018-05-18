@@ -1,6 +1,6 @@
 <?php
 
-namespace resource\behaviors;
+namespace modular\resource\behaviors;
 
 
 use yii\base\Event;
@@ -9,7 +9,7 @@ use yii\base\Event;
 /**
  * Class TrackingEvent событие с параметрами и данными нового уведомления веб-ресурса.
  *
- * @package resource\behaviors
+ * @package modular\resource\behaviors
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class TrackingEvent extends Event

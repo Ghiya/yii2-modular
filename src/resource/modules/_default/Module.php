@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace resource\modules\_default;
+namespace modular\resource\modules\_default;
 
 
 /**
@@ -12,10 +12,10 @@ namespace resource\modules\_default;
  * @property string $index          read-only идентификатор абонента в зависимости от выполняемого веб-ресурса
  * @property int    $trackerState   read-only общее количество всех новых уведомлений модуля
  *
- * @package resource\modules\_default
+ * @package modular\resource\modules\_default
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
-class Module extends \common\modules\_default\Module
+class Module extends \modular\common\modules\_default\Module
 {
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace common\helpers;
+namespace modular\common\helpers;
 
 
 use yii\base\Object;
@@ -14,7 +14,7 @@ use yii\helpers\Html;
  * @property string $result read-only результат выполненной миграции
  * @property array  $log    read-only массив сообщений об ошибках
  *
- * @package common\helpers
+ * @package modular\common\helpers
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  * @version v1.0
  *

@@ -3,21 +3,21 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace common;
+namespace modular\common;
 
 
-use common\modules\_default\Module;
-use common\services\billing\interfaces\BillingInterface;
-use common\services\billing\Subscriber;
-use common\services\smsc\interfaces\SmscInterface;
-use resource\components\Tracker;
+use modular\common\modules\_default\Module;
+use modular\common\services\billing\interfaces\BillingInterface;
+use modular\common\services\billing\Subscriber;
+use modular\common\services\smsc\interfaces\SmscInterface;
+use modular\resource\components\Tracker;
 use yii\base\ErrorException;
 use yii\web\IdentityInterface;
 
 /**
  * Class Dispatcher singleton для доступа ресурсов к постоянно используемым системным объектам.
  *
- * @package common
+ * @package modular\common
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 final class Dispatcher
@@ -72,7 +72,7 @@ final class Dispatcher
     /**
      * Возвращает объект выполняемого приложения.
      *
-     * @return \yii\console\Application|\yii\web\Application|\panel\Application|\resource\Application
+     * @return \yii\console\Application|\yii\web\Application|\modular\panel\Application|\modular\resource\Application
      */
     public static function app()
     {

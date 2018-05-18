@@ -2,7 +2,7 @@
 /**
  * @copyright (c) 2014-2017 ООО "Глобал Телеком". Все права защищены.
  */
-namespace common;
+namespace modular\common;
 
 use Yii;
 use yii\base\Component;
@@ -12,7 +12,7 @@ use yii\helpers\Html;
 /**
  * Class Core сервисный компонент вспомогательных методов
  *
- * @package common
+ * @package modular\common
  * @author  Mikadze Ghiya <gmikadze@v-tell.com>
  */
 class Log extends Component {

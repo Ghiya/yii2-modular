@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace panel\behaviors;
+namespace modular\panel\behaviors;
 
 
 use yii\base\Behavior;
@@ -36,7 +36,7 @@ use yii\db\BaseActiveRecord;
  *
  * @property BaseActiveRecord $owner
  *
- * @package panel\behaviors
+ * @package modular\panel\behaviors
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class SafeDeleteBehavior extends Behavior

@@ -3,7 +3,7 @@
 namespace panel;
 
 
-use common\models\ModuleInit;
+use modular\common\models\ModuleInit;
 use yii\helpers\ArrayHelper;
 
 
@@ -17,7 +17,7 @@ use yii\helpers\ArrayHelper;
  * @package panel
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
-final class Application extends \common\Application
+final class Application extends \modular\common\Application
 {
 
 

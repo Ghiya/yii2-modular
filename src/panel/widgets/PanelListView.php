@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2014-2017 ООО "Глобал Телеком". Все права защищены.
  */
 
-namespace panel\widgets;
+namespace modular\panel\widgets;
 
 
 use yii\data\BaseDataProvider;
@@ -18,7 +18,7 @@ use yii\widgets\ListView;
  *
  * @property BaseDataProvider $dataProvider
  *
- * @package panel\widgets
+ * @package modular\panel\widgets
  * @author  Ghiya Mikadze<gmikadze@v-tell.ru>
  */
 class PanelListView extends ListView

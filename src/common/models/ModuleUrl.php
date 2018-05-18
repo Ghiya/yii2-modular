@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace modular\common\models;
 
 
 use yii\behaviors\TimestampBehavior;
@@ -18,7 +18,7 @@ use yii\db\ActiveRecord;
  * @property int    $created_at
  * @property ModuleInit $init read-only
  *
- * @package common\models
+ * @package modular\common\models
  * @author  Ghiya Mikadze <gmikadze@v-tell.com>
  */
 class ModuleUrl extends ActiveRecord
@@ -30,7 +30,7 @@ class ModuleUrl extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'common__v1_urls';
+        return 'modular\common__v1_urls';
     }
 
 

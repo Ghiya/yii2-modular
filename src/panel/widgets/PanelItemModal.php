@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2014-2017 ООО "Глобал Телеком". Все права защищены
  */
 
-namespace panel\widgets;
+namespace modular\panel\widgets;
 
 
 use yii\base\Widget;
@@ -20,7 +20,7 @@ use yii\widgets\Pjax;
  * @property string $shortDescriptionLink read-only HTML ссылка в списке элементов с коротким описанием
  * @property string $fullDescriptionLink  read-only HTML ссылка в списке элементов с полным описанием
  *
- * @package panel\widgets
+ * @package modular\panel\widgets
  * @author  Ghiya Mikadze <gmikadze@v-tell.com>
  */
 class PanelItemModal extends Widget

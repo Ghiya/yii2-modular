@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace modular\common\models;
 
 
 use yii\base\Model;
@@ -9,7 +9,7 @@ use yii\base\Model;
 /**
  * Class ResourceSwitch
  *
- * @package common\models
+ * @package modular\common\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ResourceSwitch extends Model

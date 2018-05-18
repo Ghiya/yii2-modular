@@ -4,7 +4,7 @@
  */
 
 
-namespace panel\widgets\dashboard;
+namespace modular\panel\widgets\dashboard;
 
 
 use yii\base\Widget;
@@ -14,13 +14,13 @@ use yii\helpers\UnsetArrayValue;
 
 /**
  * Class ResourcesList
- * @package panel\widgets\dashboard
+ * @package modular\panel\widgets\dashboard
  */
 class ResourcesList extends Widget
 {
 
 
-    public $viewPath = '@panel/widgets/dashboard/views';
+    public $viewPath = '@modular/panel/widgets/dashboard/views';
 
 
     /**

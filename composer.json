@@ -15,9 +15,7 @@
   },
   "autoload": {
     "psr-4": {
-      "common\\": "src/common",
-      "panel\\": "src/panel",
-      "resource\\": "src/resource"
+      "modular\\": "src/"
     }
   },
   "require-dev": {

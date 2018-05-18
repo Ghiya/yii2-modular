@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace common\modules\_default;
+namespace modular\common\modules\_default;
 
 
 /**
@@ -12,7 +12,7 @@ namespace common\modules\_default;
  * @property string $safeId         read-only идентификатор модуля с заменой символа `.`
  * @property string $strictId       read-only идентификатор модуля без указания папки расположения
  *
- * @package common\modules\_default
+ * @package modular\common\modules\_default
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 abstract class Module extends \yii\base\Module

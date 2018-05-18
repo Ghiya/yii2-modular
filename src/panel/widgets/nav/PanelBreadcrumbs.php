@@ -1,6 +1,6 @@
 <?php
 
-namespace panel\widgets\nav;
+namespace modular\panel\widgets\nav;
 
 
 use yii\widgets\Breadcrumbs;
@@ -9,7 +9,7 @@ use yii\widgets\Breadcrumbs;
 /**
  * Class PanelBreadcrumbs
  *
- * @package panel\widgets\nav
+ * @package modular\panel\widgets\nav
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class PanelBreadcrumbs extends Breadcrumbs

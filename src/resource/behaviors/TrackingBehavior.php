@@ -1,10 +1,10 @@
 <?php
 
-namespace resource\behaviors;
+namespace modular\resource\behaviors;
 
 
-use common\Dispatcher;
-use resource\modules\_default\Module;
+use modular\common\Dispatcher;
+use modular\resource\modules\_default\Module;
 use yii\base\Behavior;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;

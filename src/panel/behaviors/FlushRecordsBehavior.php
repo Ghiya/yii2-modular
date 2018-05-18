@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace panel\behaviors;
+namespace modular\panel\behaviors;
 
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;
@@ -19,7 +19,7 @@ use yii\web\Controller;
  *
  * @property ActiveRecord $owner
  *
- * @package panel\behaviors
+ * @package modular\panel\behaviors
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class FlushRecordsBehavior extends Behavior

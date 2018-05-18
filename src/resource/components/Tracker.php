@@ -3,13 +3,13 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace resource\components;
+namespace modular\resource\components;
 
 
-use common\Dispatcher;
-use common\models\ModuleInit;
-use resource\modules\_default\Module;
-use panel\modules\tracks\models\Track;
+use modular\common\Dispatcher;
+use modular\common\models\ModuleInit;
+use modular\resource\modules\_default\Module;
+use modular\panel\modules\tracks\models\Track;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -28,7 +28,7 @@ use yii\swiftmailer\Mailer;
  * @property string          $moduleVersion  read-only версия модуля
  * @property string          $moduleTitle    read-only название модуля
  *
- * @package resource\components
+ * @package modular\resource\components
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class Tracker extends Component
@@ -105,8 +105,8 @@ class Tracker extends Component
         return \Yii::createObject([
             'class'            => 'yii\swiftmailer\Mailer',
             'useFileTransport' => false,
-            'htmlLayout'       => '@resource/mail/layouts/html',
-            'textLayout'       => '@resource/mail/layouts/text',
+            'htmlLayout'       => '@modular/resource/mail/layouts/html',
+            'textLayout'       => '@modular/resource/mail/layouts/text',
         ]);
     }
 
@@ -289,15 +289,15 @@ class Tracker extends Component
     {
         switch ($priority) {
             case Track::PRIORITY_WARNING :
-                return '@resource/mail/tracker/warning-html';
+                return '@modular/resource/mail/tracker/warning-html';
                 break;
 
             case Track::PRIORITY_NOTICE :
-                return '@resource/mail/tracker/notice-html';
+                return '@modular/resource/mail/tracker/notice-html';
                 break;
 
             default :
-                return '@resource/mail/tracker/notice-html';
+                return '@modular/resource/mail/tracker/notice-html';
                 break;
         }
     }

@@ -1,9 +1,9 @@
 <?php
 
-namespace panel\widgets\nav;
+namespace modular\panel\widgets\nav;
 
 
-use panel\models\UserRole;
+use modular\panel\models\UserRole;
 use yii\bootstrap\Nav;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -13,7 +13,7 @@ use yii\helpers\Url;
  *
  * Class Nav виджет меню навигационной панели административного приложения системы.
  *
- * @package panel\widgets\nav
+ * @package modular\panel\widgets\nav
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class PanelNav extends Nav

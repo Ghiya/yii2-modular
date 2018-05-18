@@ -4,7 +4,7 @@
  */
 
 use yii\web\View;
-use panel\modules\_default\Module;
+use modular\panel\modules\_default\Module;
 use yii\helpers\Html;
 
 /** @var View $this */

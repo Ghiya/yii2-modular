@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace common\helpers;
+namespace modular\common\helpers;
 
 
 use yii\base\Object;
@@ -12,7 +12,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Class ServiceHelper вспомогательный класс ресурсов и административных панелей.
  *
- * @package common\helpers
+ * @package modular\common\helpers
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ServiceHelper extends Object

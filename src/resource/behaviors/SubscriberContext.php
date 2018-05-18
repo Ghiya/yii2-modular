@@ -3,12 +3,12 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace resource\behaviors;
+namespace modular\resource\behaviors;
 
 
-use resource\modules\_default\Module;
-use common\services\billing\Subscriber;
-use resource\Application;
+use modular\resource\modules\_default\Module;
+use modular\common\services\billing\Subscriber;
+use modular\resource\Application;
 use yii\base\Behavior;
 use yii\helpers\ArrayHelper;
 
@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property Module $owner
  *
- * @package resource\behaviors
+ * @package modular\resource\behaviors
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class SubscriberContext extends Behavior
@@ -97,7 +97,7 @@ class SubscriberContext extends Behavior
 
     /**
      * Производит идентификацию абонента при событии [[Application::EVENT_IDENTIFY]].
-     * > Note: Функционал используется только в приложении веб-ресурсов [[\resource\Application]].
+     * > Note: Функционал используется только в приложении веб-ресурсов [[\modular\resource\Application]].
      *
      * @param $event
      */

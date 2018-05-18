@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2017 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace common\helpers;
+namespace modular\common\helpers;
 
 
 use DOMDocument;
@@ -16,7 +16,7 @@ use yii\helpers\Json;
 /**
  * Class ResourceHelper объект вспомогательных методов системы управления ресурсами
  *
- * @package common\helpers
+ * @package modular\common\helpers
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ResourceHelper extends Object

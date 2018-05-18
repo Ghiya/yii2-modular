@@ -4,7 +4,7 @@
  */
 
 
-namespace resource\behaviors;
+namespace modular\resource\behaviors;
 
 
 use yii\base\Event;
@@ -12,7 +12,7 @@ use yii\base\Event;
 /**
  * Class SubscriberContextEvent
  *
- * @package resource\behaviors
+ * @package modular\resource\behaviors
  */
 class SubscriberContextEvent extends Event
 {

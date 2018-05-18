@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace panel\widgets\resource;
+namespace modular\panel\widgets\resource;
 
 
 use yii\base\Widget;
@@ -14,7 +14,7 @@ use yii\helpers\Html;
  * Class ItemPropertyDescription виджет расширенного описания аттрибута модели элемента списка панели администрирования
  * веб-ресурса через отображение `bootstrap popover`.
  *
- * @package panel\widgets\resource
+ * @package modular\panel\widgets\resource
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ItemPropertyDescription extends Widget

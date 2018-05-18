@@ -4,12 +4,12 @@
  */
 
 
-namespace resource\models;
+namespace modular\resource\models;
 
 
-use common\models\ModuleInit;
-use panel\models\UserRole;
-use resource\modules\_default\Module;
+use modular\common\models\ModuleInit;
+use modular\panel\models\UserRole;
+use modular\resource\modules\_default\Module;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -36,7 +36,7 @@ use yii\web\Linkable;
  * @property ModuleInit $resource     read-only
  * @property string     $subscriberId read-only
  *
- * @package resource\models
+ * @package modular\resource\models
  */
 class ActionsIndex extends ActiveRecord implements Linkable
 {
@@ -192,7 +192,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
             $links[] = [
                 'subscriber' => Url::to(
                     [
-                        '/' . \common\Application::SERVICES_ID . '.billing/subscribers/view',
+                        '/' . \modular\common\Application::SERVICES_ID . '.billing/subscribers/view',
                         'id' => $this->index
                     ], true
                 ),
@@ -264,7 +264,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
                     'value'  => !empty($this->index) ?
                         Html::a(
                             $this->index,
-                            ["/" . \common\Application::SERVICES_ID . ".billing/subscribers/view?id=" . $this->index],
+                            ["/" . \modular\common\Application::SERVICES_ID . ".billing/subscribers/view?id=" . $this->index],
                             [
                                 'class' => 'font-book revert red',
                                 'data'  => ['spinner' => 'true',],

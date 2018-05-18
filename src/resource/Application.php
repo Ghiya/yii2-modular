@@ -3,9 +3,9 @@
 namespace resource;
 
 
-use common\Dispatcher;
-use common\models\ModuleInit;
-use resource\models\ActionsIndex;
+use modular\common\Dispatcher;
+use modular\common\models\ModuleInit;
+use modular\resource\models\ActionsIndex;
 use yii\helpers\ArrayHelper;
 
 
@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
  * @package resource
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
-final class Application extends \common\Application
+final class Application extends \modular\common\Application
 {
 
 
@@ -25,7 +25,7 @@ final class Application extends \common\Application
         return ArrayHelper::merge(
             parent::behaviors(),
             [
-                'resource\behaviors\SubscriberContext',
+                'modular\resource\behaviors\SubscriberContext',
             ]
         );
     }
@@ -47,7 +47,7 @@ final class Application extends \common\Application
                 Dispatcher::tracker()->sendNotices();
             }
             // сохраняет активность модулей веб-ресурсов там где это возможно
-            /** @var \resource\modules\_default\Module $module */
+            /** @var \modular\resource\modules\_default\Module $module */
             $module = $event->sender->controller->module;
             if ($module->hasMethod('shouldIndexAction') && $module->shouldIndexAction()) {
                 ActionsIndex::add($module);

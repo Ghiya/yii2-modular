@@ -4,7 +4,7 @@
  */
 
 
-namespace resource\behaviors;
+namespace modular\resource\behaviors;
 
 
 use yii\base\Behavior;
@@ -14,7 +14,7 @@ use yii\base\Model;
 /**
  * Class IdentityBehavior
  *
- * @package resource\behaviors
+ * @package modular\resource\behaviors
  */
 class IdentityBehavior extends Behavior
 {

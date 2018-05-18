@@ -3,7 +3,7 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-use panel\modules\_default\Module;
+use modular\panel\modules\_default\Module;
 use yii\helpers\Html;
 use yii\web\View;
 

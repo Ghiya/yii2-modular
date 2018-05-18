@@ -3,13 +3,13 @@
  * @copyright Copyright (c) 2017. Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace common\models;
+namespace modular\common\models;
 
 
-use common\Application;
-use common\Dispatcher;
-use common\modules\_default\Module;
-use resource\models\ActionsIndex;
+use modular\common\Application;
+use modular\common\Dispatcher;
+use modular\common\modules\_default\Module;
+use modular\resource\models\ActionsIndex;
 use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -45,7 +45,7 @@ use yii\web\NotFoundHttpException;
  * @property ActionsIndex[] $actions         read-only массив моделей записей действий абонента
  * @property ModuleInit     $relatedResource read-only запись ресурса для панели администрирования
  *
- * @package common\models
+ * @package modular\common\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ModuleInit extends ActiveRecord
@@ -87,7 +87,7 @@ class ModuleInit extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'common__v1_resources';
+        return 'modular\common__v1_resources';
     }
 
 

@@ -4,7 +4,7 @@
  */
 
 
-namespace panel\widgets\nav;
+namespace modular\panel\widgets\nav;
 
 
 use yii\bootstrap\NavBar;
@@ -13,7 +13,7 @@ use yii\helpers\Html;
 /**
  * Class PanelNavBar виджет навигационной панели административного приложения системы.
  *
- * @package panel\widgets\nav
+ * @package modular\panel\widgets\nav
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class PanelNavBar extends NavBar

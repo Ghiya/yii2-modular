@@ -4,7 +4,7 @@
  */
 
 
-namespace common\models;
+namespace modular\common\models;
 
 
 use yii\db\ActiveRecord;
@@ -17,7 +17,7 @@ use yii\db\ActiveRecord;
  * @property string $link
  * @property int    $valid_till
  *
- * @package common\models
+ * @package modular\common\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ShortLink extends ActiveRecord
@@ -33,7 +33,7 @@ class ShortLink extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'common__v1_links';
+        return 'modular\common__v1_links';
     }
 
     /**

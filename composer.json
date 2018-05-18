@@ -13,6 +13,13 @@
   "require": {
     "php": ">=5.4.0"
   },
+  "autoload": {
+    "psr-4": {
+      "common\\": "src/common",
+      "panel\\": "src/panel",
+      "resource\\": "src/resource"
+    }
+  },
   "require-dev": {
     "yiisoft/yii2": "2.0.15",
     "codeception/codeception": "*",

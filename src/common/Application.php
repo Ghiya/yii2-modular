@@ -76,16 +76,16 @@ class Application extends \yii\web\Application
     /**
      * @inheritdoc
      */
-    public function __construct($config = [])
+    /*public function __construct($config = [])
     {
         parent::__construct(
             ArrayHelper::merge(
-                require(__DIR__ . '/config/main.php'),
-                require(__DIR__ . '/config/main-local.php'),
+                require($this->basePath . 'common/config/main.php'),
+                require($this->basePath . '/config/main-local.php'),
                 (array)$config
             )
         );
-    }
+    }*/
 
 
     /**

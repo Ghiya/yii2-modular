@@ -1,0 +1,42 @@
+# yii console commands
+/yii
+/yii_test
+/yii_test.bat
+init
+init.bat
+yii.php
+
+# phpstorm project files
+.idea
+
+# windows thumbnail cache
+Thumbs.db
+
+# composer vendor dir
+/vendor
+
+# composer itself is not needed
+composer.phar
+composer.lock
+
+# Mac DS_Store Files
+.DS_Store
+
+# phpunit itself is not needed
+phpunit.phar
+
+# local phpunit config
+/phpunit.xml
+
+# vagrant runtime
+/.vagrant
+
+#common files
+*-local.php
+*.map
+.crunch
+*.txt
+!robots.txt
+*.ico
+*.yml
+*.bat

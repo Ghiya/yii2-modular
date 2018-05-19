@@ -1,14 +1,14 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\common\models;
 
 
-use modular\common\Application;
-use modular\common\modules\_default\Module;
-use modular\resource\models\ActionsIndex;
+use common\Application;
+use modular\common\modules\Module;
+use resource\models\ActionsIndex;
 use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -85,7 +85,7 @@ class ModuleInit extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'modular\common__v1_resources';
+        return 'common__v1_resources';
     }
 
 
@@ -374,9 +374,9 @@ class ModuleInit extends ActiveRecord
                 $this->_moduleId = "$this->section_id.$this->module_id";
             }
             else {
-                $this->_moduleId = (\Yii::$app->isBackend) ? $this->module_id : $this->version;
+                $this->_moduleId = (Dispatcher::app()->isBackend) ? $this->module_id : $this->version;
             }
-            $this->_moduleId = (\Yii::$app->isBackend) ? $this->module_id : $this->version;
+            $this->_moduleId = (Dispatcher::app()->isBackend) ? $this->module_id : $this->version;
         }
         return $this->_moduleId;
     }

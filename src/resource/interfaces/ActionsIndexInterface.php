@@ -1,17 +1,18 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 
-namespace modular\resource\interfaces;
+namespace resource\interfaces;
 
 
 /**
  * Interface ActionsIndexInterface
- * Интерфейс модуля веб-ресурса с поддержкой индексации действий пользователя.
+ * интерфейс модуля ресурса с поддержкой индексации действий пользователя
  *
- * @package modular\resource\interfaces
+ * @package resource\interfaces
+ * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 interface ActionsIndexInterface
 {

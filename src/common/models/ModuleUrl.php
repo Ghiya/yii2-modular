@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\common\models;
@@ -32,7 +32,7 @@ class ModuleUrl extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'modular\common__v1_urls';
+        return 'common__v1_urls';
     }
 
 

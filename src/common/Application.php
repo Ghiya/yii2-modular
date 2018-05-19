@@ -1,13 +1,13 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\common;
+namespace common;
 
 
-use modular\common\models\ModuleInit;
-use modular\common\modules\Module;
+use common\models\ModuleInit;
+use common\modules\_default\Module;
 use yii\base\ErrorException;
 use yii\helpers\ArrayHelper;
 use yii\log\FileTarget;
@@ -25,7 +25,8 @@ use yii\web\HttpException;
  * @property ModuleInit[] $resourceBundles read-only массив моделей параметров модулей веб-ресурсов системы
  * @property bool         $isBackend       read-only если выполняется приложение административных панелей
  *
- * @package modular\common
+ * @package common
+ * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class Application extends \yii\web\Application
 {
@@ -52,7 +53,7 @@ class Application extends \yii\web\Application
     /**
      * @const string SERVICE_INTERFACE
      */
-    const SERVICE_INTERFACE = 'modular\common\services\ServicesInterface';
+    const SERVICE_INTERFACE = 'common\services\ServicesInterface';
 
 
     /**
@@ -76,16 +77,16 @@ class Application extends \yii\web\Application
     /**
      * @inheritdoc
      */
-    /*public function __construct($config = [])
+    public function __construct($config = [])
     {
         parent::__construct(
             ArrayHelper::merge(
-                require($this->basePath . 'common/config/main.php'),
-                require($this->basePath . '/config/main-local.php'),
+                require(__DIR__ . '/config/main.php'),
+                require(__DIR__ . '/config/main-local.php'),
                 (array)$config
             )
         );
-    }*/
+    }
 
 
     /**
@@ -101,9 +102,9 @@ class Application extends \yii\web\Application
             [
                 'authManager' => [
                     'class'          => 'yii\rbac\PhpManager',
-                    'assignmentFile' => '@modular\common/rbac/assignments.php',
-                    'itemFile'       => '@modular\common/rbac/items.php',
-                    'ruleFile'       => '@modular\common/rbac/rules.php',
+                    'assignmentFile' => '@common/rbac/assignments.php',
+                    'itemFile'       => '@common/rbac/items.php',
+                    'ruleFile'       => '@common/rbac/rules.php',
                 ],
                 'cache'       => [
                     'class' => 'yii\caching\FileCache',
@@ -129,9 +130,8 @@ class Application extends \yii\web\Application
      *
      * @param ModuleInit $moduleInit модель параметров модуля
      *
-     * @throws ErrorException
-     * @throws HttpException
-     * @throws \yii\base\InvalidConfigException
+     * @throws HttpException если не удалось определить идентификатор модуля
+     * @throws ErrorException если регистрируемый модуль не определён
      */
     public function registerModule(ModuleInit $moduleInit)
     {
@@ -140,8 +140,8 @@ class Application extends \yii\web\Application
             // init module
             $defaultModuleClass =
                 $this->isBackend ?
-                    'modular\panel\modules\_default\Module' :
-                    'modular\resource\modules\_default\Module';
+                    'panel\modules\_default\Module' :
+                    'resource\modules\_default\Module';
             $this->setModule($moduleInit->moduleId, [
                 'class'       =>
                     file_exists($moduleInit->resourceAlias . '/Module.php') ?
@@ -181,14 +181,14 @@ class Application extends \yii\web\Application
                 // init module logs
                 \Yii::$app->log->targets[] = new FileTarget([
                     'logFile'        => !empty($moduleInit->version) ?
-                        '@modular\common/logs/'
+                        '@common/logs/'
                         . $moduleInit->section_id . '/'
                         . $moduleInit->module_id . '/'
                         . $moduleInit->version . '/'
                         . date("Y-m/d/")
                         . date("H")
                         . '.log' :
-                        '@modular\common/logs/'
+                        '@common/logs/'
                         . $moduleInit->section_id . '/'
                         . $moduleInit->module_id . '/'
                         . date("Y-m/d/")
@@ -212,15 +212,13 @@ class Application extends \yii\web\Application
                         $this->getModule($moduleInit->moduleId)->get('i18n')->translations
                     );
                 }
-            }
-            else {
+            } else {
                 throw new HttpException(
                     404,
                     'Отсутствует конфигурационный файл модуля с идентификатором `' . $moduleInit->moduleId . '`'
                 );
             }
-        }
-        else {
+        } else {
             throw new ErrorException('Регистрируемый модуль не определён.');
         }
     }

@@ -1,17 +1,18 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\panel;
 
 
+use common\Application;
 use modular\common\models\ModuleInit;
 use yii\helpers\ArrayHelper;
 
 
 /**
- * Class Panel
+ * Class PanelApplication
  * Приложение административных панелей ресурсов системы управления.
  *
  * @property array $panelItems   read-only массив элементов меню модулей веб-ресурсов системы
@@ -19,16 +20,12 @@ use yii\helpers\ArrayHelper;
  *
  * @package modular\panel
  */
-final class Application extends \modular\common\Application
+final class PanelApplication extends Application
 {
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\web\HttpException
+     * @inheritdoc
      */
     public function bootstrap()
     {

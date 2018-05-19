@@ -1,9 +1,9 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\panel\behaviors;
+namespace panel\behaviors;
 
 
 use yii\base\Behavior;
@@ -13,8 +13,7 @@ use yii\db\BaseActiveRecord;
 
 
 /**
- * Class SafeDeleteBehavior
- * Поведение модели с функционалом безопасного удаления записи.
+ * Class SafeDeleteBehavior поведение модели с функционалом безопасного удаления записи.
  *
  * > Note: Если существуют связанные модели необходимо прикрепить данное поведение к каждой из них.
  *
@@ -37,7 +36,8 @@ use yii\db\BaseActiveRecord;
  *
  * @property BaseActiveRecord $owner
  *
- * @package modular\panel\behaviors
+ * @package panel\behaviors
+ * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class SafeDeleteBehavior extends Behavior
 {
@@ -47,7 +47,6 @@ class SafeDeleteBehavior extends Behavior
      * @const int STATE_DEFAULT значение аттрибута триггера безопасного удаления если запись ещё не удалялась
      */
     const STATE_DEFAULT = 0;
-
 
     /**
      * @const int STATE_DELETED значение аттрибута триггера безопасного удаления если запись уже была удалена в корзину
@@ -99,8 +98,7 @@ class SafeDeleteBehavior extends Behavior
                 if ($this->owner->getAttribute($this->safeDeleteAttribute) === self::STATE_DEFAULT) {
                     $this->owner->updateAttributes([$this->safeDeleteAttribute => self::STATE_DELETED,]);
                     $event->isValid = false;
-                }
-                else {
+                } else {
                     $this->owner->updateAttributes([$this->safeDeleteAttribute => self::STATE_DEFAULT,]);
                     $event->isValid = true;
                 }

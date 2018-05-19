@@ -1,14 +1,15 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 
-namespace modular\resource\models;
+namespace resource\models;
 
 
-use modular\common\models\ModuleInit;
-use modular\resource\modules\Module;
+use common\models\ModuleInit;
+use panel\models\UserRole;
+use resource\modules\_default\Module;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -35,7 +36,7 @@ use yii\web\Linkable;
  * @property ModuleInit $resource     read-only
  * @property string     $subscriberId read-only
  *
- * @package modular\resource\models
+ * @package resource\models
  */
 class ActionsIndex extends ActiveRecord implements Linkable
 {
@@ -159,8 +160,10 @@ class ActionsIndex extends ActiveRecord implements Linkable
                     /** @var ActionsIndex $model */
                     return \Yii::$app->formatter->asDatetime($model->created_at, "php:H:i:s");
                 },
-                'user_ip'     => 'user_ip',
-                'user_agent'  => 'user_agent',
+                'user_ip'     => (\Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA)) ?
+                    'user_ip' : new UnsetArrayValue(),
+                'user_agent'  => (\Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA)) ?
+                    'user_agent' : new UnsetArrayValue(),
             ]
         );
     }
@@ -189,7 +192,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
             $links[] = [
                 'subscriber' => Url::to(
                     [
-                        '/' . \modular\common\Application::SERVICES_ID . '.billing/subscribers/view',
+                        '/' . \common\Application::SERVICES_ID . '.billing/subscribers/view',
                         'id' => $this->index
                     ], true
                 ),
@@ -248,7 +251,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
      */
     public function viewFields()
     {
-        return
+        return ArrayHelper::merge(
             [
                 [
                     'label'  => "Дата",
@@ -261,7 +264,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
                     'value'  => !empty($this->index) ?
                         Html::a(
                             $this->index,
-                            ["/" . \modular\common\Application::SERVICES_ID . ".billing/subscribers/view?id=" . $this->index],
+                            ["/" . \common\Application::SERVICES_ID . ".billing/subscribers/view?id=" . $this->index],
                             [
                                 'class' => 'font-book revert red',
                                 'data'  => ['spinner' => 'true',],
@@ -301,17 +304,22 @@ class ActionsIndex extends ActiveRecord implements Linkable
                         return $rendered;
                     },
                 ],
+            ],
+            \Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA) ?
                 [
-                    'label'  => "IP",
-                    'format' => 'html',
-                    'value'  => $this->user_ip,
-                ],
-                [
-                    'label'  => "Веб-агент",
-                    'format' => 'html',
-                    'value'  => $this->user_agent,
-                ],
-            ];
+                    [
+                        'label'  => "IP",
+                        'format' => 'html',
+                        'value'  => $this->user_ip,
+                    ],
+                    [
+                        'label'  => "Веб-агент",
+                        'format' => 'html',
+                        'value'  => $this->user_agent,
+                    ],
+                ] :
+                []
+        );
     }
 
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 
@@ -18,25 +18,23 @@ use yii\db\ActiveRecord;
  * @property int    $valid_till
  *
  * @package modular\common\models
+ * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ShortLink extends ActiveRecord
 {
-
 
     /**
      * @const int VALID_TILL_INTERVAL продолжительность действия ссылки
      */
     const VALID_TILL_INTERVAL = 172800;
 
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'modular\common__v1_links';
+        return 'common__v1_links';
     }
-
 
     /**
      * @inheritdoc
@@ -48,7 +46,6 @@ class ShortLink extends ActiveRecord
             ['link', 'required'],
         ];
     }
-
 
     /**
      * Добавляет ссылку и возвращает сформированный хэш.
@@ -67,12 +64,10 @@ class ShortLink extends ActiveRecord
                 $this->save(false);
             }
             return $this->hash;
-        }
-        else {
+        } else {
             return false;
         }
     }
-
 
     /**
      * Возвращает ссылку по указанному хешу.
@@ -86,7 +81,6 @@ class ShortLink extends ActiveRecord
         $model = static::find()->where(['hash' => $hash,])->filterWhere(['>', 'valid_till', time()])->one();
         return (!empty($model)) ? $model->link : '';
     }
-
 
     /**
      * @param string $hash

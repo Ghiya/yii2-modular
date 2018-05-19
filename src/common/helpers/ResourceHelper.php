@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\common\helpers;
@@ -9,7 +9,6 @@ namespace modular\common\helpers;
 use DOMDocument;
 use yii\base\Object;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\helpers\Json;
 
 
@@ -17,7 +16,6 @@ use yii\helpers\Json;
  * Class ResourceHelper объект вспомогательных методов системы управления ресурсами
  *
  * @package modular\common\helpers
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ResourceHelper extends Object
 {
@@ -28,10 +26,12 @@ class ResourceHelper extends Object
      */
     const DEBUG_PRINT_JSON = 'json';
 
+
     /**
      * @const string DEBUG_PRINT_XML
      */
     const DEBUG_PRINT_XML = 'xml';
+
 
     /**
      * @const string DEBUG_PRINT_PLAIN
@@ -152,40 +152,41 @@ class ResourceHelper extends Object
         if (ArrayHelper::isIndexed($array)) {
             // перебираем исходный массив
             for ($index = 0; $index < count($array); $index++) {
-                $currentIndexItem = $array[ $index ];
+                $currentIndexItem = $array[$index];
                 // если элемент не пуст, является ассоциативным массивом и существуют указанный ключ со значением
-                if (!empty($currentIndexItem) && !empty($currentIndexItem[ $key ]) && ArrayHelper::isAssociative($currentIndexItem)) {
+                if (!empty($currentIndexItem) && !empty($currentIndexItem[$key]) && ArrayHelper::isAssociative($currentIndexItem)) {
                     // если это первый из обрабатываемых элементов
                     if (empty($resultMapKey)) {
                         // если первое значение ключа stirng и не указано всегда индексировать, то приводим к string и создаём ассоциативный массив
                         // в остальных случая приводим к integer и создаём индексированный массив
-                        $currentIndexItemKeyCasted = (is_string($currentIndexItem[ $key ]) && !$alwaysIndex) ?
-                            settype($currentIndexItem[ $key ], "string") :
-                            settype($currentIndexItem[ $key ], "integer");
+                        $currentIndexItemKeyCasted = (is_string($currentIndexItem[$key]) && !$alwaysIndex) ?
+                            settype($currentIndexItem[$key], "string") :
+                            settype($currentIndexItem[$key], "integer");
                     } // для всех последующих элементов
                     else {
                         // если предыдущее значение ключа индексации string устанавливаем ключ ассоциативного массива результата
                         // иначе - устанавливаем индекс индексированного массива результата
                         $currentIndexItemKeyCasted = (is_string($resultMapKey) && !$alwaysIndex) ?
-                            settype($currentIndexItem[ $key ], "string") :
-                            settype($currentIndexItem[ $key ], "integer");
+                            settype($currentIndexItem[$key], "string") :
+                            settype($currentIndexItem[$key], "integer");
                     }
                     // если приведение типа произошло без ошибок
                     if ($currentIndexItemKeyCasted) {
-                        $resultMapKey = $currentIndexItem[ $key ];
+                        $resultMapKey = $currentIndexItem[$key];
                         // если в массиве результата элемент с текущим индексом не существует
                         // или не разрешено дописывание
-                        if (empty($resultMap[ $resultMapKey ]) || !$enablePush) {
+                        if (empty($resultMap[$resultMapKey]) || !$enablePush) {
                             // создаём новый элемент из элемента исходного массива или заменяем предыдущий элемент
-                            $resultMap[ $resultMapKey ] = $currentIndexItem;
-                        } else {
+                            $resultMap[$resultMapKey] = $currentIndexItem;
+                        }
+                        else {
                             // если элемент один, то есть это ассоциативный элемент исходного массива
                             // преобразуем элемент массива результата в индексный массив
-                            if (ArrayHelper::isAssociative($resultMap[ $resultMapKey ])) {
-                                $resultMap[ $resultMapKey ] = [$resultMap[ $resultMapKey ],];
+                            if (ArrayHelper::isAssociative($resultMap[$resultMapKey])) {
+                                $resultMap[$resultMapKey] = [$resultMap[$resultMapKey],];
                             }
                             // дописываем в результат элемент исходного массива
-                            $resultMap[ $resultMapKey ][] = $currentIndexItem;
+                            $resultMap[$resultMapKey][] = $currentIndexItem;
                         }
                     }
                 }
@@ -214,30 +215,30 @@ class ResourceHelper extends Object
                 $params = ArrayHelper::merge([
                     'value' => '',
                     'title' => '',
-                    'type' => self::DEBUG_PRINT_PLAIN,
+                    'type'  => self::DEBUG_PRINT_PLAIN,
                 ], $params);
 
-                if (!empty($params[ 'value' ])) {
+                if (!empty($params['value'])) {
 
-                    switch ($params[ 'type' ]) {
+                    switch ($params['type']) {
 
                         case self::DEBUG_PRINT_XML :
-                            $debugValue .= (!empty($params[ 'title' ])) ? "/** " . $params[ 'title' ] . " */\r\n\r\n" : "\r\n\r\n";
+                            $debugValue .= (!empty($params['title'])) ? "/** " . $params['title'] . " */\r\n\r\n" : "\r\n\r\n";
                             $dom = new DOMDocument();
-                            $dom->loadXML($params[ 'value' ]);
+                            $dom->loadXML($params['value']);
                             $dom->formatOutput = true;
                             $debugValue .= Html::encode($dom->saveXML());
                             break;
 
                         case self::DEBUG_PRINT_JSON :
-                            $debugValue .= (!empty($params[ 'title' ])) ? "/** " . $params[ 'title' ] . " */\r\n\r\n" : "\r\n\r\n";
+                            $debugValue .= (!empty($params['title'])) ? "/** " . $params['title'] . " */\r\n\r\n" : "\r\n\r\n";
                             $debugValue .= Html::encode(Json::encode($params['value'],
                                 JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
                             break;
 
                         case self::DEBUG_PRINT_PLAIN :
-                            $debugValue .= (!empty($params[ 'title' ])) ? "/** " . $params[ 'title' ] . " */\r\n\r\n" : "\r\n\r\n";
-                            $debugValue .= Html::encode($params[ 'value' ]);
+                            $debugValue .= (!empty($params['title'])) ? "/** " . $params['title'] . " */\r\n\r\n" : "\r\n\r\n";
+                            $debugValue .= Html::encode($params['value']);
                             break;
 
                         default :
@@ -245,10 +246,12 @@ class ResourceHelper extends Object
                     }
                 }
 
-            } elseif (is_string($params)) {
+            }
+            elseif (is_string($params)) {
                 $debugValue .= "/** */\r\n\r\n";
                 $debugValue .= Html::encode($params);
-            } else {
+            }
+            else {
                 ob_start();
                 var_dump($params);
                 $debugValue .= ob_get_clean();
@@ -260,7 +263,8 @@ class ResourceHelper extends Object
         if ($formatOutput) {
             echo $debugValue;
             return null;
-        } else {
+        }
+        else {
             return $debugValue;
         }
     }

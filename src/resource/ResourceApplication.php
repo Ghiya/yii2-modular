@@ -1,47 +1,40 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\resource;
 
 
+use common\Application;
 use modular\common\models\ModuleInit;
-use modular\resource\models\ActionsIndex;
+use resource\models\ActionsIndex;
 use yii\helpers\ArrayHelper;
 
 
 /**
- * Class Resource
+ * Class ResourceApplication
  * Приложение модулей веб-ресурсов системы управления.
  *
  * @package modular\resource
  */
-final class Application extends \modular\common\Application
+final class ResourceApplication extends Application
 {
 
 
-    /**
-     * {@inheritdoc}
-     */
     public function behaviors()
     {
         return ArrayHelper::merge(
             parent::behaviors(),
             [
-                'modular\resource\behaviors\SubscriberContext',
+                'resource\behaviors\SubscriberContext',
             ]
         );
     }
 
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \yii\base\ErrorException
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\web\HttpException
-     * @throws \yii\web\NotFoundHttpException
+     * @inheritdoc
      */
     public function bootstrap()
     {
@@ -56,7 +49,7 @@ final class Application extends \modular\common\Application
                 \Yii::$app->controller->module->get('tracker')->sendNotices();
             }
             // сохраняет активность модулей веб-ресурсов там где это возможно
-            /** @var \modular\resource\modules\_default\Module $module */
+            /** @var \modular\resource\modules\Module $module */
             $module = $event->sender->controller->module;
             if ($module->hasMethod('shouldIndexAction') && $module->shouldIndexAction()) {
                 ActionsIndex::add($module);

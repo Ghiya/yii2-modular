@@ -1,9 +1,9 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\panel\behaviors;
+namespace panel\behaviors;
 
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;
@@ -13,14 +13,14 @@ use yii\web\Controller;
 
 
 /**
- * Class FlushRecordsBehavior
- * Поведение контроллера для автоматического удаления устаревших записей согласно установленным параметрам очистки. При
- * событии [[\yii\web\Controller::EVENT_BEFORE_ACTION]] производит проверку на наличие подходящих записей и удаляет
- * найденные.
+ * Class FlushRecordsBehavior поведение контроллера для автоматического удаления устаревших записей согласно
+ * установленным параметрам очистки. При событии [[\yii\web\Controller::EVENT_BEFORE_ACTION]] производит проверку на
+ * наличие подходящих записей и удаляет найденные.
  *
  * @property ActiveRecord $owner
  *
- * @package modular\panel\behaviors
+ * @package panel\behaviors
+ * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class FlushRecordsBehavior extends Behavior
 {

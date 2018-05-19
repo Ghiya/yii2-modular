@@ -1,9 +1,11 @@
 <?php
 /**
- * Copyright (c) 2018. Ghiya Mikadze <ghiya@mikadze.me>
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
 namespace modular\common\modules;
+
+use modular\common\helpers\ArrayHelper;
 
 
 /**
@@ -72,9 +74,35 @@ abstract class Module extends \yii\base\Module
         if (preg_match("/\./i", $this->id)) {
             $aModuleId = explode(".", $this->id);
             return (string)array_pop($aModuleId);
-        } else {
+        }
+        else {
             return $this->id;
         }
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+        \Yii::configure($this, $this->getConfig());
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function getConfig()
+    {
+        return
+            file_exists(__DIR__ . '/config/config-local.php') ?
+                ArrayHelper::merge(
+                    require __DIR__ . '/config/config.php',
+                    require __DIR__ . '/config/config-local.php'
+                ) :
+                require __DIR__ . '/config/config.php';
     }
 
 }

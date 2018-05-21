@@ -6,7 +6,7 @@
 namespace modular\resource;
 
 
-use common\Application;
+use modular\common\Application;
 use modular\common\models\ModuleInit;
 use resource\models\ActionsIndex;
 use yii\helpers\ArrayHelper;
@@ -34,7 +34,12 @@ final class ResourceApplication extends Application
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\HttpException
+     * @throws \yii\web\NotFoundHttpException
      */
     public function bootstrap()
     {

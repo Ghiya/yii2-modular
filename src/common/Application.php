@@ -3,11 +3,11 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace common;
+namespace modular\common;
 
 
-use common\models\ModuleInit;
-use common\modules\_default\Module;
+use modular\common\models\ModuleInit;
+use modular\common\modules\Module;
 use yii\base\ErrorException;
 use yii\helpers\ArrayHelper;
 use yii\log\FileTarget;
@@ -26,7 +26,6 @@ use yii\web\HttpException;
  * @property bool         $isBackend       read-only если выполняется приложение административных панелей
  *
  * @package common
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class Application extends \yii\web\Application
 {
@@ -75,14 +74,16 @@ class Application extends \yii\web\Application
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct($config = [])
     {
         parent::__construct(
             ArrayHelper::merge(
-                require(__DIR__ . '/config/main.php'),
-                require(__DIR__ . '/config/main-local.php'),
+                ArrayHelper::merge(
+                    require(\Yii::getAlias('@common/config/main.php')),
+                    require(\Yii::getAlias('@common/config/main-local.php'))
+                ),
                 (array)$config
             )
         );
@@ -90,7 +91,7 @@ class Application extends \yii\web\Application
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      *
      * Добавляет в компоненты ядра приложения компоненты используемые по-умолчанию.
      *
@@ -130,8 +131,9 @@ class Application extends \yii\web\Application
      *
      * @param ModuleInit $moduleInit модель параметров модуля
      *
-     * @throws HttpException если не удалось определить идентификатор модуля
-     * @throws ErrorException если регистрируемый модуль не определён
+     * @throws ErrorException
+     * @throws HttpException
+     * @throws \yii\base\InvalidConfigException
      */
     public function registerModule(ModuleInit $moduleInit)
     {
@@ -212,13 +214,15 @@ class Application extends \yii\web\Application
                         $this->getModule($moduleInit->moduleId)->get('i18n')->translations
                     );
                 }
-            } else {
+            }
+            else {
                 throw new HttpException(
                     404,
                     'Отсутствует конфигурационный файл модуля с идентификатором `' . $moduleInit->moduleId . '`'
                 );
             }
-        } else {
+        }
+        else {
             throw new ErrorException('Регистрируемый модуль не определён.');
         }
     }

@@ -7,9 +7,9 @@
 namespace resource\models;
 
 
-use common\models\ModuleInit;
-use panel\models\UserRole;
-use resource\modules\_default\Module;
+use modular\common\models\ModuleInit;
+use modular\panel\models\UserRole;
+use modular\resource\modules\Module;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;

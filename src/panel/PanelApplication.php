@@ -6,7 +6,7 @@
 namespace modular\panel;
 
 
-use common\Application;
+use modular\common\Application;
 use modular\common\models\ModuleInit;
 use yii\helpers\ArrayHelper;
 
@@ -25,7 +25,11 @@ final class PanelApplication extends Application
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
+     * @throws \yii\base\ErrorException
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\HttpException
      */
     public function bootstrap()
     {

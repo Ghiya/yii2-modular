@@ -8,7 +8,7 @@ namespace modular\common\models;
 
 use modular\common\Application;
 use modular\common\modules\Module;
-use resource\models\ActionsIndex;
+use modular\resource\models\ActionsIndex;
 use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -21,28 +21,29 @@ use yii\web\NotFoundHttpException;
 /**
  * Class ModuleInit модель идентификационных параметров модуля ресурса системы управления.
  *
- * @property string         $section_id      расположение модуля
- * @property string         $module_id       идентификатор
- * @property string         $version         версия
- * @property string         $title           название
- * @property string         $description     описание
- * @property int            $type            тип ресурса
- * @property string         $params          параметры ресурса в JSON формате
- * @property bool           $is_active       если активен
- * @property int            $created_at
- * @property int            $updated_at
- * @property bool           $isProvider      read-only если модель системных параметров модуля провайдера
- * @property bool           $isService       read-only если модель системных параметров служебного компонента
- * @property bool           $isResource      read-only если модель системных параметров модуля веб-ресурса
- * @property Module         $resource        read-only модуль
- * @property string         $moduleId        read-only идентификатор модуля
- * @property string         $resourceAlias   read-only путь к модулю
- * @property string         $resourcePath    read-only пространство имён модуля
- * @property string         $defaultRoute    read-only роутинг по-умолчанию
- * @property array          $bundleParams    параметры модуля ресурса
- * @property ModuleUrl[]    $links           read-only массив связанных URL
- * @property ActionsIndex[] $actions         read-only массив моделей записей действий абонента
- * @property ModuleInit     $relatedResource read-only запись ресурса для панели администрирования
+ * @property string              $section_id      расположение модуля
+ * @property string              $module_id       идентификатор
+ * @property string              $version         версия
+ * @property string              $title           название
+ * @property string              $description     описание
+ * @property int                 $type            тип ресурса
+ * @property string              $params          параметры ресурса в JSON формате
+ * @property bool                $is_active       если активен
+ * @property int                 $created_at
+ * @property int                 $updated_at
+ * @property-read bool           $isProvider      если модель системных параметров модуля провайдера
+ * @property-read bool           $isService       если модель системных параметров служебного компонента
+ * @property-read bool           $isResource      если модель системных параметров модуля веб-ресурса
+ * @property-read Module         $resource        модуль
+ * @property-read string         $moduleId        идентификатор модуля
+ * @property-read string         $resourceAlias   путь к модулю
+ * @property-read string         $resourcePath    пространство имён модуля
+ * @property-read string         $defaultRoute    роутинг по-умолчанию
+ * @property-read array          $bundleParams    параметры модуля ресурса
+ * @property-read ModuleUrl[]    $links           массив связанных URL
+ * @property-read ActionsIndex[] $actions         массив моделей записей действий абонента
+ * @property-read ModuleInit     $relatedResource запись ресурса для панели администрирования
+ * @property-read string         $uniqueId        уникальный идентификатор модуля
  *
  * @package modular\common\models
  */
@@ -66,6 +67,12 @@ class ModuleInit extends ActiveRecord
      * @const int TYPE_SERVICE тип модуля служебного системного сервиса
      */
     const TYPE_SERVICE = 2;
+
+
+    /**
+     * Разделитель в идентификаторе модуля.
+     */
+    const MODULE_ID_DELIMITER = "/\./i";
 
 
     /**
@@ -140,15 +147,27 @@ class ModuleInit extends ActiveRecord
     /**
      * Возвращает read-only идентификатор модуля с заменой символа `.`;
      *
-     * @param string $safeReplace если опционально требуется замена отличная от `-`
+     * @param string|bool $safeReplace если опционально требуется замена отличная от `-`
      *
      * @return string
      */
     public function getSafeId($safeReplace = "-")
     {
-        return preg_match("/\./i", $this->module_id) ?
-            (string)preg_replace("/\./i", $safeReplace, $this->module_id) :
+        return preg_match(self::MODULE_ID_DELIMITER, $this->module_id) ?
+            (string)preg_replace(self::MODULE_ID_DELIMITER, $safeReplace, $this->module_id) :
             $this->module_id;
+    }
+
+
+    /**
+     * Возвращает уникальный идентификатор модуля.
+     *
+     * @return string
+     */
+    public function getUniqueId()
+    {
+        $moduleId = explode(".", $this->module_id);
+        return array_pop($moduleId);
     }
 
 
@@ -262,12 +281,21 @@ class ModuleInit extends ActiveRecord
      * Возвращает read-only путь к модулю на сервере.
      * @return string
      */
-    public function getResourceAlias()
+    /*public function getResourceAlias()
     {
         return \Yii::getAlias(
             (empty($this->version)) ?
                 '@' . $this->section_id . '/' . $this->getSafeId("/") :
                 '@' . $this->section_id . '/' . $this->getSafeId("/") . '/' . $this->version
+        );
+    }*/
+
+    public function getResourceAlias()
+    {
+        return \Yii::getAlias(
+            (empty($this->version)) ?
+                "@$this->uniqueId/$this->section_id" :
+                "@$this->uniqueId/$this->section_id/$this->version"
         );
     }
 

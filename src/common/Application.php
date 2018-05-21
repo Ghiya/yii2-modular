@@ -52,7 +52,7 @@ class Application extends \yii\web\Application
     /**
      * @const string SERVICE_INTERFACE
      */
-    const SERVICE_INTERFACE = 'common\services\ServicesInterface';
+    const SERVICE_INTERFACE = 'modular\common\services\ServicesInterface';
 
 
     /**
@@ -142,8 +142,8 @@ class Application extends \yii\web\Application
             // init module
             $defaultModuleClass =
                 $this->isBackend ?
-                    'panel\modules\_default\Module' :
-                    'resource\modules\_default\Module';
+                    '@modular\panel\modules\Module' :
+                    '@modular\resource\modules\Module';
             $this->setModule($moduleInit->moduleId, [
                 'class'       =>
                     file_exists($moduleInit->resourceAlias . '/Module.php') ?

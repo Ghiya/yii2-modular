@@ -7,8 +7,8 @@ namespace modular\resource\components;
 
 
 use modular\common\models\ModuleInit;
+use modular\panel\modules\tracks\models\Track;
 use modular\resource\modules\Module;
-use panel\modules\tracks\models\Track;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -17,7 +17,8 @@ use yii\swiftmailer\Mailer;
 
 
 /**
- * Class Tracker системный компонент трекера уведомлений веб-ресурсов системы управления веб-ресурсами
+ * Class Tracker
+ * Компонент трекера уведомлений модулей.
  *
  * @property ModuleInit|null $relatedBundle  read-only активный пакет системы
  * @property Mailer          $mailer         read-only компонент отправки электронной почты
@@ -96,7 +97,8 @@ class Tracker extends Component
     /**
      * Возвращает компонент отправки сообщений электронной почты.
      *
-     * @return Object|MailerInterface
+     * @return object
+     * @throws \yii\base\InvalidConfigException
      */
     public function getMailer()
     {
@@ -155,6 +157,8 @@ class Tracker extends Component
      */
     public function getNoticeDefaults()
     {
+        $requestPost = \Yii::$app->request->post();
+        $requestGet = \Yii::$app->request->get();
         return [
             'session_id'    => (!empty(\Yii::$app->session)) ? \Yii::$app->session->id : null,
             'module_id'     => $this->moduleId,
@@ -162,11 +166,11 @@ class Tracker extends Component
             'action_id'     => !empty(\Yii::$app->controller->action) ? \Yii::$app->controller->action->id : '',
             'version'       => $this->moduleVersion,
             'priority'      => Track::PRIORITY_WARNING,
-            'request_post'  => (!empty(\Yii::$app->request->post())) ?
-                http_build_query(\Yii::$app->request->post(), '', "<br/>") :
+            'request_post'  => (!empty($requestPost)) ?
+                http_build_query($requestPost, '', "<br/>") :
                 'не определён',
-            'request_get'   => (!empty(\Yii::$app->request->get())) ?
-                http_build_query(\Yii::$app->request->get(), '', "<br/>") :
+            'request_get'   => (!empty($requestGet)) ?
+                http_build_query($requestGet, '', "<br/>") :
                 'не определён',
             'user_ip'       => \Yii::$app->request->userIP,
             'user_agent'    => \Yii::$app->request->userAgent,
@@ -259,12 +263,13 @@ class Tracker extends Component
                 // отправляем уведомление на все адреса разработчиков
                 $this->mailer->sendMultiple($emails);
             }
+            return;
             // отправляем через СМС
             if (!empty($trackModel->messageTo) && $trackModel->hasNotifyParam($this->notifyParamMessage) && !empty($trackModel->trackerParams['sender'][$this->notifyParamMessage])) {
                 \Yii::trace('[ ' . $trackModel->id . ' ] отправка уведомления через СМС адресатам : ' . Json::encode($trackModel->messageTo),
                     __METHOD__);
-                //Dispatcher::smsc()->useLog = false;
-                /*Dispatcher::smsc()->msgFrom = $trackModel->trackerParams['sender'][$this->notifyParamMessage];
+                Dispatcher::smsc()->useLog = false;
+                Dispatcher::smsc()->msgFrom = $trackModel->trackerParams['sender'][$this->notifyParamMessage];
                 // отправляем уведомление на все телефоны разработчиков
                 foreach ($trackModel->messageTo as $msgTo) {
                     Dispatcher::smsc()
@@ -273,7 +278,7 @@ class Tracker extends Component
                                 'to'   => $msgTo,
                                 'text' => "[ Ticket: $trackModel->id ] $this->moduleTitle : $trackModel->decodedPriority",
                             ]
-                        );*/
+                        );
             }
         }
     }
@@ -285,8 +290,7 @@ class Tracker extends Component
  *
  * @return string
  */
-protected
-function decodePriorityMailViewPath($priority)
+protected function decodePriorityMailViewPath($priority)
 {
     switch ($priority) {
         case Track::PRIORITY_WARNING :

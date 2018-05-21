@@ -3,7 +3,7 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace panel\modules\logs\models;
+namespace modular\panel\modules\logs\models;
 
 
 use modular\common\models\ModuleInit;
@@ -23,7 +23,7 @@ use yii\db\ActiveRecord;
  * @property ModuleInit $bundle
  * @property string     $createdAt read-only форматированная дата создания записи
  *
- * @package panel\modules\logs\models
+ * @package modular\panel\modules\logs\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class LogRecord extends ActiveRecord

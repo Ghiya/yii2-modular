@@ -3,7 +3,7 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace panel\behaviors;
+namespace modular\panel\behaviors;
 
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;

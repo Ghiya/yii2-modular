@@ -4,15 +4,14 @@
  */
 
 
-namespace resource\interfaces;
+namespace modular\resource\interfaces;
 
 
 /**
  * Interface ActionsIndexInterface
- * интерфейс модуля ресурса с поддержкой индексации действий пользователя
+ * Интерфейс модуля ресурса с поддержкой индексации действий пользователя.
  *
- * @package resource\interfaces
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
+ * @package modular\resource\interfaces
  */
 interface ActionsIndexInterface
 {

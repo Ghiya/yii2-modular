@@ -3,11 +3,11 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace resource\behaviors;
+namespace modular\resource\behaviors;
 
 
-use common\Dispatcher;
-use resource\modules\_default\Module;
+use modular\resource\components\Tracker;
+use modular\resource\modules\Module;
 use yii\base\Behavior;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -71,7 +71,7 @@ class TrackingBehavior extends Behavior
     {
         $events = ArrayHelper::merge(parent::events(), [
             Controller::EVENT_AFTER_ACTION => function ($event) {
-                Dispatcher::tracker()->sendNotices();
+                \Yii::$app->controller->module->get('tracker')->sendNotices();
             },
             self::EVENT_CAUGHT_ERROR       => 'handleEvent',
         ]);
@@ -131,8 +131,10 @@ class TrackingBehavior extends Behavior
                     $this->eventTitle($event->name) . $event->message,
             ]
         );
+        /** @var Tracker $tracker */
+        $tracker = \Yii::$app->controller->module->get('tracker');
         // создаёт уведомление с получателями в зависимости от параметров события
-        Dispatcher::tracker()->handle(
+        $tracker->handle(
             $track,
             $event->sendParams,
             ($event->developersOnly) ?
@@ -142,13 +144,13 @@ class TrackingBehavior extends Behavior
                         '79583897366',
                     ],
                 ] :
-                Dispatcher::tracker()->notifyParams['observers'],
+                $tracker->notifyParams['observers'],
             true,
             ($event->developersOnly) ? $this->developerIds : null
         );
         // отправляет уведомление сразу если указано в параметрах события
         if ($event->forceSend) {
-            Dispatcher::tracker()->sendNotices();
+            $tracker->sendNotices();
         }
     }
 

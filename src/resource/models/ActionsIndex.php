@@ -4,7 +4,7 @@
  */
 
 
-namespace resource\models;
+namespace modular\resource\models;
 
 
 use modular\common\models\ModuleInit;
@@ -13,8 +13,8 @@ use modular\resource\modules\Module;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
+use modular\common\helpers\ArrayHelper;
+use modular\common\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
@@ -36,7 +36,7 @@ use yii\web\Linkable;
  * @property ModuleInit $resource     read-only
  * @property string     $subscriberId read-only
  *
- * @package resource\models
+ * @package rmodular\esource\models
  */
 class ActionsIndex extends ActiveRecord implements Linkable
 {

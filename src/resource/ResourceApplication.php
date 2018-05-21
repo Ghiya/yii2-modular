@@ -8,7 +8,7 @@ namespace modular\resource;
 
 use modular\common\Application;
 use modular\common\models\ModuleInit;
-use resource\models\ActionsIndex;
+use modular\resource\models\ActionsIndex;
 use yii\helpers\ArrayHelper;
 
 

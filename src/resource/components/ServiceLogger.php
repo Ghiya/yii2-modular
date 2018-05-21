@@ -12,12 +12,12 @@ use modular\common\models\ServiceLog;
 use yii\base\Object;
 
 /**
- * Class Logger компонент логирования запросов провайдеров внешних сервисов.
+ * Class ServiceLogger
+ * Компонент логирования запросов провайдеров внешних сервисов.
  *
  * @property Module $module
  *
  * @package modular\resource\components
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class ServiceLogger extends Object
 {

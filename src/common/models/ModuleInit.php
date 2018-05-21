@@ -6,7 +6,7 @@
 namespace modular\common\models;
 
 
-use common\Application;
+use modular\common\Application;
 use modular\common\modules\Module;
 use resource\models\ActionsIndex;
 use yii\base\ErrorException;
@@ -370,13 +370,15 @@ class ModuleInit extends ActiveRecord
     public function getModuleId()
     {
         if (empty($this->_moduleId)) {
+            /** @var Application $app */
+            $app = \Yii::$app;
             if ($this->isProvider) {
                 $this->_moduleId = "$this->section_id.$this->module_id";
             }
             else {
-                $this->_moduleId = (Dispatcher::app()->isBackend) ? $this->module_id : $this->version;
+                $this->_moduleId = ($app->isBackend) ? $this->module_id : $this->version;
             }
-            $this->_moduleId = (Dispatcher::app()->isBackend) ? $this->module_id : $this->version;
+            $this->_moduleId = ($app->isBackend) ? $this->module_id : $this->version;
         }
         return $this->_moduleId;
     }

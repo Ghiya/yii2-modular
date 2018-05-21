@@ -3,7 +3,7 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace panel\modules\tracks\models;
+namespace modular\panel\modules\tracks\models;
 
 
 use modular\common\models\ShortLink;
@@ -45,7 +45,7 @@ use yii\helpers\Json;
  * @property string $decodedPriority read-only строковое описание уровня приоритетности записи
  * @property string $debugData       read-only данные отладочной информации
  *
- * @package panel\modules\tracks\models
+ * @package modular\panel\modules\tracks\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class Track extends ActiveRecord

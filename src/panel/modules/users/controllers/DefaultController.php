@@ -9,7 +9,7 @@ namespace modular\panel\modules\users\controllers;
 use modular\common\controllers\Controller;
 use modular\panel\models\User;
 use modular\panel\models\UserRole;
-use panel\modules\users\models\UserDataForm;
+use modular\panel\modules\users\models\UserDataForm;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;

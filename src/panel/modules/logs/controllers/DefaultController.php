@@ -7,10 +7,10 @@ namespace modular\panel\modules\logs\controllers;
 
 
 use modular\common\controllers\Controller;
-use panel\behaviors\FlushRecordsBehavior;
+use modular\panel\behaviors\FlushRecordsBehavior;
 use modular\panel\models\UserRole;
-use panel\modules\logs\models\LogRecord;
-use panel\modules\logs\models\Search;
+use modular\common\models\ServiceLog;
+use modular\panel\modules\logs\models\Search;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
@@ -25,7 +25,7 @@ class DefaultController extends Controller
 {
 
 
-    public $viewPath = '@panel/modules/logs/views/default';
+    public $viewPath = '@modular/panel/modules/logs/views/default';
 
 
     /**
@@ -51,7 +51,7 @@ class DefaultController extends Controller
             ],
             [
                 'class'       => FlushRecordsBehavior::className(),
-                'recordClass' => LogRecord::className(),
+                'recordClass' => ServiceLog::className(),
                 'interval'    => 7,
                 'permission'  => UserRole::PM_REMOVE_RESOURCE_DATA,
             ]
@@ -125,7 +125,7 @@ class DefaultController extends Controller
      */
     public function actionView()
     {
-        $model = LogRecord::findById(
+        $model = ServiceLog::findById(
             \Yii::$app->request->get('id', null)
         );
         if (empty($model)) {
@@ -176,7 +176,7 @@ class DefaultController extends Controller
      */
     public function actionDelete()
     {
-        $model = LogRecord::findById(
+        $model = ServiceLog::findById(
             \Yii::$app->request->post('id', null)
         );
         if (empty($model) || !$model->delete()) {
@@ -200,7 +200,7 @@ class DefaultController extends Controller
      */
     public function actionDeleteSelected()
     {
-        $removedRowsCount = LogRecord::deleteSelected(\Yii::$app->request->post('selected', []));
+        $removedRowsCount = ServiceLog::deleteSelected(\Yii::$app->request->post('selected', []));
         if (!$removedRowsCount) {
             \Yii::$app->getSession()->setFlash(
                 'warning',

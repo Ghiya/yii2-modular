@@ -8,9 +8,9 @@ namespace modular\panel\modules\tracks\controllers;
 
 use modular\common\controllers\Controller;
 use modular\common\helpers\ResourceHelper;
-use panel\behaviors\FlushRecordsBehavior;
+use modular\panel\behaviors\FlushRecordsBehavior;
 use modular\panel\models\UserRole;
-use panel\modules\tracks\models\Track;
+use modular\panel\modules\tracks\models\Track;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;

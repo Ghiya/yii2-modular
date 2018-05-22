@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "86d84d2740b3d4abbf07febaf524e181",
+    "content-hash": "7979c52c4edfc9722dd6fba4c385e048",
     "packages": [
         {
             "name": "ghiyam/apix",
@@ -1332,7 +1332,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0"
+        "php": ">=5.5.0"
     },
     "platform-dev": []
 }

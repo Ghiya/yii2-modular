@@ -52,7 +52,7 @@ class Application extends \yii\web\Application
     /**
      * @const string SERVICE_INTERFACE
      */
-    const SERVICE_INTERFACE = 'modular\common\services\ServicesInterface';
+    const SERVICE_INTERFACE = 'common\services\ServicesInterface';
 
 
     /**
@@ -138,7 +138,7 @@ class Application extends \yii\web\Application
     public function registerModule(ModuleInit $moduleInit)
     {
         if (!empty($moduleInit)) {
-            \Yii::trace("Регистрация модуля ресурса `$moduleInit->title`.", __METHOD__);
+            \Yii::debug("Регистрация модуля ресурса `$moduleInit->title`.", __METHOD__);
             // init module
             $defaultModuleClass =
                 $this->isBackend ?

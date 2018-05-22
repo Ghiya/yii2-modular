@@ -218,7 +218,7 @@ class Tracker extends Component
                 \Yii::warning($notice['message'], __METHOD__);
             }
             else {
-                \Yii::trace($notice['message'], __METHOD__);
+                \Yii::debug($notice['message'], __METHOD__);
             }
         }
     }
@@ -242,7 +242,7 @@ class Tracker extends Component
             }
             // отправляем по почте
             if (!empty($trackModel->mailTo) && $trackModel->hasNotifyParam($this->notifyParamEmail) && $this->mailer !== null && !empty($this->notifyParams['sender'][$this->notifyParamEmail])) {
-                \Yii::trace('[ ' . $trackModel->id . ' ] отправка уведомления по электронной почте адресатам : ' . Json::encode($trackModel->mailTo),
+                \Yii::debug('[ ' . $trackModel->id . ' ] отправка уведомления по электронной почте адресатам : ' . Json::encode($trackModel->mailTo),
                     __METHOD__);
                 $emails = [];
                 // формируем почтовые уведомления
@@ -266,7 +266,7 @@ class Tracker extends Component
             return;
             // отправляем через СМС
             if (!empty($trackModel->messageTo) && $trackModel->hasNotifyParam($this->notifyParamMessage) && !empty($trackModel->trackerParams['sender'][$this->notifyParamMessage])) {
-                \Yii::trace('[ ' . $trackModel->id . ' ] отправка уведомления через СМС адресатам : ' . Json::encode($trackModel->messageTo),
+                \Yii::debug('[ ' . $trackModel->id . ' ] отправка уведомления через СМС адресатам : ' . Json::encode($trackModel->messageTo),
                     __METHOD__);
                 Dispatcher::smsc()->useLog = false;
                 Dispatcher::smsc()->msgFrom = $trackModel->trackerParams['sender'][$this->notifyParamMessage];

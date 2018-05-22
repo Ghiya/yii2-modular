@@ -281,15 +281,6 @@ class ModuleInit extends ActiveRecord
      * Возвращает read-only путь к модулю на сервере.
      * @return string
      */
-    /*public function getResourceAlias()
-    {
-        return \Yii::getAlias(
-            (empty($this->version)) ?
-                '@' . $this->section_id . '/' . $this->getSafeId("/") :
-                '@' . $this->section_id . '/' . $this->getSafeId("/") . '/' . $this->version
-        );
-    }*/
-
     public function getResourceAlias()
     {
         return \Yii::getAlias(
@@ -309,9 +300,8 @@ class ModuleInit extends ActiveRecord
     public function getResourcePath()
     {
         return (empty($this->version)) ?
-            $this->section_id . '\\' .
-            $this->getSafeId("\\") :
-            $this->section_id . '\\' . $this->getSafeId("\\") . '\\' . $this->version;
+            "$this->uniqueId\\$this->section_id" :
+            "$this->uniqueId\\$this->section_id\\$this->version";
     }
 
 

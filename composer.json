@@ -33,6 +33,10 @@
   },
   "repositories": [
     {
+      "type": "vcs",
+      "url": "git@github.com:Ghiya/apix.git"
+    },
+    {
       "type": "composer",
       "url": "https://asset-packagist.org"
     }

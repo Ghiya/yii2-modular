@@ -33,6 +33,8 @@ final class PanelApplication extends Application
      */
     public function bootstrap()
     {
+        // parent bootstrapping always goes first because of the modules installing as extensions
+        parent::bootstrap();
         foreach (
             ModuleInit::findResources(
                 [self::PANEL_APP_ID,],
@@ -40,7 +42,6 @@ final class PanelApplication extends Application
             ) as $moduleInit) {
             $this->registerModule($moduleInit);
         }
-        parent::bootstrap();
     }
 
 

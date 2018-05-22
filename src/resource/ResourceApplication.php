@@ -43,6 +43,9 @@ final class ResourceApplication extends Application
      */
     public function bootstrap()
     {
+        // parent bootstrapping always goes first because of the modules installing as extensions
+        parent::bootstrap();
+
         // регистрирует модуль ресурса в приложении
         $this->registerModule(ModuleInit::findResourceByUrl());
 
@@ -60,7 +63,6 @@ final class ResourceApplication extends Application
                 ActionsIndex::add($module);
             }
         });
-        parent::bootstrap();
     }
 
 

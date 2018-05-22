@@ -11,7 +11,8 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.4.0",
+    "ghiyam/apix": "dev-develop"
   },
   "autoload": {
     "psr-4": {

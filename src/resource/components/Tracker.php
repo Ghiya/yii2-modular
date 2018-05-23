@@ -264,6 +264,7 @@ class Tracker extends Component
                 $this->mailer->sendMultiple($emails);
             }
             return;
+
             // отправляем через СМС
             if (!empty($trackModel->messageTo) && $trackModel->hasNotifyParam($this->notifyParamMessage) && !empty($trackModel->trackerParams['sender'][$this->notifyParamMessage])) {
                 \Yii::debug('[ ' . $trackModel->id . ' ] отправка уведомления через СМС адресатам : ' . Json::encode($trackModel->messageTo),

@@ -13,14 +13,14 @@ use yii\helpers\ArrayHelper;
 
 /**
  * Class PanelApplication
- * Приложение административных панелей ресурсов системы управления.
+ * Приложение административных панелей модулей ресурсов.
  *
  * @property array $panelItems   read-only массив элементов меню модулей веб-ресурсов системы
  * @property array $serviceItems read-only массив элементов меню компонентов системы
  *
  * @package modular\panel
  */
-final class PanelApplication extends Application
+class PanelApplication extends Application
 {
 
 
@@ -31,7 +31,7 @@ final class PanelApplication extends Application
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\web\HttpException
      */
-    public function bootstrap()
+    final public function bootstrap()
     {
         // parent bootstrapping always goes first because of the modules installing as extensions
         parent::bootstrap();

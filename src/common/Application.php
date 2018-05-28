@@ -16,7 +16,7 @@ use yii\web\HttpException;
 
 /**
  * Class Application
- * Базовый класс приложений модулей системы управления.
+ * Абстрактный базовый класс приложений модулей ресурсов и панелей их администрирования.
  *
  * @property Module[]     $modules
  * @property Module[]     $panels          read-only массив модулей панелей администрирования веб-ресурсов
@@ -27,7 +27,7 @@ use yii\web\HttpException;
  *
  * @package common
  */
-class Application extends \yii\web\Application
+abstract class Application extends \yii\web\Application
 {
 
 
@@ -76,7 +76,7 @@ class Application extends \yii\web\Application
     /**
      * {@inheritdoc}
      */
-    public function __construct($config = [])
+    final public function __construct($config = [])
     {
         parent::__construct(
             ArrayHelper::merge(
@@ -96,7 +96,7 @@ class Application extends \yii\web\Application
      * Добавляет в компоненты ядра приложения компоненты используемые по-умолчанию.
      *
      */
-    public function coreComponents()
+    final public function coreComponents()
     {
         return ArrayHelper::merge(
             parent::coreComponents(),
@@ -291,7 +291,7 @@ class Application extends \yii\web\Application
      *
      * @return bool
      */
-    public function getIsBackend()
+    final public function getIsBackend()
     {
         return ($this->id === self::PANEL_APP_ID);
     }

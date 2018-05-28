@@ -14,23 +14,12 @@ use yii\helpers\ArrayHelper;
 
 /**
  * Class ResourceApplication
- * Приложение модулей веб-ресурсов системы управления.
+ * Приложение модулей ресурсов.
  *
  * @package modular\resource
  */
-final class ResourceApplication extends Application
+class ResourceApplication extends Application
 {
-
-
-    public function behaviors()
-    {
-        return ArrayHelper::merge(
-            parent::behaviors(),
-            [
-                'resource\behaviors\SubscriberContext',
-            ]
-        );
-    }
 
 
     /**
@@ -41,22 +30,19 @@ final class ResourceApplication extends Application
      * @throws \yii\web\HttpException
      * @throws \yii\web\NotFoundHttpException
      */
-    public function bootstrap()
+    final public function bootstrap()
     {
         // parent bootstrapping always goes first because of the modules installing as extensions
         parent::bootstrap();
-
-        // регистрирует модуль ресурса в приложении
+        // add resource module to the application
         $this->registerModule(ModuleInit::findResourceByUrl());
-
-        // для события окончания действия [[\yii\web\Application::EVENT_AFTER_ACTION]]
+        // [[\yii\web\Application::EVENT_AFTER_ACTION]]
         $this->on(self::EVENT_AFTER_ACTION, function ($event) {
-
-            // отправляет все уведомления ресурса
+            // sending all resource tracks
             if (\Yii::$app->controller->module->has('tracker')) {
                 \Yii::$app->controller->module->get('tracker')->sendNotices();
             }
-            // сохраняет активность модулей веб-ресурсов там где это возможно
+            // save resource activity if possible
             /** @var \modular\resource\modules\Module $module */
             $module = $event->sender->controller->module;
             if ($module->hasMethod('shouldIndexAction') && $module->shouldIndexAction()) {
@@ -67,30 +53,25 @@ final class ResourceApplication extends Application
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function registerModule(ModuleInit $moduleInit)
+    final public function registerModule(ModuleInit $moduleInit)
     {
         parent::registerModule($moduleInit);
-
         $this->name = $moduleInit->title;
-
-        // устанавливаем в приложение правило роутинга ресурса по-умолчанию
-        $this->defaultRoute = $moduleInit->defaultRoute;
-
-        // устанавливаем компонент пользователя
+        // set default routing
+        $this->getUrlManager()->addRules(['/' => !empty($moduleInit->version) ? $moduleInit->version : $moduleInit->uniqueId]);
+        // set user component
         if ($moduleInit->resource->has('user')) {
             $this->set('user', $moduleInit->resource->get('user'));
         }
-
-        // устанавливаем компонент обработчика ошибок
+        // set error handler component's params
         if (!empty($moduleInit->resource->params['errorHandler'])) {
             foreach ($moduleInit->resource->params['errorHandler'] as $param => $value) {
                 $this->errorHandler->{$param} = $value;
             }
         }
-
-        // устанавливает параметры ресурса в параметры приложения если они есть
+        // merge application params with resource params
         if (!empty($moduleInit->resource->params)) {
             $this->params = ArrayHelper::merge($this->params, $moduleInit->resource->params);
         }

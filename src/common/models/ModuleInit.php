@@ -19,7 +19,8 @@ use yii\web\NotFoundHttpException;
 
 
 /**
- * Class ModuleInit модель идентификационных параметров модуля ресурса системы управления.
+ * Class ModuleInit
+ * Модель идентификационных параметров модуля ресурса.
  *
  * @property string              $section_id      расположение модуля
  * @property string              $module_id       идентификатор
@@ -38,7 +39,6 @@ use yii\web\NotFoundHttpException;
  * @property-read string         $moduleId        идентификатор модуля
  * @property-read string         $resourceAlias   путь к модулю
  * @property-read string         $resourcePath    пространство имён модуля
- * @property-read string         $defaultRoute    роутинг по-умолчанию
  * @property-read array          $bundleParams    параметры модуля ресурса
  * @property-read ModuleUrl[]    $links           массив связанных URL
  * @property-read ActionsIndex[] $actions         массив моделей записей действий абонента
@@ -126,7 +126,7 @@ class ModuleInit extends ActiveRecord
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
         ];
     }
 
@@ -206,7 +206,7 @@ class ModuleInit extends ActiveRecord
      */
     public function getLinks()
     {
-        return $this->hasMany(ModuleUrl::className(), ['init_id' => 'id',]);
+        return $this->hasMany(ModuleUrl::class, ['init_id' => 'id',]);
     }
 
 
@@ -216,7 +216,7 @@ class ModuleInit extends ActiveRecord
      */
     public function getActions()
     {
-        return $this->hasMany(ActionsIndex::className(), ['resource_id' => 'id',]);
+        return $this->hasMany(ActionsIndex::class, ['resource_id' => 'id',]);
     }
 
 

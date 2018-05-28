@@ -9,7 +9,8 @@ use modular\common\helpers\ArrayHelper;
 
 
 /**
- * Class Module базовый класс модуля ресурса системы.
+ * Class Module
+ * Базовый класс модуля ресурса.
  *
  * @property string $safeId         read-only идентификатор модуля с заменой символа `.`
  * @property string $strictId       read-only идентификатор модуля без указания папки расположения

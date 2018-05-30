@@ -101,26 +101,30 @@ abstract class Application extends \yii\web\Application
         return ArrayHelper::merge(
             parent::coreComponents(),
             [
-                'authManager' => [
-                    'class'          => 'yii\rbac\PhpManager',
-                    'assignmentFile' => '@common/rbac/assignments.php',
-                    'itemFile'       => '@common/rbac/items.php',
-                    'ruleFile'       => '@common/rbac/rules.php',
-                ],
-                'cache'       => [
-                    'class' => 'yii\caching\FileCache',
-                ],
-                'session'     => [
-                    'class' => 'yii\web\Session',
-                ],
-                'formatter'   => [
-                    'dateFormat'        => 'dd.MM.yyyy',
-                    'decimalSeparator'  => '.',
-                    'thousandSeparator' => ' ',
-                    'locale'            => 'ru-RU',
-                    'defaultTimeZone'   => 'Europe/Moscow',
-                    'nullDisplay'       => '<i class="fa fa-minus"></i>',
-                ],
+                'authManager' =>
+                    [
+                        'class'          => 'yii\rbac\PhpManager',
+                        'assignmentFile' => '@common/rbac/assignments.php',
+                        'itemFile'       => '@common/rbac/items.php',
+                        'ruleFile'       => '@common/rbac/rules.php',
+                    ],
+                'cache'       =>
+                    [
+                        'class' => 'yii\caching\FileCache',
+                    ],
+                'session'     =>
+                    [
+                        'class' => 'yii\web\Session',
+                    ],
+                'formatter'   =>
+                    [
+                        'dateFormat'        => 'dd.MM.yyyy',
+                        'decimalSeparator'  => '.',
+                        'thousandSeparator' => ' ',
+                        'locale'            => 'ru-RU',
+                        'defaultTimeZone'   => 'Europe/Moscow',
+                        'nullDisplay'       => '<i class="fa fa-minus"></i>',
+                    ]
             ]
         );
     }
@@ -129,69 +133,60 @@ abstract class Application extends \yii\web\Application
     /**
      * Регистрирует в приложении модуль ресурса с указанными параметрами.
      *
-     * @param ModuleInit $moduleInit модель параметров модуля
+     * @param ModuleInit $init модель параметров модуля
      *
      * @throws ErrorException
      * @throws HttpException
      * @throws \yii\base\InvalidConfigException
      */
-    public function registerModule(ModuleInit $moduleInit)
+    public function registerModule(ModuleInit $init)
     {
-        \Yii::debug("Регистрация модуля ресурса `$moduleInit->title`.", __METHOD__);
+        \Yii::debug("Регистрация модуля ресурса `$init->title`.", __METHOD__);
         // init module
         $defaultModuleClass =
             $this->isBackend ?
                 '@modular\panel\modules\Module' :
                 '@modular\resource\modules\Module';
-        $this->setModule($moduleInit->moduleId, [
-            'class'       =>
-                file_exists($moduleInit->resourceAlias . '/Module.php') ?
-                    $moduleInit->resourcePath . '\Module' :
+        $this->setModule($init->moduleId, [
+            'class'        =>
+                file_exists($init->resourceAlias . '/Module.php') ?
+                    $init->resourcePath . '\Module' :
                     $defaultModuleClass,
-            'title'       => $moduleInit->title,
-            'description' => $moduleInit->description,
-            'isProvider'  => $moduleInit->isProvider,
-            'isService'   => $moduleInit->isService,
-            'isResource'  => $moduleInit->isResource,
+            'title'        => $init->title,
+            'description'  => $init->description,
+            'isProvider'   => $init->isProvider,
+            'isService'    => $init->isService,
+            'isResource'   => $init->isResource,
+            'bundleParams' => $init->toArray()
         ]);
         // configure module
-        if (file_exists($moduleInit->resourceAlias . '/config/config.php')) {
-            $configCommon = require($moduleInit->resourceAlias . '/config/config.php');
-            $configLocal = (file_exists($moduleInit->resourceAlias . '/config/config-local.php')) ?
-                require($moduleInit->resourceAlias . '/config/config-local.php') :
-                [];
+        if (file_exists($init->resourceAlias . '/config/config.php')) {
             \Yii::configure(
-                $this->getModule($moduleInit->moduleId),
+                $this->getModule($init->moduleId),
                 ArrayHelper::merge(
-                    ArrayHelper::merge(
-                        $configCommon,
-                        [
-                            'params' =>
-                                [
-                                    'bundleParams' => $moduleInit->toArray(),
-                                ]
-                        ]
-                    ),
-                    $configLocal
+                    require $init->resourceAlias . '/config/config.php',
+                    file_exists($init->resourceAlias . '/config/config-local.php') ?
+                        require $init->resourceAlias . '/config/config-local.php' :
+                        []
                 )
             );
             // define application language
-            if (isset($this->getModule($moduleInit->moduleId)->params['defaults']['language'])) {
-                $this->language = $this->getModule($moduleInit->moduleId)->params['defaults']['language'];
+            if (isset($this->getModule($init->moduleId)->params['defaults']['language'])) {
+                $this->language = $this->getModule($init->moduleId)->params['defaults']['language'];
             }
             // init module logs
             \Yii::$app->log->targets[] = new FileTarget([
-                'logFile'        => !empty($moduleInit->version) ?
+                'logFile'        => !empty($init->version) ?
                     '@common/logs/'
-                    . $moduleInit->section_id . '/'
-                    . $moduleInit->module_id . '/'
-                    . $moduleInit->version . '/'
+                    . $init->section_id . '/'
+                    . $init->module_id . '/'
+                    . $init->version . '/'
                     . date("Y-m/d/")
                     . date("H")
                     . '.log' :
                     '@common/logs/'
-                    . $moduleInit->section_id . '/'
-                    . $moduleInit->module_id . '/'
+                    . $init->section_id . '/'
+                    . $init->module_id . '/'
                     . date("Y-m/d/")
                     . date("H")
                     . '.log',
@@ -203,21 +198,21 @@ abstract class Application extends \yii\web\Application
                 },
             ]);
             // init routing
-            if ($this->getModule($moduleInit->moduleId)->has('urlManager')) {
-                \Yii::$app->getUrlManager()->addRules($this->getModule($moduleInit->moduleId)->get('urlManager')->rules);
+            if ($this->getModule($init->moduleId)->has('urlManager')) {
+                \Yii::$app->getUrlManager()->addRules($this->getModule($init->moduleId)->get('urlManager')->rules);
             }
             // устанавливает компонент языковых локализаций приложения если он есть
-            if ($this->getModule($moduleInit->moduleId)->has('i18n')) {
+            if ($this->getModule($init->moduleId)->has('i18n')) {
                 $this->i18n->translations = ArrayHelper::merge(
                     $this->i18n->translations,
-                    $this->getModule($moduleInit->moduleId)->get('i18n')->translations
+                    $this->getModule($init->moduleId)->get('i18n')->translations
                 );
             }
         }
         else {
             throw new HttpException(
                 404,
-                'Отсутствует конфигурационный файл модуля с идентификатором `' . $moduleInit->moduleId . '`'
+                'Отсутствует конфигурационный файл модуля с идентификатором `' . $init->moduleId . '`'
             );
         }
     }

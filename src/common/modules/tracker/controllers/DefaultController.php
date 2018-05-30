@@ -3,7 +3,7 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\panel\modules\tracks\controllers;
+namespace modular\common\modules\tracker\controllers;
 
 
 use modular\common\controllers\Controller;
@@ -20,14 +20,14 @@ use yii\web\Response;
 /**
  * Class DefaultController контроллер уведомлений веб-ресурса системы
  *
- * @package panel\modules\tracks\controllers
+ * @package modular\common\modules\tracker\controllers
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class DefaultController extends Controller
 {
 
 
-    public $viewPath = '@modular/panel/modules/tracks/views/default';
+    public $viewPath = '@modular/common/modules/tracker/views/default';
 
 
     /**
@@ -37,7 +37,7 @@ class DefaultController extends Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow'   => true,
@@ -57,8 +57,8 @@ class DefaultController extends Controller
                 ],
             ],
             [
-                'class'       => FlushRecordsBehavior::className(),
-                'recordClass' => Track::className(),
+                'class'       => FlushRecordsBehavior::class,
+                'recordClass' => Track::class,
                 'interval'    => 7,
                 'permission'  => UserRole::PM_REMOVE_RESOURCE_DATA,
             ]

@@ -3,23 +3,23 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\resource\behaviors;
+namespace modular\common\modules\tracker\behaviors;
 
 
+use modular\common\controllers\Controller;
+use modular\common\helpers\ArrayHelper;
+use modular\common\modules\tracker\components\Tracking;
 use modular\resource\components\Tracker;
 use modular\resource\modules\Module;
 use yii\base\Behavior;
-use yii\helpers\ArrayHelper;
-use yii\web\Controller;
 
 
 /**
  * Class TrackingBehavior базовый класс поведения обработки уведомлений веб-ресурсов.
  *
- * @property Module $module   read-only
- * @property string $panelUrl read-only адрес URL административной панели веб-ресурса
+ * @property-read string $panelUrl URL административной панели веб-ресурса
  *
- * @package core\modules\core\behaviors
+ * @package modular\common\modules\tracker\behaviors
  * @author  Mikadze Ghiya <ghiya@mikadze.me>
  */
 class TrackingBehavior extends Behavior
@@ -69,12 +69,13 @@ class TrackingBehavior extends Behavior
      */
     public function events()
     {
-        $events = ArrayHelper::merge(parent::events(), [
-            Controller::EVENT_AFTER_ACTION => function ($event) {
-                \Yii::$app->controller->module->get('tracker')->sendNotices();
-            },
-            self::EVENT_CAUGHT_ERROR       => 'handleEvent',
-        ]);
+        $events =
+            ArrayHelper::merge(
+                parent::events(),
+                [
+                    self::EVENT_CAUGHT_ERROR => 'handleEvent',
+                ]
+            );
         foreach ($this->eventTracks as $trackEvent) {
             $events[$trackEvent] = 'handleEvent';
         }
@@ -83,56 +84,42 @@ class TrackingBehavior extends Behavior
 
 
     /**
-     * Возвращает read-only адрес URL административной панели веб-ресурса.
-     *
-     * @return string
-     */
-    public function getPanelUrl()
-    {
-        return (defined("YII_DEBUG") && YII_DEBUG == true) ?
-            'https://dev-services.v-tell.ru/' . $this->getModule()->params['bundleParams']['module_id'] :
-            'https://services.v-tell.ru/' . $this->getModule()->params['bundleParams']['module_id'];
-    }
-
-
-    /**
      * Возвращает параметры и данные уведомления в зависимости от обрабатываемого события.
      *
      * @param TrackingEvent $event название события
-     *
-     * @return array вернёт пустой массив если для указанного события параметры не определены
      */
-    public function trackOnEvent(TrackingEvent $event)
+    public function trackOnEvent(TrackingEvent &$event)
     {
-        return [];
     }
 
 
     /**
-     * Обрабатывает событие контроллера веб-ресурса.
-     * Создаёт соответствующее уведомление веб-ресурса через системный компонент трекинга уведомлений.
+     * Обрабатывает уведомление веб-ресурса через модульный компонент трекера уведомлений.
      *
      * @param TrackingEvent|null $event
+     *
+     * @throws \yii\base\InvalidConfigException
      */
-    public function handleEvent(TrackingEvent $event = null)
+    public function handleEvent($event)
     {
+        \Yii::debug("Handle track event `" . $event->name . "`", __METHOD__);
         // определяет данные уведомления
-        if (empty($event->track)) {
-            $track = $this->trackOnEvent($event);
-        } else {
-            $track = $event->track;
-        }
-        // устанавливает параметры и содержание уведомления
-        $track = ArrayHelper::merge(
-            $track,
-            [
-                'message' => (!empty($track['message'])) ?
-                    $this->eventTitle($event->name) . $track['message'] . $event->message :
-                    $this->eventTitle($event->name) . $event->message,
-            ]
+        $this->trackOnEvent($event);
+        $event->track =
+            ArrayHelper::merge(
+                $event->track,
+                [
+                    'message'     => $this->eventTitle($event->name) . $event->track['message'],
+                    'resource_id' => $event->sender->module->bundleParams['module_id'],
+                    'version'     => $event->sender->module->bundleParams['version']
+                ]
+            );
+        \Yii::$app->trigger(
+            Tracking::EVENT_HANDLE_TRACK,
+            $event
         );
         /** @var Tracker $tracker */
-        $tracker = \Yii::$app->controller->module->get('tracker');
+        /*$tracker = $this->owner->module->get('tracker');
         // создаёт уведомление с получателями в зависимости от параметров события
         $tracker->handle(
             $track,
@@ -151,7 +138,7 @@ class TrackingBehavior extends Behavior
         // отправляет уведомление сразу если указано в параметрах события
         if ($event->forceSend) {
             $tracker->sendNotices();
-        }
+        }*/
     }
 
 

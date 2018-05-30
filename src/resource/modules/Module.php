@@ -29,6 +29,12 @@ abstract class Module extends \modular\common\modules\Module
 
 
     /**
+     * @var array параметры трекера веб-ресурса
+     */
+    public $tracking = [];
+
+
+    /**
      * Возвращает идентификатор абонента.
      *
      * @return null|string

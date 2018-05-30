@@ -3,17 +3,16 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\panel\modules\tracks\models;
+namespace modular\common\modules\tracker\models;
 
 
+use modular\common\helpers\ArrayHelper;
+use modular\common\helpers\Html;
 use modular\common\models\ShortLink;
 use modular\common\modules\Module;
-use yii\base\DynamicModel;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\helpers\Json;
 
 
@@ -22,19 +21,20 @@ use yii\helpers\Json;
  *
  * @property int    $id
  * @property string $session_id      идентификатор сессии входящего запроса
- * @property string $version         версия модуля веб-ресурса
- * @property string $module_id       идентификатор модуля веб-ресурса
- * @property string $related_item    связанный элемент уведомления
- * @property string $controller_id   идентификатор контроллера модуля веб-ресурса
- * @property string $action_id       идентификатор действия контроллера модуля веб-ресурса
- * @property string $request_post    POST данные запроса
- * @property string $request_get     GET данные запроса
+ * @property string $resource_id     идентификатор модуля веб-ресурса
+ * @property string $module_id       идентификатор модуля активного контроллера
+ * @property string $controller_id   идентификатор активного контроллера
+ * @property string $action_id       идентификатор действия активного контроллера
+ * @property string $request         параметры запроса
+ * @property string $request_method  тип запроса
  * @property string $priority        приоритет заметки
  * @property string $message         содержание заметки
  * @property string $user_ip         адрес IP входящего запроса
  * @property string $user_agent      веб-агент входящего запроса
  * @property string $viewed_by       данные просмотра в JSON
  * @property string $allowed_for     данные доступа в JSON
+ * @property string $related_item    связанный элемент уведомления
+ * @property string $version         версия модуля веб-ресурса
  * @property int    $updated_at
  * @property int    $created_at
  * @property array  $viewedBy        массив данных просмотра
@@ -45,7 +45,7 @@ use yii\helpers\Json;
  * @property string $decodedPriority read-only строковое описание уровня приоритетности записи
  * @property string $debugData       read-only данные отладочной информации
  *
- * @package modular\panel\modules\tracks\models
+ * @package modular\common\modules\tracker\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class Track extends ActiveRecord
@@ -53,49 +53,19 @@ class Track extends ActiveRecord
 
 
     /**
-     * @const int PRIORITY_WARNING
+     * Высокий приоритет уведомления.
      */
     const PRIORITY_WARNING = 2;
 
 
     /**
-     * @const int PRIORITY_NOTICE
+     * Обычный приоритет уведомления.
      */
     const PRIORITY_NOTICE = 1;
 
 
     /**
-     * @var bool $shouldBeSaved если запись модели должна быть сохранена
-     */
-    public $shouldBeSaved = true;
-
-
-    /**
-     * @var array $trackerParams параметры отправки для модели уведомления
-     */
-    public $trackerParams = [];
-
-
-    /**
-     * @var array $_observers
-     */
-    private $_observers = [];
-
-
-    /**
-     * @var array $_mailTo
-     */
-    private $_mailTo = [];
-
-
-    /**
-     * @var array $_messageTo
-     */
-    private $_messageTo = [];
-
-
-    /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -104,122 +74,160 @@ class Track extends ActiveRecord
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
-        return [
-            TimestampBehavior::className(),
-        ];
+        return [TimestampBehavior::class,];
     }
 
 
     /**
-     * @inheritdoc
-     *
-     * Используется в отладочной информации.
+     * {@inheritdoc}
+     */
+    public function scenarios()
+    {
+        return
+            [
+                self::SCENARIO_DEFAULT => [
+                    'session_id',
+                    'resource_id',
+                    'module_id',
+                    'controller_id',
+                    'action_id',
+                    'request',
+                    'request_method',
+                    'priority',
+                    'message',
+                    'user_ip',
+                    'user_agent',
+                    'viewed_by',
+                    'allowed_for'
+                ],
+            ];
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formName()
+    {
+        return '';
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return
+            [
+                [
+                    'session_id',
+                    'default',
+                    'value' => function () {
+                        return \Yii::$app->session->id;
+                    }
+                ],
+                [
+                    'module_id',
+                    'default',
+                    'value' => function () {
+                        return \Yii::$app->controller->module->id;
+                    }
+                ],
+                [
+                    'controller_id',
+                    'default',
+                    'value' => function () {
+                        return \Yii::$app->controller->id;
+                    }
+                ],
+                [
+                    'action_id',
+                    'default',
+                    'value' => function () {
+                        return \Yii::$app->controller->action->id;
+                    }
+                ],
+                [
+                    'user_ip',
+                    'default',
+                    'value' => function () {
+                        return \Yii::$app->request->userIP;
+                    }
+                ],
+                [
+                    'user_agent',
+                    'default',
+                    'value' => function () {
+                        return \Yii::$app->request->userAgent;
+                    }
+                ],
+                [
+                    'request',
+                    'default',
+                    'value' => function () {
+                        return
+                            http_build_query(
+                                \Yii::$app->request->isPost ?
+                                    \Yii::$app->request->post() : \Yii::$app->request->get(),
+                                '',
+                                '<br/>'
+                            );
+                    }
+                ],
+                [
+                    'request_method',
+                    'default',
+                    'value' => function () {
+                        return \Yii::$app->request->method;
+                    }
+                ],
+                [
+                    'priority',
+                    'default',
+                    'value' => self::PRIORITY_NOTICE
+                ],
+            ];
+    }
+
+
+    /**
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
         return [
-            'user_agent'   => 'Веб-агент',
-            'request_post' => 'POST',
-            'request_get'  => 'GET',
+            'user_agent'     => 'Веб-агент',
+            'request'        => 'Параметры запроса',
+            'request_method' => 'Метод запроса',
         ];
     }
 
 
     /**
-     * Возвращает read-only свойство массива адресов электронной почты получателей уведомлений.
-     *
-     * @return array
-     */
-    public function getMailTo()
-    {
-        if (empty($this->_mailTo)) {
-            $this->_mailTo = (is_array($this->observers['mailTo'])) ? (array)$this->observers['mailTo'] : [];
-        }
-        return $this->_mailTo;
-    }
-
-
-    /**
-     * Возвращает read-only свойство массива номеров телефонов получателей уведомлений.
-     *
-     * @return array
-     */
-    public function getMessageTo()
-    {
-        if (empty($this->_messageTo)) {
-            $this->_messageTo = (is_array($this->observers['messageTo'])) ? $this->observers['messageTo'] : [];
-        }
-        return $this->_messageTo;
-    }
-
-
-    /**
-     * Возвращает read-only свойство массива данных контактов получателей уведомлений.
-     *
-     * @return array
-     */
-    public function getObservers()
-    {
-        if (empty($this->_observers)) {
-            $_mailTo = [];
-            $_messageTo = [];
-            foreach ($this->trackerParams['observers'] as $observer) {
-                foreach ($observer as $contact) {
-                    // email
-                    $model = DynamicModel::validateData(['contact' => $contact,], [
-                        ['contact', 'email'],
-                    ]);
-                    if (!$model->hasErrors()) {
-                        $_mailTo[] = $contact;
-                    }
-                    // phone
-                    $model = DynamicModel::validateData(['contact' => $contact,], [
-                        ['contact', 'number'],
-                    ]);
-                    if (!$model->hasErrors()) {
-                        $_messageTo[] = $contact;
-                    }
-                }
-            }
-            if (!empty($_mailTo)) {
-                $_mailTo = array_unique($_mailTo);
-            }
-            if (!empty($_messageTo)) {
-                $_messageTo = array_unique($_messageTo);
-            }
-            $this->_observers = [
-                'mailTo'    => $_mailTo,
-                'messageTo' => $_messageTo,
-            ];
-        }
-        return $this->_observers;
-    }
-
-
-    /**
-     * Если установлен указанный тип уведомлений.
-     *
-     * @param string $notifyParam тип уведомления получателей ( например : 'email', 'message' )
-     *
-     * @return bool
-     */
-    public function hasNotifyParam($notifyParam)
-    {
-        return (!empty($this->trackerParams['notify']) && ArrayHelper::isIndexed($this->trackerParams['notify'])) ?
-            in_array($notifyParam, $this->trackerParams['notify']) : false;
-    }
-
-
-    /**
-     * Возвращает read-only свойство с текстовым описанием уровня приоритетности записи.
+     * Возвращает строковый заголовок уведомления.
      *
      * @return string
      */
-    public function getDecodedPriority()
+    public function getMessageSubject()
+    {
+        return
+            $this->isNewRecord ?
+                \Yii::$app->name . " : " . $this->getPriorityLabel() :
+                "[ Ticket: $this->id ] " . \Yii::$app->name . " : " . $this->getPriorityLabel();
+    }
+
+
+    /**
+     * Возвращает название приоритета записи.
+     *
+     * @return string
+     */
+    public function getPriorityLabel()
     {
         switch ($this->priority) {
             case self::PRIORITY_NOTICE :
@@ -291,7 +299,8 @@ class Track extends ActiveRecord
                 foreach ($user as $id) {
                     $this->viewedBy = $id;
                 }
-            } else {
+            }
+            else {
                 $this->viewedBy = $user;
             }
         }
@@ -349,7 +358,8 @@ class Track extends ActiveRecord
                 foreach ($user as $id) {
                     $this->allowedFor = $id;
                 }
-            } else {
+            }
+            else {
                 $this->allowedFor = $user;
             }
         }
@@ -498,7 +508,8 @@ class Track extends ActiveRecord
                     ]
                 ) . "<br/><br/>" :
                 $this->_buildLink($this->getRelatedItem(), $useShortLink);
-        } else {
+        }
+        else {
             return '';
         }
 
@@ -527,7 +538,8 @@ class Track extends ActiveRecord
                 return !empty($shortLink) ?
                     $panelLink . "/ref/" . $shortLink :
                     $link;
-            } else {
+            }
+            else {
                 return "$panelLink/" . $module->params['bundleParams']['module_id'] . "/$relatedItem[0]/view?id=$relatedItem[1]";
             }
         }

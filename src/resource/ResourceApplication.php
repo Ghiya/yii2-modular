@@ -9,17 +9,25 @@ namespace modular\resource;
 use modular\common\Application;
 use modular\common\models\ModuleInit;
 use modular\resource\models\ActionsIndex;
-use yii\helpers\ArrayHelper;
+use modular\resource\modules\Module;
 
 
 /**
  * Class ResourceApplication
  * Приложение модулей ресурсов.
  *
+ * @property-read Module $resourceModule активный модуль веб-ресурса
+ *
  * @package modular\resource
  */
 class ResourceApplication extends Application
 {
+
+
+    /**
+     * @var Module
+     */
+    private $_module;
 
 
     /**
@@ -38,13 +46,9 @@ class ResourceApplication extends Application
         $this->registerModule(ModuleInit::findResourceByUrl());
         // [[\yii\web\Application::EVENT_AFTER_ACTION]]
         $this->on(self::EVENT_AFTER_ACTION, function ($event) {
-            // sending all resource tracks
-            if (\Yii::$app->controller->module->has('tracker')) {
-                \Yii::$app->controller->module->get('tracker')->sendNotices();
-            }
-            // save resource activity if possible
-            /** @var \modular\resource\modules\Module $module */
+            /** @var Module $module */
             $module = $event->sender->controller->module;
+            // save resource activity if possible
             if ($module->hasMethod('shouldIndexAction') && $module->shouldIndexAction()) {
                 ActionsIndex::add($module);
             }
@@ -55,26 +59,37 @@ class ResourceApplication extends Application
     /**
      * {@inheritdoc}
      */
-    final public function registerModule(ModuleInit $moduleInit)
+    final public function registerModule(ModuleInit $init)
     {
-        parent::registerModule($moduleInit);
-        $this->name = $moduleInit->title;
+        parent::registerModule($init);
+        /** @var Module _module */
+        $this->_module = $this->getModule($init->moduleId);
+        $this->name = $init->title;
         // set default routing
-        $this->getUrlManager()->addRules(['/' => !empty($moduleInit->version) ? $moduleInit->version : $moduleInit->uniqueId]);
-        // set user component
-        if ($moduleInit->resource->has('user')) {
-            $this->set('user', $moduleInit->resource->get('user'));
+        $this->getUrlManager()->addRules(['/' => !empty($init->version) ? $init->version : $init->uniqueId]);
+        // configure tracking component
+        \Yii::configure(\Yii::$app->get('tracking'), $this->_module->tracking);
+        // configure user component
+        if ($this->_module->has('user')) {
+            $this->set('user', $this->_module->get('user'));
         }
-        // set error handler component's params
-        if (!empty($moduleInit->resource->params['errorHandler'])) {
-            foreach ($moduleInit->resource->params['errorHandler'] as $param => $value) {
+        // configure error handler component
+        if (!empty($this->_module->params['errorHandler'])) {
+            foreach ($this->_module->params['errorHandler'] as $param => $value) {
                 $this->errorHandler->{$param} = $value;
             }
         }
-        // merge application params with resource params
-        if (!empty($moduleInit->resource->params)) {
-            $this->params = ArrayHelper::merge($this->params, $moduleInit->resource->params);
-        }
+    }
+
+
+    /**
+     * Возвращает модуль активного веб-ресурса.
+     *
+     * @return Module
+     */
+    final public function getResource()
+    {
+        return $this->_module;
     }
 
 }

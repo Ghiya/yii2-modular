@@ -22,33 +22,39 @@ abstract class Module extends \yii\base\Module
 
 
     /**
-     * @var string $title название модуля
+     * @var string название модуля
      */
     public $title = '';
 
 
     /**
-     * @var string $description описание модуля
+     * @var string описание модуля
      */
     public $description = '';
 
 
     /**
-     * @var bool $isProvider если модуль ресурса провайдера данных внешнего сервиса
+     * @var bool если модуль ресурса провайдера данных внешнего сервиса
      */
     public $isProvider = false;
 
 
     /**
-     * @var bool $isService если модуль системного компонента
+     * @var bool если модуль системного компонента
      */
     public $isService = false;
 
 
     /**
-     * @var bool $isResource если модуль веб-ресурса системы
+     * @var bool если модуль веб-ресурса системы
      */
     public $isResource = false;
+
+
+    /**
+     * @var array
+     */
+    public $bundleParams = [];
 
 
     /**
@@ -80,16 +86,6 @@ abstract class Module extends \yii\base\Module
             return $this->id;
         }
     }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function init()
-    {
-        parent::init();
-        \Yii::configure($this, $this->getConfig());
-    }*/
 
 
     /**

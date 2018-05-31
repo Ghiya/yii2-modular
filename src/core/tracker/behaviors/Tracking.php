@@ -8,6 +8,7 @@ namespace modular\core\tracker\behaviors;
 
 use modular\core\Controller;
 use modular\core\helpers\ArrayHelper;
+use modular\core\tracker\events\Track;
 use modular\core\tracker\TracksDispatcher;
 use modular\resource\ResourceModule;
 use yii\base\Behavior;

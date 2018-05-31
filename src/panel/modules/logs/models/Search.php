@@ -6,7 +6,7 @@
 
 namespace modular\panel\modules\logs\models;
 
-use modular\common\models\ServiceLog;
+use modular\core\models\ServiceLog;
 
 
 /**

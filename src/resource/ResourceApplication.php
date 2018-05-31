@@ -6,10 +6,9 @@
 namespace modular\resource;
 
 
-use modular\common\Application;
-use modular\common\models\ModuleInit;
+use modular\core\Application;
+use modular\core\models\ModuleInit;
 use modular\resource\models\ActionsIndex;
-use modular\resource\modules\Module;
 
 
 /**

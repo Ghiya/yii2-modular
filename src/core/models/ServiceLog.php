@@ -3,14 +3,14 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\panel\modules\logs\models;
+namespace modular\core\models;
 
 
 use modular\core\models\ModuleInit;
 use yii\db\ActiveRecord;
 
 /**
- * Class LogRecord модель записи лога запроса провайдера данных внешнего сервиса.
+ * Class ServiceLog модель записей логов запросов в биллинг.
  *
  * @property int        $id
  * @property int        $bundle_id
@@ -23,10 +23,10 @@ use yii\db\ActiveRecord;
  * @property ModuleInit $bundle
  * @property string     $createdAt read-only форматированная дата создания записи
  *
- * @package modular\panel\modules\logs\models
+ * @package modular\core\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
-class LogRecord extends ActiveRecord
+class ServiceLog extends ActiveRecord
 {
 
 
@@ -123,7 +123,8 @@ class LogRecord extends ActiveRecord
                             "/**\r\n * Файл лога: " . $this->filename .
                             "\r\n */\r\n</pre>\r\n" .
                             file_get_contents($this->filename);
-                    } else {
+                    }
+                    else {
                         return $this->filenameEmptyText;
                     }
                 },
@@ -136,6 +137,7 @@ class LogRecord extends ActiveRecord
      * Возвращает read-only форматированную дату создания записи.
      *
      * @return string
+     * @throws \yii\base\InvalidConfigException
      */
     public function getCreatedAt()
     {

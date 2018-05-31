@@ -6,9 +6,9 @@
 namespace modular\resource\components;
 
 
-use modular\common\helpers\Html;
-use modular\common\modules\Module;
-use modular\common\models\ServiceLog;
+use modular\core\helpers\Html;
+use modular\core\modules\Module;
+use modular\core\models\ServiceLog;
 use yii\base\Object;
 
 /**
@@ -74,7 +74,7 @@ class ServiceLogger extends Object
     /**
      * @var string $logPath абсолютный путь на сервере для хранения файлов логов
      */
-    public $logPath = '@common/logs/providers';
+    public $logPath = '@core/logs/providers';
 
 
     /**

@@ -5,7 +5,7 @@
 
 namespace modular\panel;
 
-use modular\common\Module;
+use modular\core\Module;
 use yii\helpers\ArrayHelper;
 
 

@@ -6,10 +6,10 @@
 namespace modular\panel\modules\logs\controllers;
 
 
-use modular\common\controllers\Controller;
+use modular\core\controllers\Controller;
 use modular\panel\behaviors\FlushRecordsBehavior;
 use modular\panel\models\UserRole;
-use modular\common\models\ServiceLog;
+use modular\core\models\ServiceLog;
 use modular\panel\modules\logs\models\Search;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;

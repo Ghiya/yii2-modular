@@ -6,8 +6,8 @@
 namespace modular\panel;
 
 
-use modular\common\Application;
-use modular\common\models\ModuleInit;
+use modular\core\Application;
+use modular\core\models\ModuleInit;
 use yii\helpers\ArrayHelper;
 
 

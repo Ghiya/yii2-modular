@@ -29,7 +29,7 @@ phpunit.phar
 # vagrant runtime
 /.vagrant
 
-#common files
+#core files
 *-local.php
 *.map
 .crunch

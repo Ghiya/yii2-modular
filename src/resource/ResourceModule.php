@@ -5,7 +5,7 @@
 
 namespace modular\resource;
 
-use modular\common\Module;
+use modular\core\Module;
 
 
 /**

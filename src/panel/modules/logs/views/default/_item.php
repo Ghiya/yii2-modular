@@ -4,7 +4,7 @@
  */
 
 use modular\panel\models\UserRole;
-use modular\common\models\ServiceLog;
+use modular\core\models\ServiceLog;
 use modular\panel\widgets\PanelItemModal;
 use yii\helpers\Html;
 

@@ -7,14 +7,14 @@
 namespace modular\resource\models;
 
 
-use modular\common\models\ModuleInit;
+use modular\core\models\ModuleInit;
 use modular\panel\models\UserRole;
-use modular\resource\modules\Module;
+use modular\resource\ResourceModule;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use modular\common\helpers\ArrayHelper;
-use modular\common\helpers\Html;
+use modular\core\helpers\ArrayHelper;
+use modular\core\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
@@ -64,7 +64,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
     {
         return [
             [
-                'class'              => TimestampBehavior::className(),
+                'class'              => TimestampBehavior::class,
                 'updatedAtAttribute' => false,
             ]
         ];
@@ -89,16 +89,16 @@ class ActionsIndex extends ActiveRecord implements Linkable
      */
     public function getResource()
     {
-        return $this->hasOne(ModuleInit::className(), ['id' => 'resource_id']);
+        return $this->hasOne(ModuleInit::class, ['id' => 'resource_id']);
     }
 
 
     /**
      * Добавляет запись действия для указанного модуля.
      *
-     * @param Module $module
+     * @param ResourceModule $module
      */
-    public static function add(Module $module)
+    public static function add(ResourceModule $module)
     {
         $action = new static();
         $action->index = $module->index;

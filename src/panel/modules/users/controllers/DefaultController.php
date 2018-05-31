@@ -6,7 +6,7 @@
 namespace modular\panel\modules\users\controllers;
 
 
-use modular\common\controllers\Controller;
+use modular\core\controllers\Controller;
 use modular\panel\models\User;
 use modular\panel\models\UserRole;
 use modular\panel\modules\users\models\UserDataForm;

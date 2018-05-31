@@ -16,7 +16,7 @@ use modular\resource\modules\Module;
  * Class ResourceApplication
  * Приложение модулей ресурсов.
  *
- * @property-read Module $resourceModule активный модуль веб-ресурса
+ * @property-read ResourceModule $resourceModule активный модуль веб-ресурса
  *
  * @package modular\resource
  */
@@ -25,7 +25,7 @@ class ResourceApplication extends Application
 
 
     /**
-     * @var Module
+     * @var ResourceModule
      */
     private $_module;
 
@@ -46,7 +46,7 @@ class ResourceApplication extends Application
         $this->registerModule(ModuleInit::findResourceByUrl());
         // [[\yii\web\Application::EVENT_AFTER_ACTION]]
         $this->on(self::EVENT_AFTER_ACTION, function ($event) {
-            /** @var Module $module */
+            /** @var ResourceModule $module */
             $module = $event->sender->controller->module;
             // save resource activity if possible
             if ($module->hasMethod('shouldIndexAction') && $module->shouldIndexAction()) {
@@ -62,7 +62,7 @@ class ResourceApplication extends Application
     final public function registerModule(ModuleInit $init)
     {
         parent::registerModule($init);
-        /** @var Module _module */
+        /** @var ResourceModule _module */
         $this->_module = $this->getModule($init->moduleId);
         $this->name = $init->title;
         // set default routing
@@ -85,7 +85,7 @@ class ResourceApplication extends Application
     /**
      * Возвращает модуль активного веб-ресурса.
      *
-     * @return Module
+     * @return ResourceModule
      */
     final public function getResource()
     {

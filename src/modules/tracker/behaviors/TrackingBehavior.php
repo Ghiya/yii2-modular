@@ -3,13 +3,12 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-namespace modular\common\modules\tracker\behaviors;
+namespace modular\modules\tracker\behaviors;
 
 
 use modular\common\controllers\Controller;
 use modular\common\helpers\ArrayHelper;
-use modular\common\modules\tracker\components\Tracking;
-use modular\resource\components\Tracker;
+use modular\modules\tracker\components\Tracking;
 use modular\resource\modules\Module;
 use yii\base\Behavior;
 
@@ -19,7 +18,7 @@ use yii\base\Behavior;
  *
  * @property-read string $panelUrl URL административной панели веб-ресурса
  *
- * @package modular\common\modules\tracker\behaviors
+ * @package modular\modules\tracker\behaviors
  * @author  Mikadze Ghiya <ghiya@mikadze.me>
  */
 class TrackingBehavior extends Behavior
@@ -97,8 +96,6 @@ class TrackingBehavior extends Behavior
      * Обрабатывает уведомление веб-ресурса через модульный компонент трекера уведомлений.
      *
      * @param TrackingEvent|null $event
-     *
-     * @throws \yii\base\InvalidConfigException
      */
     public function handleEvent($event)
     {

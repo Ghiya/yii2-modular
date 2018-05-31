@@ -4,16 +4,16 @@
  */
 
 
-namespace modular\common\modules\tracker\behaviors;
+namespace modular\modules\tracker\behaviors;
 
 
-use modular\common\modules\tracker\models\Track;
+use modular\modules\tracker\models\Track;
 use yii\swiftmailer\Mailer;
 
 /**
  * Class EmailTrackSender
  *
- * @package modular\common\modules\tracker\behaviors
+ * @package modular\modules\tracker\behaviors
  */
 class EmailTrackSender extends TrackSender
 {

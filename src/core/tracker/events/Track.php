@@ -16,8 +16,9 @@ use yii\base\Event;
  * Абстрактный базовый класс события контроллера с параметрами нового уведомления веб-ресурса.
  *
  * @property-read Controller $sender
+ * @property-read TrackData  $model
  * @property-read array      $observers
- * @property-read array      $sendersIds
+ * @property-read array      $notifyBy
  *
  * @package modular\core\tracker\behaviors
  */
@@ -115,6 +116,8 @@ abstract class Track extends Event
 
 
     /**
+     * Список данных получателей уведомлений.
+     *
      * @return array
      */
     public function getObservers()
@@ -127,24 +130,27 @@ abstract class Track extends Event
 
 
     /**
+     * Список используемых идентификаторов отправщиков уведомлений.
+     *
      * @return array
      */
-    public function getSenderIds()
+    public function getNotifyBy()
     {
         return
-            !empty($this->sendParams['notify']) ?
-                (array)$this->sendParams['notify'] :
+            !empty($this->sendParams['notifyBy']) ?
+                (array)$this->sendParams['notifyBy'] :
                 [];
     }
 
 
     /**
+     * Если возможна отправка уведомления.
+     *
      * @return bool
      */
     public function isSendEnable()
     {
-        return
-            !empty($this->sendParams['notify']) && !empty($this->sendParams['observers']);
+        return !empty($this->notifyBy) && !empty($this->observers);
     }
 
 }

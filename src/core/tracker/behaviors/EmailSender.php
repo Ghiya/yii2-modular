@@ -8,10 +8,12 @@ namespace modular\core\tracker\behaviors;
 
 
 use modular\core\tracker\events\Track;
+use modular\core\tracker\models\TrackData;
 use yii\swiftmailer\Mailer;
 
 /**
- * Class EmailTrackSender
+ * Class EmailSender
+ * Поведение отправщика уведомлений через электронную почту.
  *
  * @package modular\core\tracker\behaviors
  */
@@ -19,6 +21,9 @@ class EmailSender extends Sender
 {
 
 
+    /**
+     * @var string
+     */
     protected $id = "email";
 
 
@@ -29,22 +34,7 @@ class EmailSender extends Sender
 
 
     /**
-     * @return array
-     */
-    public function events()
-    {
-        return
-            [
-                $this->id . ".sendTrackEvent" =>
-                    function (Track $track) {
-                        $this->send($track);
-                    }
-            ];
-    }
-
-
-    /**
-     * @param Track $track
+     * {@inheritdoc}
      *
      * @throws \yii\base\InvalidConfigException
      */
@@ -104,11 +94,11 @@ class EmailSender extends Sender
     protected function getMailViewPath($priority)
     {
         switch ($priority) {
-            case Track::PRIORITY_WARNING :
+            case TrackData::PRIORITY_WARNING :
                 return '@resource/mail/tracker/warning-html';
                 break;
 
-            case Track::PRIORITY_NOTICE :
+            case TrackData::PRIORITY_NOTICE :
                 return '@resource/mail/tracker/notice-html';
                 break;
 

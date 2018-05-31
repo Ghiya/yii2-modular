@@ -8,7 +8,7 @@ namespace modular\core\tracker\behaviors;
 
 
 use modular\core\tracker\events\Track;
-use modular\core\tracker\TracksDispatcher;
+use modular\core\tracker\TracksManager;
 use yii\base\Behavior;
 use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
@@ -16,12 +16,15 @@ use yii\base\InvalidConfigException;
 /**
  * Class TrackSender
  *
- * @property-read TracksDispatcher $owner
+ * @property-read TracksManager $owner
  *
  * @package modular\core\tracker\behaviors
  */
-class Sender extends Behavior
+abstract class Sender extends Behavior
 {
+
+
+    const DEFAULT_EVENT_POSTFIX = '.sendTrackEvent';
 
 
     /**
@@ -56,10 +59,36 @@ class Sender extends Behavior
     public function init()
     {
         parent::init();
+        if (empty($this->id)) {
+            throw new InvalidConfigException("Property `id` must be defined in class.");
+        }
         if (empty($this->sender)) {
             throw new InvalidConfigException("Property `sender` must be defined.");
         }
     }
+
+
+    /**
+     * @return array
+     */
+    public function events()
+    {
+        return
+            [
+                self::eventNameFor($this->id) =>
+                    function (Track $track) {
+                        $this->send($track);
+                    }
+            ];
+    }
+
+
+    /**
+     * @param Track $track
+     *
+     * @return mixed
+     */
+    abstract protected function send(Track $track);
 
 
     /**
@@ -81,6 +110,19 @@ class Sender extends Behavior
             }
         }
         return array_unique($this->_recipients);
+    }
+
+
+    /**
+     * Возвращает название события отправки уведомления для указанного идентификатора отправщика.
+     *
+     * @param string $senderId
+     *
+     * @return string
+     */
+    public static function eventNameFor($senderId = "")
+    {
+        return "$senderId." . self::DEFAULT_EVENT_POSTFIX;
     }
 
 }

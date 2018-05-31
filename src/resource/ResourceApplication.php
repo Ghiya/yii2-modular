@@ -9,6 +9,7 @@ namespace modular\resource;
 use modular\core\Application;
 use modular\core\models\ModuleInit;
 use modular\resource\models\ActionsIndex;
+use yii\log\FileTarget;
 
 
 /**
@@ -64,21 +65,23 @@ class ResourceApplication extends Application
         /** @var ResourceModule _module */
         $this->_module = $this->getModule($init->moduleId);
         $this->name = $init->title;
+        // define module logs
+        $this->log->targets[] = new FileTarget($init->getLogParams());
         // set default routing
         $this->getUrlManager()->addRules(['/' => !empty($init->version) ? $init->version : $init->uniqueId]);
-        // configure tracking component
-        \Yii::configure(\Yii::$app->get('tracking'), $this->_module->tracking);
         // configure user component
         if ($this->_module->has('user')) {
             $this->set('user', $this->_module->get('user'));
         }
         // configure error handler component
+        \Yii::configure($this->get('errorHandler'), $this->_module->errorsConfig);
         if (!empty($this->_module->params['errorHandler'])) {
             foreach ($this->_module->params['errorHandler'] as $param => $value) {
                 $this->errorHandler->{$param} = $value;
             }
         }
     }
+
 
 
     /**

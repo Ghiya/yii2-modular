@@ -9,7 +9,7 @@ namespace modular\core\tracker\behaviors;
 use modular\core\Controller;
 use modular\core\helpers\ArrayHelper;
 use modular\core\tracker\events\Track;
-use modular\core\tracker\TracksDispatcher;
+use modular\core\tracker\TracksManager;
 use modular\resource\ResourceModule;
 use yii\base\Behavior;
 use yii\base\Module;
@@ -46,15 +46,15 @@ class Tracking extends Behavior
 
 
     /**
-     * @var array $eventTitles заголовки текстов обрабатываемых событий
+     * @var array заголовки пользовательских уведомлений
      */
-    public $eventTitles = [];
+    public $tracksTitles = [];
 
 
     /**
-     * @var array $eventTracks константы триггеров обрабатываемых событий
+     * @var array идентификаторы событий пользовательских уведомлений
      */
-    public $eventTracks = [];
+    public $tracksEvents = [];
 
 
     /**
@@ -77,7 +77,7 @@ class Tracking extends Behavior
                     self::EVENT_CAUGHT_ERROR => 'handleEvent',
                 ]
             );
-        foreach ($this->eventTracks as $trackEvent) {
+        foreach ($this->tracksEvents as $trackEvent) {
             $events[$trackEvent] = 'handleEvent';
         }
         return $events;
@@ -87,49 +87,54 @@ class Tracking extends Behavior
     /**
      * Возвращает параметры и данные уведомления в зависимости от обрабатываемого события.
      *
-     * @param Track $event название события
+     * @param Track $track событие уведомления
      */
-    public function trackOnEvent(Track &$event)
+    public function trackOnEvent(Track &$track)
     {
     }
 
 
     /**
-     * Обрабатывает уведомление веб-ресурса через модульный компонент трекера уведомлений.
+     * Подготавливает уведомление веб-ресурса и вызывает событие обработки.
      *
-     * @param Track|null $event
+     * @param Track|null $track
      */
-    public function handleEvent($event)
+    public function handleEvent(Track $track)
     {
-        \Yii::debug("Handle track event `" . $event->name . "`", __METHOD__);
-        // определяет данные уведомления
-        $this->trackOnEvent($event);
-        $event->track =
-            ArrayHelper::merge(
-                $event->track,
+        \Yii::debug("Handle web-resource track `" . $track->name . "`", __METHOD__);
+        // configure track with module params ( default config )
+        \Yii::configure($track, $this->owner->module->tracksConfig);
+        // set custom track message
+        $this->trackOnEvent($track);
+        // add track title
+        $this->addTitle($track);
+        // add track owner's params
+        $track
+            ->model
+            ->load(
                 [
-                    'message'     => $this->eventTitle($event->name) . $event->track['message'],
-                    'resource_id' => $event->sender->module->bundleParams['module_id'],
-                    'version'     => $event->sender->module->bundleParams['version']
+                    'resource_id' => $this->owner->module->bundleParams['module_id'],
+                    'version'     => $this->owner->module->bundleParams['version']
                 ]
             );
+        // triggers handle event
         \Yii::$app->trigger(
-            TracksDispatcher::EVENT_HANDLE_TRACK,
-            $event
+            TracksManager::EVENT_HANDLE_TRACK,
+            $track
         );
     }
 
 
     /**
-     * Возвращает заголовок уведомления в зависимости от названия обрабатываемого события.
+     * Добавляет заголовок уведомления в зависимости от названия обрабатываемого события.
      *
-     * @param string $eventName
-     *
-     * @return string
+     * @param Track $track
      */
-    protected function eventTitle($eventName = '')
+    protected function addTitle(Track &$track)
     {
-        return (!empty($this->eventTitles[$eventName])) ? (string)"<strong>" . $this->eventTitles[$eventName] . "</strong>\r\n\r\n" : '';
+        $track->message =
+            !empty($this->tracksTitles[$track->name]) ?
+                (string)"<strong>" . $this->tracksTitles[$track->name] . "</strong>\r\n\r\n$track->message" : $track->message;
     }
 
 

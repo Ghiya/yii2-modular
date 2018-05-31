@@ -12,7 +12,9 @@ use modular\core\Module;
  * Class Module
  * Базовый класс модуля веб-ресурса.
  *
- * @property-read string $index идентификатор абонента в зависимости от выполняемого веб-ресурса
+ * @property-read string $index        идентификатор абонента в зависимости от выполняемого веб-ресурса
+ * @property-read array  $tracksConfig параметры конфигурации компонента управления уведомлениями модуля
+ * @property-read array  $errorsConfig параметры конфигурации компонента обработчика ошибок
  *
  * @package modular\resource
  */
@@ -27,9 +29,30 @@ abstract class ResourceModule extends Module
 
 
     /**
-     * @var array параметры трекера веб-ресурса
+     * Возвращает параметры конфигурации компонента управления уведомлениями модуля
+     * [[\modular\core\tracker\TracksManager]]. Если параметры не определены, то вернёт пустой массив.
+     *
+     * @return array
      */
-    public $tracking = [];
+    public function getTracksConfig()
+    {
+        return
+            isset($this->params['tracks']) ?
+                $this->params['tracks'] : [];
+    }
+
+
+    /**
+     * Возвращает параметры конфигурации компонента обработчика ошибок.
+     *
+     * @return array
+     */
+    public function getErrorsConfig()
+    {
+        return
+            isset($this->params['errors']) ?
+                $this->params['errors'] : [];
+    }
 
 
     /**

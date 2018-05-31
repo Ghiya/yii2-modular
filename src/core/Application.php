@@ -146,18 +146,21 @@ abstract class Application extends \yii\web\Application
             $this->isBackend ?
                 '@modular\panel\modules\Module' :
                 '@modular\resource\modules\Module';
-        $this->setModule($init->moduleId, [
-            'class'        =>
-                file_exists($init->resourceAlias . '/Module.php') ?
-                    $init->resourcePath . '\Module' :
-                    $defaultModuleClass,
-            'title'        => $init->title,
-            'description'  => $init->description,
-            'isProvider'   => $init->isProvider,
-            'isService'    => $init->isService,
-            'isResource'   => $init->isResource,
-            'bundleParams' => $init->toArray()
-        ]);
+        $this->setModule(
+            $init->moduleId,
+            [
+                'class'        =>
+                    file_exists($init->resourceAlias . '/Module.php') ?
+                        $init->resourcePath . '\Module' :
+                        $defaultModuleClass,
+                'title'        => $init->title,
+                'description'  => $init->description,
+                'isProvider'   => $init->isProvider,
+                'isService'    => $init->isService,
+                'isResource'   => $init->isResource,
+                'bundleParams' => $init->toArray()
+            ]
+        );
         // configure module
         if (file_exists($init->resourceAlias . '/config/config.php')) {
             \Yii::configure(
@@ -173,29 +176,6 @@ abstract class Application extends \yii\web\Application
             if (isset($this->getModule($init->moduleId)->params['defaults']['language'])) {
                 $this->language = $this->getModule($init->moduleId)->params['defaults']['language'];
             }
-            // init module logs
-            \Yii::$app->log->targets[] = new FileTarget([
-                'logFile'        => !empty($init->version) ?
-                    '@core/logs/'
-                    . $init->section_id . '/'
-                    . $init->module_id . '/'
-                    . $init->version . '/'
-                    . date("Y-m/d/")
-                    . date("H")
-                    . '.log' :
-                    '@core/logs/'
-                    . $init->section_id . '/'
-                    . $init->module_id . '/'
-                    . date("Y-m/d/")
-                    . date("H")
-                    . '.log',
-                'exportInterval' => 1,
-                'levels'         => ['error', 'info', 'trace', 'warning',],
-                'categories'     => [],
-                'prefix'         => function ($message) {
-                    return "[" . \Yii::$app->request->userIP . "]";
-                },
-            ]);
             // init routing
             if ($this->getModule($init->moduleId)->has('urlManager')) {
                 \Yii::$app->getUrlManager()->addRules($this->getModule($init->moduleId)->get('urlManager')->rules);
@@ -210,7 +190,7 @@ abstract class Application extends \yii\web\Application
         }
         else {
             throw new HttpException(
-                404,
+                500,
                 'Отсутствует конфигурационный файл модуля с идентификатором `' . $init->moduleId . '`'
             );
         }

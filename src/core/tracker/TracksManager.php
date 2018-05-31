@@ -7,21 +7,22 @@ namespace modular\core\tracker;
 
 
 use modular\core\Application;
+use modular\core\tracker\behaviors\Sender;
 use modular\core\tracker\events\Track;
 use yii\base\BootstrapInterface;
 use yii\base\Component;
 
 
 /**
- * Class TracksDispatcher
- * Компонент трекера уведомлений модулей веб-ресурсов.
+ * Class TracksManager
+ * Компонент управления треками уведомлений модулей веб-ресурсов.
  * Прикрепляет и конфигурирует поведение приложения для обработки и отправки уведомлений веб-ресурсов.
  *
  * > Note: Обязателен к загрузке на этапе сборки приложения `bootstrap`.
  *
  * @package modular\core\tracker
  */
-class TracksDispatcher extends Component implements BootstrapInterface
+class TracksManager extends Component implements BootstrapInterface
 {
 
 
@@ -155,8 +156,8 @@ class TracksDispatcher extends Component implements BootstrapInterface
             $track = $this->getQueue()->dequeue();
             \Yii::debug("Sending track `" . $track->getModel()->getMessageSubject() . "`", __METHOD__);
             if ($track->isSendEnable()) {
-                foreach ($track->sendersIds as $senderId) {
-                    $this->trigger("$senderId.sendTrackEvent", $track);
+                foreach ($track->notifyBy as $senderId) {
+                    $this->trigger(Sender::eventNameFor($senderId), $track);
                 }
             }
         }

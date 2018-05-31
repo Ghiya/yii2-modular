@@ -221,6 +221,62 @@ class ModuleInit extends ActiveRecord
 
 
     /**
+     * Возвращает путь папки для хранения логов модуля.
+     *
+     * @return bool|string
+     */
+    protected function getLogFolderPath()
+    {
+        $path = \Yii::getAlias('@common/logs/resources');
+        if (!is_readable($path)) {
+            mkdir($path);
+        }
+        $path = "$path/" . $this->getUniqueId();
+        if (!is_readable($path)) {
+            mkdir($path);
+        }
+        $path = "$path/" . date("Y-m-d");
+        if (!is_readable($path)) {
+            mkdir($path);
+        }
+        return $path;
+    }
+
+
+    /**
+     * Возвращает полный путь для актуального файла лога.
+     *
+     * @return string
+     */
+    protected function getLogFile()
+    {
+        return !empty($this->version) ?
+            $this->getLogFolderPath() . "/$this->version" . date("_H_00") . ".log" :
+            $this->getLogFolderPath() . "/" . date("H_00") . ".log";
+    }
+
+
+    /**
+     * Возвращает параметры конфигурации Yii2 компонента лога.
+     *
+     * @return array
+     */
+    public function getLogParams()
+    {
+        return
+            [
+                'logFile'        => $this->getLogFile(),
+                'exportInterval' => 1,
+                'levels'         => ['error', 'info', 'trace', 'warning',],
+                'categories'     => [],
+                'prefix'         => function () {
+                    return "[" . \Yii::$app->request->userIP . "]";
+                },
+            ];
+    }
+
+
+    /**
      * Возвращает read-only значение роутинга по-умолчанию для модуля веб-ресурса пакета.
      * @return string
      */

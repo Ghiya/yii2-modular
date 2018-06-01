@@ -134,11 +134,8 @@ class TracksManager extends Component implements BootstrapInterface
      */
     public function handleTrack(Track $track)
     {
-        // создаём модель уведомления и добавляем её в очередь
+        // создаёт модель уведомления и добавляем её в очередь
         if (!empty($track->message)) {
-            if ($track->keepTrack) {
-                $track->getModel()->save(false);
-            }
             $this->configSend($track);
             $this->getQueue()->enqueue($track);
         }
@@ -154,7 +151,7 @@ class TracksManager extends Component implements BootstrapInterface
         while (!$this->getQueue()->isEmpty()) {
             /** @var Track $track */
             $track = $this->getQueue()->dequeue();
-            \Yii::debug("Sending track `" . $track->getModel()->getMessageSubject() . "`", __METHOD__);
+            \Yii::debug("Sending track `" . $track->model->getMessageSubject() . "`", __METHOD__);
             if ($track->isSendEnable()) {
                 foreach ($track->notifyBy as $senderId) {
                     $this->trigger(Sender::eventNameFor($senderId), $track);

@@ -92,6 +92,7 @@ class TrackData extends ActiveRecord
                 self::SCENARIO_DEFAULT => [
                     'session_id',
                     'resource_id',
+                    'version',
                     'module_id',
                     'controller_id',
                     'action_id',
@@ -448,9 +449,9 @@ class TrackData extends ActiveRecord
      *
      * @return array
      */
-    public function messageParams()
+    public function getNoticeParams()
     {
-        return ArrayHelper::merge(
+        /*return ArrayHelper::merge(
             $this->toArray([
                 'message',
                 'priority',
@@ -461,7 +462,15 @@ class TrackData extends ActiveRecord
             [
                 'link' => $this->getRelatedLink(false, true),
             ]
-        );
+        );*/
+        return
+            $this->toArray([
+                'message',
+                'priority',
+                'module_id',
+                'version',
+                'session_id',
+            ]);
     }
 
 

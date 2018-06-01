@@ -9,7 +9,6 @@ namespace modular\core\tracker\behaviors;
 
 use modular\core\tracker\events\Track;
 use modular\core\tracker\models\TrackData;
-use yii\swiftmailer\Mailer;
 
 /**
  * Class EmailSender
@@ -43,13 +42,13 @@ class EmailSender extends Sender
         $emails = [];
         $subject = $track->getModel()->getMessageSubject();
         foreach ($this->getRecipients($track) as $recipient) {
-            $emails[] = $this->getMailer()
+            $emails[] = \Yii::$app->mailer
                 ->compose(
                     $this->getMailViewPath($track->priority),
                     [
                         'resource' => $track->sender->module->bundleParams['title'],
                         'subject'  => $subject,
-                        'notice'   => $track->getModel()->messageParams(),
+                        'notice'   => $track->getModel()->getNoticeParams(),
                     ]
                 )
                 ->setFrom($this->sender)
@@ -57,32 +56,7 @@ class EmailSender extends Sender
                 ->setSubject($subject);
         }
         // отправляем уведомление на все адреса разработчиков
-        $this->getMailer()->sendMultiple($emails);
-    }
-
-
-    /**
-     * @var Mailer
-     */
-    private $_mailer;
-
-
-    /**
-     * @return Mailer
-     */
-    protected function getMailer()
-    {
-        if (empty($this->_mailer)) {
-            $this->_mailer =
-                new Mailer(
-                    [
-                        'useFileTransport' => false,
-                        'htmlLayout'       => '@resource/mail/layouts/html',
-                        'textLayout'       => '@resource/mail/layouts/text',
-                    ]
-                );
-        }
-        return $this->_mailer;
+        \Yii::$app->mailer->sendMultiple($emails);
     }
 
 

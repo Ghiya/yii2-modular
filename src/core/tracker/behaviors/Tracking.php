@@ -74,11 +74,11 @@ class Tracking extends Behavior
             ArrayHelper::merge(
                 parent::events(),
                 [
-                    self::EVENT_CAUGHT_ERROR => 'handleEvent',
+                    self::EVENT_CAUGHT_ERROR => 'createTrack',
                 ]
             );
         foreach ($this->tracksEvents as $trackEvent) {
-            $events[$trackEvent] = 'handleEvent';
+            $events[$trackEvent] = 'createTrack';
         }
         return $events;
     }
@@ -95,28 +95,19 @@ class Tracking extends Behavior
 
 
     /**
-     * Подготавливает уведомление веб-ресурса и вызывает событие обработки.
+     * Создаёт новое событие уведомления веб-ресурса и вызывает его обработку.
      *
-     * @param Track|null $track
+     * @param Track $track
      */
-    public function handleEvent(Track $track)
+    public function createTrack(Track $track)
     {
         \Yii::debug("Handle web-resource track `" . $track->name . "`", __METHOD__);
-        // configure track with module params ( default config )
-        \Yii::configure($track, $this->owner->module->tracksConfig);
+        // configure track send params with module default if track defined are empty
+        $this->configTrack($track);
         // set custom track message
         $this->trackOnEvent($track);
-        // add track title
-        $this->addTitle($track);
-        // add track owner's params
-        $track
-            ->model
-            ->load(
-                [
-                    'resource_id' => $this->owner->module->bundleParams['module_id'],
-                    'version'     => $this->owner->module->bundleParams['version']
-                ]
-            );
+        // completes track model
+        $this->completeModel($track);
         // triggers handle event
         \Yii::$app->trigger(
             TracksManager::EVENT_HANDLE_TRACK,
@@ -126,15 +117,48 @@ class Tracking extends Behavior
 
 
     /**
+     * Конфигурирует уведомление перед обработкой.
+     * Устанавливает кастомные параметры отправки уведомления, если они определены в событии.
+     *
+     * @param Track $track
+     */
+    protected function configTrack(Track &$track)
+    {
+        $config = $this->owner->module->tracksConfig;
+        if (!empty($config)) {
+            if (!empty($track->notifyBy)) {
+                $config['sendParams']['notifyBy'] = $track->notifyBy;
+            }
+            if (!empty($track->observers)) {
+                $config['sendParams']['observers'] = $track->observers;
+            }
+            \Yii::configure(
+                $track,
+                $config
+            );
+        }
+    }
+
+
+    /**
      * Добавляет заголовок уведомления в зависимости от названия обрабатываемого события.
      *
      * @param Track $track
      */
-    protected function addTitle(Track &$track)
+    protected function completeModel(Track &$track)
     {
-        $track->message =
-            !empty($this->tracksTitles[$track->name]) ?
-                (string)"<strong>" . $this->tracksTitles[$track->name] . "</strong>\r\n\r\n$track->message" : $track->message;
+        $track->model->load(
+            [
+                'message'     =>
+                    !empty($this->tracksTitles[$track->name]) ?
+                        (string)"<strong>" . $this->tracksTitles[$track->name] . "</strong>\r\n\r\n$track->message" : $track->message,
+                'resource_id' => $this->owner->module->bundleParams['module_id'],
+                'version'     => $this->owner->module->bundleParams['version']
+            ]
+        );
+        if ($track->keepTrack) {
+            $track->model->save(false);
+        }
     }
 
 

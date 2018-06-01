@@ -206,7 +206,7 @@ abstract class Application extends \yii\web\Application
     {
         $resources = [];
         foreach ($this->modules as $module) {
-            if (is_object($module) && isset($module->params['bundleParams']) && $module->params['bundleParams']['type'] == ModuleInit::TYPE_PROVIDER) {
+            if (is_object($module) && isset($module->bundleParams) && $module->bundleParams['type'] == ModuleInit::TYPE_PROVIDER) {
                 $resources[] = $module;
             }
         }
@@ -223,7 +223,7 @@ abstract class Application extends \yii\web\Application
     {
         $resources = [];
         foreach ($this->modules as $module) {
-            if (is_object($module) && isset($module->params['bundleParams']) && $module->params['bundleParams']['type'] == ModuleInit::TYPE_SERVICE) {
+            if (is_object($module) && isset($module->bundleParams) && $module->bundleParams['type'] == ModuleInit::TYPE_SERVICE) {
                 $resources[] = $module;
             }
         }
@@ -240,7 +240,7 @@ abstract class Application extends \yii\web\Application
     {
         $resources = [];
         foreach ($this->modules as $module) {
-            if (is_object($module) && isset($module->params['bundleParams']) && $module->params['bundleParams']['type'] == ModuleInit::TYPE_RESOURCE) {
+            if (is_object($module) && isset($module->bundleParams) && $module->bundleParams['type'] == ModuleInit::TYPE_RESOURCE) {
                 $resources[] = $module;
             }
         }

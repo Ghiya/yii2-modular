@@ -13,19 +13,23 @@ use yii\web\IdentityInterface;
 /**
  * Class AutoLoginBehavior
  * Поведение приложения для автоматичской авторизации пользователя по указанному параметру события.
+ *
  * @package modular\core\behaviors
  */
 class AutoLoginBehavior extends Behavior
 {
 
 
+    /**
+     * Название события автоматической авторизации пользователя.
+     */
     const EVENT_AUTO_LOGIN = 'modular.autoLoginEvent';
 
 
     /**
      * @var int|null
      */
-    public $duration;
+    public $duration = 0;
 
 
     /**

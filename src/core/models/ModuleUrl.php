@@ -42,7 +42,7 @@ class ModuleUrl extends ActiveRecord
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
         ];
     }
 
@@ -54,7 +54,7 @@ class ModuleUrl extends ActiveRecord
      */
     public function getInit()
     {
-        return $this->hasOne(ModuleInit::className(), ['id' => 'init_id',]);
+        return $this->hasOne(ModuleInit::class, ['id' => 'init_id',]);
     }
 
 }

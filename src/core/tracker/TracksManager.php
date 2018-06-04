@@ -45,6 +45,12 @@ class TracksManager extends Component implements BootstrapInterface
 
 
     /**
+     * @var array  список получателей разработчиков ( используется для параметра уведомления `devOnly` )
+     */
+    public $devObservers = [];
+
+
+    /**
      * @var array конфигурация отправщика уведомлений используемого по-умолчанию
      */
     public $defaultSender = [];
@@ -69,7 +75,7 @@ class TracksManager extends Component implements BootstrapInterface
 
 
     /**
-     * {@inheritdoc}
+     * @param Application $app
      */
     public function bootstrap($app)
     {
@@ -116,13 +122,7 @@ class TracksManager extends Component implements BootstrapInterface
             }
         }
         if ($track->devOnly) {
-            $track->sendParams['observers'] =
-                [
-                    [
-                        'gmikadze@v-tell.com',
-                        '79583897366',
-                    ],
-                ];
+            $track->sendParams['observers'] = $this->devObservers;
         }
     }
 

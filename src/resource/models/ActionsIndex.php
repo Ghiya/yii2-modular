@@ -7,14 +7,14 @@
 namespace modular\resource\models;
 
 
+use modular\core\helpers\ArrayHelper;
+use modular\core\helpers\Html;
 use modular\core\models\ModuleInit;
 use modular\panel\models\UserRole;
 use modular\resource\ResourceModule;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use modular\core\helpers\ArrayHelper;
-use modular\core\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\UnsetArrayValue;
 use yii\helpers\Url;
@@ -102,7 +102,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
     {
         $action = new static();
         $action->index = $module->index;
-        $action->resource_id = $module->params['bundleParams']['id'];
+        $action->resource_id = $module->bundleParams['id'];
         $action->panel_link = $module->getIndexPanelLink();
         $action->description = $module->indexDescription(
             \Yii::$app->controller->id,

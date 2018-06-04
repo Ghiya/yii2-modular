@@ -9,7 +9,6 @@ namespace modular\core;
 use modular\core\models\ModuleInit;
 use yii\base\ErrorException;
 use yii\helpers\ArrayHelper;
-use yii\log\FileTarget;
 use yii\web\HttpException;
 
 
@@ -163,35 +162,53 @@ abstract class Application extends \yii\web\Application
         );
         // configure module
         if (file_exists($init->resourceAlias . '/config/config.php')) {
-            \Yii::configure(
-                $this->getModule($init->moduleId),
-                ArrayHelper::merge(
-                    require $init->resourceAlias . '/config/config.php',
-                    file_exists($init->resourceAlias . '/config/config-local.php') ?
-                        require $init->resourceAlias . '/config/config-local.php' :
-                        []
-                )
+            $this->config(
+                $init->moduleId,
+                $init->resourceAlias
             );
-            // define application language
-            if (isset($this->getModule($init->moduleId)->params['defaults']['language'])) {
-                $this->language = $this->getModule($init->moduleId)->params['defaults']['language'];
-            }
-            // init routing
-            if ($this->getModule($init->moduleId)->has('urlManager')) {
-                \Yii::$app->getUrlManager()->addRules($this->getModule($init->moduleId)->get('urlManager')->rules);
-            }
-            // устанавливает компонент языковых локализаций приложения если он есть
-            if ($this->getModule($init->moduleId)->has('i18n')) {
-                $this->i18n->translations = ArrayHelper::merge(
-                    $this->i18n->translations,
-                    $this->getModule($init->moduleId)->get('i18n')->translations
-                );
-            }
         }
         else {
             throw new HttpException(
                 500,
                 'Отсутствует конфигурационный файл модуля с идентификатором `' . $init->moduleId . '`'
+            );
+        }
+    }
+
+
+    /**
+     * Конфигурирует модуль и настраивает зависимые параметры приложения.
+     *
+     * @param string $moduleId
+     * @param string $modulePath
+     *
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function config($moduleId, $modulePath)
+    {
+        $withModule = $this->getModule($moduleId);
+        \Yii::configure(
+            $withModule,
+            ArrayHelper::merge(
+                require $modulePath . '/config/config.php',
+                file_exists($modulePath . '/config/config-local.php') ?
+                    require $modulePath . '/config/config-local.php' :
+                    []
+            )
+        );
+        // define application language
+        if (isset($withModule->params['defaults']['language'])) {
+            $this->language = $withModule->params['defaults']['language'];
+        }
+        // init routing
+        if ($withModule->has('urlManager')) {
+            \Yii::$app->getUrlManager()->addRules($withModule->get('urlManager')->rules);
+        }
+        // устанавливает компонент языковых локализаций приложения если он есть
+        if ($withModule->has('i18n')) {
+            $this->i18n->translations = ArrayHelper::merge(
+                $this->i18n->translations,
+                $withModule->get('i18n')->translations
             );
         }
     }

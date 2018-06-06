@@ -47,7 +47,10 @@ class AutoLoginBehavior extends Behavior
                                 \Yii::createObject(
                                     \Yii::$app->user->identityClass
                                 );
-                            \Yii::$app->user->login($identity::findIdentity($event->userId), $this->duration);
+                            $user = $identity::findIdentity($event->userId);
+                            if ( !empty($user) ) {
+                                \Yii::$app->user->login($identity::findIdentity($event->userId), $this->duration);
+                            }
                         }
                     }
             ];

@@ -68,7 +68,7 @@ class ResourceApplication extends Application
         // define module logs
         $this->log->targets[] = new FileTarget($init->getLogParams());
         // set default routing
-        $this->getUrlManager()->addRules(['/' => !empty($init->version) ? $init->version : $init->uniqueId]);
+        $this->getUrlManager()->addRules(['/' => $init->routeUri . '/index',]);
         // configure user component
         if ($this->_module->has('user')) {
             $this->set('user', $this->_module->get('user'));
@@ -81,7 +81,6 @@ class ResourceApplication extends Application
             }
         }
     }
-
 
 
     /**

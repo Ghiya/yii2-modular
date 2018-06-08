@@ -19,6 +19,8 @@ use yii\web\NotFoundHttpException;
 
 
 /**
+ * @todo    strongly refactor
+ *
  * Class ModuleInit
  * Модель идентификационных параметров модуля ресурса.
  *
@@ -32,6 +34,7 @@ use yii\web\NotFoundHttpException;
  * @property bool                $is_active       если активен
  * @property int                 $created_at
  * @property int                 $updated_at
+ * @property-read string         $routeUri        URI роутинга контроллера модуля используемого по-умолчанию
  * @property-read bool           $isProvider      если модель системных параметров модуля провайдера
  * @property-read bool           $isService       если модель системных параметров служебного компонента
  * @property-read bool           $isResource      если модель системных параметров модуля веб-ресурса
@@ -277,12 +280,13 @@ class ModuleInit extends ActiveRecord
 
 
     /**
-     * Возвращает read-only значение роутинга по-умолчанию для модуля веб-ресурса пакета.
+     * Возвращает строковое значение URI для роутинга контроллера модуля используемого по-умолчанию.
+     *
      * @return string
      */
-    public function getDefaultRoute()
+    public function getRouteUri()
     {
-        return (!empty($this->version)) ? $this->version . '/default/index' : 'default/index';
+        return (!empty($this->version)) ? $this->version . '/default' : $this->uniqueId . '/default';
     }
 
 

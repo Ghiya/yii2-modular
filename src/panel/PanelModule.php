@@ -18,8 +18,31 @@ use yii\helpers\ArrayHelper;
  *
  * @package modular\panel
  */
-class PanelModule extends Module
+abstract class PanelModule extends Module
 {
+
+
+    /**
+     * @return array
+     */
+    protected function menuItems()
+    {
+        return [];
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+        \Yii::$app->params['menuItems'][] =
+            [
+                'label' => $this->title,
+                'items' => $this->menuItems()
+            ];
+    }
 
 
     /**

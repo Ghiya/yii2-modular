@@ -31,7 +31,7 @@ class Module extends PanelModule
                 [
                     [
                         'label'   => '<span class="pull-left"><i class="fa fa-envelope-o"></i></span><span class="pull-right">'
-                            . \Yii::t("core", "Tracker")
+                            . "Tracker"
                             . '</span>',
                         'url'     => ["/tracker"],
                         'encode'  => false,

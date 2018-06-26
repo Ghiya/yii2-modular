@@ -8,7 +8,9 @@ namespace modular\core\models;
 
 use modular\core\Application;
 use modular\core\Module;
+use modular\panel\PanelModule;
 use modular\resource\models\ActionsIndex;
+use modular\resource\ResourceModule;
 use yii\base\ErrorException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -16,20 +18,17 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 
 /**
- * @todo    strongly refactor
- *
  * Class ModuleInit
  * Модель идентификационных параметров модуля ресурса.
  *
- * @property string              $section_id      расположение модуля
  * @property string              $module_id       идентификатор
  * @property string              $version         версия
  * @property string              $title           название
  * @property string              $description     описание
- * @property int                 $type            тип ресурса
  * @property string              $params          параметры ресурса в JSON формате
  * @property bool                $is_active       если активен
  * @property int                 $created_at
@@ -39,43 +38,18 @@ use yii\web\NotFoundHttpException;
  * @property-read bool           $isService       если модель системных параметров служебного компонента
  * @property-read bool           $isResource      если модель системных параметров модуля веб-ресурса
  * @property-read Module         $resource        модуль
- * @property-read string         $moduleId        идентификатор модуля
+ * @property-read string $appId идентификатор модуля в приложении
  * @property-read string         $resourceAlias   путь к модулю
  * @property-read string         $resourcePath    пространство имён модуля
  * @property-read array          $bundleParams    параметры модуля ресурса
- * @property-read ModuleUrl[]    $links           массив связанных URL
+ * @property-read ModuleUrl[] $urls массив связанных URL
  * @property-read ActionsIndex[] $actions         массив моделей записей действий абонента
  * @property-read ModuleInit     $relatedResource запись ресурса для панели администрирования
- * @property-read string         $uniqueId        уникальный идентификатор модуля
  *
  * @package modular\core\models
  */
 class ModuleInit extends ActiveRecord
 {
-
-
-    /**
-     * @const int TYPE_RESOURCE тип модуля веб-ресурса
-     */
-    const TYPE_RESOURCE = 0;
-
-
-    /**
-     * @const int TYPE_PROVIDER тип модуля провайдер данных внешних сервисов
-     */
-    const TYPE_PROVIDER = 1;
-
-
-    /**
-     * @const int TYPE_SERVICE тип модуля служебного системного сервиса
-     */
-    const TYPE_SERVICE = 2;
-
-
-    /**
-     * Разделитель в идентификаторе модуля.
-     */
-    const MODULE_ID_DELIMITER = "/\./i";
 
 
     /**
@@ -85,17 +59,11 @@ class ModuleInit extends ActiveRecord
 
 
     /**
-     * @var string $_moduleId
-     */
-    private $_moduleId = '';
-
-
-    /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'common__v1_resources';
+        return 'common__v1_init';
     }
 
 
@@ -104,13 +72,11 @@ class ModuleInit extends ActiveRecord
      */
     public function rules()
     {
-        return ArrayHelper::merge(
-            parent::rules(),
+        return
             [
-                [['section_id', 'module_id', 'version', 'title', 'description'], 'string',],
+                [['module_id', 'version', 'title', 'description', 'params',], 'string',],
                 ['is_active', 'boolean',]
-            ]
-        );
+            ];
     }
 
 
@@ -148,33 +114,6 @@ class ModuleInit extends ActiveRecord
 
 
     /**
-     * Возвращает read-only идентификатор модуля с заменой символа `.`;
-     *
-     * @param string|bool $safeReplace если опционально требуется замена отличная от `-`
-     *
-     * @return string
-     */
-    public function getSafeId($safeReplace = "-")
-    {
-        return preg_match(self::MODULE_ID_DELIMITER, $this->module_id) ?
-            (string)preg_replace(self::MODULE_ID_DELIMITER, $safeReplace, $this->module_id) :
-            $this->module_id;
-    }
-
-
-    /**
-     * Возвращает уникальный идентификатор модуля.
-     *
-     * @return string
-     */
-    public function getUniqueId()
-    {
-        $moduleId = explode(".", $this->module_id);
-        return array_pop($moduleId);
-    }
-
-
-    /**
      * Возвращает массив пользовательских параметров модуля.
      *
      * @return array
@@ -204,10 +143,11 @@ class ModuleInit extends ActiveRecord
 
 
     /**
-     * Возвращает read-only массив моделей URL связанных с пакетом.
+     * Возвращает массив моделей URL связанных с пакетом.
+     *
      * @return \yii\db\ActiveQuery|ModuleUrl[]
      */
-    public function getLinks()
+    public function getUrls()
     {
         return $this->hasMany(ModuleUrl::class, ['init_id' => 'id',]);
     }
@@ -234,7 +174,7 @@ class ModuleInit extends ActiveRecord
         if (!is_readable($path)) {
             mkdir($path);
         }
-        $path = "$path/" . $this->getUniqueId();
+        $path = "$path/" . $this->module_id;
         if (!is_readable($path)) {
             mkdir($path);
         }
@@ -286,104 +226,66 @@ class ModuleInit extends ActiveRecord
      */
     public function getRouteId()
     {
-        return (!empty($this->version)) ? $this->version : $this->uniqueId;
+        //return (!empty($this->version)) ? $this->version : $this->module_id;
     }
 
 
-    /**
-     * Если модель системных параметров модуля провайдера API взаимодействия с внешним сервисом.
-     * @return bool
-     */
-    public function getIsProvider()
-    {
-        return $this->type == self::TYPE_PROVIDER;
-    }
-
 
     /**
-     * Если модель системных параметров модуля служебного компонента.
-     * @return bool
-     */
-    public function getIsService()
-    {
-        return $this->type == self::TYPE_SERVICE;
-    }
-
-
-    /**
-     * Если модель системных параметров модуля веб-ресурса.
-     * @return bool
-     */
-    public function getIsResource()
-    {
-        return $this->type == self::TYPE_RESOURCE;
-    }
-
-
-    /**
-     * Возвращает read-only запись ресурса для панели администрирования.
-     * @return null|static
-     */
-    public function getRelatedResource()
-    {
-        return ($this->section_id == Application::PANEL_APP_ID) ?
-            static::findOne(
-                [
-                    'section_id' => Application::RESOURCE_APP_ID,
-                    'module_id'  => $this->module_id
-                ]
-            ) :
-            null;
-    }
-
-
-    /**
-     * Возвращает read-only путь к модулю на сервере.
+     * Возвращает путь к модулю веб-ресурса на сервере.
+     *
      * @return string
      */
-    public function getResourceAlias()
+    /*public function getResourceAlias()
     {
-        return \Yii::getAlias(
-            (empty($this->version)) ?
-                "@$this->uniqueId/$this->section_id" :
-                "@$this->uniqueId/$this->section_id/$this->version"
-        );
-    }
+        return
+            \Yii::getAlias(
+                (empty($this->version)) ?
+                    "@$this->module_id/" . Application::RESOURCE_APP_ID :
+                    "@$this->module_id/" . Application::RESOURCE_APP_ID . "/$this->version"
+            );
+    }*/
 
 
     /**
-     * Возвращает read-only путь к модулю веб-ресурса.
+     * Возвращает путь к модулю веб-ресурса.
      *
-     * @return string если файл класса модуля не найден в соответствующей папке, то вернёт путь базового класса модуля
-     *                ресурса системы
+     * @return string
      */
-    public function getResourcePath()
+    /*public function getResourcePath()
     {
         return (empty($this->version)) ?
-            "$this->uniqueId\\$this->section_id" :
-            "$this->uniqueId\\$this->section_id\\$this->version";
-    }
+            "$this->module_id\\" . Application::RESOURCE_APP_ID :
+            "$this->module_id\\" . Application::RESOURCE_APP_ID . "\\$this->version";
+    }*/
 
 
     /**
-     * Возвращает модель параметров ресурса для URL текущего запроса.
-     * @return ModuleInit
-     * @throws NotFoundHttpException если пакет не был найден или неактивен
+     * @return bool|string
      */
-    public static function findResourceByUrl()
-    {
+    /*public function getPanelAlias() {
+        return
+            \Yii::getAlias(
+                "@$this->module_id/" . Application::PANEL_APP_ID
+            );
+    }*/
+
+
+    /**
+     * @return array|ModuleInit|ModuleInit[]
+     * @throws ServerErrorHttpException
+     */
+    public static function getItems() {
         /** @var ModuleUrl $url */
         $url = ModuleUrl::findOne(['url' => $_SERVER['SERVER_NAME'], 'is_active' => 1,]);
-        if (!empty($url)) {
-            if ($url->init->is_active) {
-                return $url->init;
+        if ( !empty($url) ) {
+            if (empty($url->init)) {
+                throw new ServerErrorHttpException('Undefined resource for the `' . $_SERVER['SERVER_NAME'] . '`.');
             }
-            else {
-                throw new NotFoundHttpException('Пакет для указанного URL неактивен.');
-            }
+            return $url->init;
         }
         else {
-            throw new NotFoundHttpException('Пакет не зарегистрирован или URL неактивен.');
+            return static::find()->all();
         }
     }
 
@@ -396,14 +298,14 @@ class ModuleInit extends ActiveRecord
      *
      * @return ModuleInit[]|ActiveQuery
      */
-    public static function findResourcesById($resourceId = [], $returnQuery = false)
+    /*public static function findResourcesById($resourceId = [], $returnQuery = false)
     {
         $resourceId = (array)$resourceId;
         $query = static::find()
             ->andFilterWhere(['or like', 'module_id', $resourceId])
             ->orFilterWhere(['or like', 'section_id', $resourceId]);
         return ($returnQuery) ? $query : $query->all();
-    }
+    }*/
 
 
     /**
@@ -414,12 +316,12 @@ class ModuleInit extends ActiveRecord
      *
      * @return ModuleInit[]
      */
-    public static function findResources($ids = [], $activeOnly = true)
+    /*public static function findResources($ids = [], $activeOnly = true)
     {
         return static::findResourcesById($ids, true)
             ->andFilterWhere(['is_active' => $activeOnly ? 1 : null,])
             ->all();
-    }
+    }*/
 
 
     /**
@@ -427,7 +329,7 @@ class ModuleInit extends ActiveRecord
      * @return Module
      * @throws ErrorException если модуль ресурса не был добавлен в приложение
      */
-    public function getResource()
+    /*public function getResource()
     {
         if (empty($this->_resource)) {
             if (\Yii::$app->hasModule($this->moduleId)) {
@@ -438,27 +340,44 @@ class ModuleInit extends ActiveRecord
             }
         }
         return $this->_resource;
-    }
+    }*/
 
 
     /**
-     * Возвращает read-only идентификатор модуля.
-     * @return string
+     * @return object|ResourceModule|PanelModule
+     * @throws \yii\base\InvalidConfigException
      */
-    public function getModuleId()
-    {
-        if (empty($this->_moduleId)) {
-            /** @var Application $app */
-            $app = \Yii::$app;
-            if ($this->isProvider) {
-                $this->_moduleId = "$this->section_id.$this->module_id";
-            }
-            else {
-                $this->_moduleId = ($app->isBackend) ? $this->module_id : $this->version;
-            }
-            $this->_moduleId = ($app->isBackend) ? $this->module_id : $this->version;
+    public function appendModule() {
+        if ( file_exists($this->getPath() . "/Module.php") ) {
+            $moduleId = Application::isPanel() ? $this->module_id : $this->version;
+            \Yii::$app->setModule(
+                $moduleId,
+                [
+                    'class' => $this->getClass(),
+                    'title'        => $this->title,
+                    'description'  => $this->description,
+                    'bundleParams' => $this->toArray()
+                ]
+            );
+            return \Yii::$app->getModule($moduleId);
         }
-        return $this->_moduleId;
+        return null;
+    }
+
+    public function getPath() {
+        return
+            \Yii::getAlias(
+                Application::isPanel() ?
+                    "@$this->module_id/" . \Yii::$app->id :
+                    "@$this->module_id/" . \Yii::$app->id . "/$this->version"
+            );
+    }
+
+    public function getClass() {
+        return
+            Application::isPanel() ?
+                "$this->module_id\\" . \Yii::$app->id . "\\Module" :
+                "$this->module_id\\" . \Yii::$app->id . "\\$this->version\Module";
     }
 
 }

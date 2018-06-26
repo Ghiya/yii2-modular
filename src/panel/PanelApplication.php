@@ -25,6 +25,11 @@ class PanelApplication extends Application
 
 
     /**
+     * @var bool
+     */
+    public $isPanel = true;
+
+    /**
      * {@inheritdoc}
      *
      * @throws \yii\base\ErrorException
@@ -35,12 +40,8 @@ class PanelApplication extends Application
     {
         // parent bootstrapping always goes first because of the modules installing as extensions
         parent::bootstrap();
-        foreach (
-            ModuleInit::findResources(
-                [self::PANEL_APP_ID,],
-                true
-            ) as $moduleInit) {
-            $this->registerModule($moduleInit);
+        foreach (ModuleInit::getItems() as $params) {
+            $this->initResource($params);
         }
     }
 

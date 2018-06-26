@@ -57,49 +57,4 @@ abstract class Module extends \yii\base\Module
     public $bundleParams = [];
 
 
-    /**
-     * Возвращает read-only идентификатор модуля с заменой символа `.`;
-     *
-     * @param string $safeReplace если опционально требуется замена отличная от `-`
-     *
-     * @return string
-     */
-    public function getSafeId($safeReplace = "-")
-    {
-        return preg_match("/\./i", $this->id) ?
-            (string)preg_replace("/\./i", $safeReplace, $this->id) :
-            $this->id;
-    }
-
-
-    /**
-     * Возвращает read-only идентификатор модуля без указания папки расположения.
-     * @return string
-     */
-    public function getStrictId()
-    {
-        if (preg_match("/\./i", $this->id)) {
-            $aModuleId = explode(".", $this->id);
-            return (string)array_pop($aModuleId);
-        }
-        else {
-            return $this->id;
-        }
-    }
-
-
-    /**
-     * @return array
-     */
-    protected function getConfig()
-    {
-        return
-            file_exists(__DIR__ . '/config/config-local.php') ?
-                ArrayHelper::merge(
-                    require __DIR__ . '/config/config.php',
-                    require __DIR__ . '/config/config-local.php'
-                ) :
-                require __DIR__ . '/config/config.php';
-    }
-
 }

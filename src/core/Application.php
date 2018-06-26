@@ -7,9 +7,14 @@ namespace modular\core;
 
 
 use modular\core\models\ModuleInit;
+use modular\panel\PanelModule;
+use modular\resource\ResourceModule;
 use yii\base\ErrorException;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\log\FileTarget;
 use yii\web\HttpException;
+use yii\web\ServerErrorHttpException;
 
 
 /**
@@ -30,63 +35,24 @@ abstract class Application extends \yii\web\Application
 
 
     /**
-     * @const string PANEL_APP_ID идентификатор приложения панелей администрирования модулей
+     * Идентификатор приложения панелей администрирования
      */
     const PANEL_APP_ID = 'panel';
 
 
     /**
-     * @const string RESOURCE_APP_ID идентификатор приложения модулей веб-ресурсов
+     * Идентификатор приложения веб-ресурсов
      */
     const RESOURCE_APP_ID = 'resource';
 
 
-    /**
-     * @const string SERVICES_ID идентификатор расположения системных модулей
-     */
-    const SERVICES_ID = 'services';
-
 
     /**
-     * @const string SERVICE_INTERFACE
+     * @return bool
      */
-    const SERVICE_INTERFACE = 'common\services\ServicesInterface';
-
-
-    /**
-     * @const string SERVICE_BILLING_ID
-     */
-    const SERVICE_BILLING_ID = '_billing';
-
-
-    /**
-     * @const string SERVICE_SMSC_ID
-     */
-    const SERVICE_SMSC_ID = '_smsc';
-
-
-    /**
-     * @const string SERVICE_PROVIDER_ID
-     */
-    const SERVICE_PROVIDER_ID = '_provider';
-
-
-    /**
-     * {@inheritdoc}
-     */
-    final public function __construct($config = [])
-    {
-        parent::__construct(
-            ArrayHelper::merge(
-                ArrayHelper::merge(
-                    require(\Yii::getAlias('@common/config/main.php')),
-                    require(\Yii::getAlias('@common/config/main-local.php'))
-                ),
-                (array)$config
-            )
-        );
+    final public static function isPanel() {
+        return \Yii::$app->id == self::PANEL_APP_ID;
     }
-
 
     /**
      * {@inheritdoc}
@@ -129,49 +95,57 @@ abstract class Application extends \yii\web\Application
 
 
     /**
-     * Регистрирует в приложении модуль ресурса с указанными параметрами.
+     * Инициализирует модуль веб-ресурса относительно указанных параметров.
      *
-     * @param ModuleInit $init модель параметров модуля
+     * @param ModuleInit $params
      *
-     * @throws ErrorException
-     * @throws HttpException
+     * @return ResourceModule|PanelModule
+     * @throws ServerErrorHttpException
      * @throws \yii\base\InvalidConfigException
      */
-    public function registerModule(ModuleInit $init)
+    public function initResource(ModuleInit $params)
     {
-        \Yii::debug("Регистрация модуля ресурса `$init->title`.", __METHOD__);
-        // init module
-        $defaultModuleClass =
-            $this->isBackend ?
-                '@modular\panel\modules\Module' :
-                '@modular\resource\modules\Module';
-        $this->setModule(
-            $init->moduleId,
-            [
-                'class'        =>
-                    file_exists($init->resourceAlias . '/Module.php') ?
-                        $init->resourcePath . '\Module' :
-                        $defaultModuleClass,
-                'title'        => $init->title,
-                'description'  => $init->description,
-                'isProvider'   => $init->isProvider,
-                'isService'    => $init->isService,
-                'isResource'   => $init->isResource,
-                'bundleParams' => $init->toArray()
-            ]
-        );
-        // configure module
-        if (file_exists($init->resourceAlias . '/config/config.php')) {
-            $this->config(
-                $init->moduleId,
-                $init->resourceAlias
+        \Yii::debug("Initializing resource `$params->title`.", __METHOD__);
+        $resource = $params->appendModule();
+        if ( !empty($resource) ) {
+            $this->setModule(
+                self::isPanel() ? $params->module_id : $params->version,
+                $resource
             );
+            // configure resource
+            \Yii::configure(
+                $resource,
+                file_exists($params->getPath() . '/config/config-local.php') ?
+                    ArrayHelper::merge(
+                        require $params->getPath() . '/config/config.php',
+                        require $params->getPath() . '/config/config-local.php'
+                    ) :
+                    require $params->getPath() . '/config/config.php'
+            );
+            // define application language
+            if (isset($resource->params['defaults']['language'])) {
+                $this->language = $resource->params['defaults']['language'];
+            }
+            // init routing
+            if ($resource->has('urlManager')) {
+                \Yii::$app->getUrlManager()->addRules($resource->get('urlManager')->rules);
+            }
+            // define translations
+            if ($resource->has('i18n')) {
+                $this->i18n->translations =
+                    ArrayHelper::merge(
+                        $this->i18n->translations,
+                        $resource->get('i18n')->translations
+                    );
+            }
+            if ( !self::isPanel() ) {
+                // define module logs
+                $this->log->targets[] = new FileTarget($params->getLogParams());
+            }
+            return $resource;
         }
         else {
-            throw new HttpException(
-                500,
-                'Отсутствует конфигурационный файл модуля с идентификатором `' . $init->moduleId . '`'
-            );
+            throw new ServerErrorHttpException("Trying to init undefined resource.");
         }
     }
 
@@ -184,7 +158,7 @@ abstract class Application extends \yii\web\Application
      *
      * @throws \yii\base\InvalidConfigException
      */
-    protected function config($moduleId, $modulePath)
+    /*protected function config($moduleId, $modulePath)
     {
         $withModule = $this->getModule($moduleId);
         \Yii::configure(
@@ -211,7 +185,7 @@ abstract class Application extends \yii\web\Application
                 $withModule->get('i18n')->translations
             );
         }
-    }
+    }*/
 
 
     /**
@@ -219,7 +193,7 @@ abstract class Application extends \yii\web\Application
      *
      * @return Module[]
      */
-    public function getProviders()
+    /*public function getProviders()
     {
         $resources = [];
         foreach ($this->modules as $module) {
@@ -228,7 +202,7 @@ abstract class Application extends \yii\web\Application
             }
         }
         return $resources;
-    }
+    }*/
 
 
     /**
@@ -236,7 +210,7 @@ abstract class Application extends \yii\web\Application
      *
      * @return Module[]
      */
-    public function getServices()
+    /*public function getServices()
     {
         $resources = [];
         foreach ($this->modules as $module) {
@@ -245,7 +219,7 @@ abstract class Application extends \yii\web\Application
             }
         }
         return $resources;
-    }
+    }*/
 
 
     /**
@@ -253,7 +227,7 @@ abstract class Application extends \yii\web\Application
      *
      * @return Module[]
      */
-    public function getPanels()
+    /*public function getPanels()
     {
         $resources = [];
         foreach ($this->modules as $module) {
@@ -262,7 +236,7 @@ abstract class Application extends \yii\web\Application
             }
         }
         return $resources;
-    }
+    }*/
 
 
     /**
@@ -271,10 +245,10 @@ abstract class Application extends \yii\web\Application
      *
      * @return ModuleInit[]
      */
-    public function getResourceBundles()
+    /*public function getResourceBundles()
     {
         return ModuleInit::findResources([self::RESOURCE_APP_ID], true);
-    }
+    }*/
 
 
     /**
@@ -282,9 +256,9 @@ abstract class Application extends \yii\web\Application
      *
      * @return bool
      */
-    final public function getIsBackend()
+    /*final public function getIsBackend()
     {
         return ($this->id === self::PANEL_APP_ID);
-    }
+    }*/
 
 }

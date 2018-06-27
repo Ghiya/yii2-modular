@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 /** @var bool $editAllowed */
 
 $this->title = 'Профиль';
-$this->params['breadcrumbs'][] = \Yii::$app->controller->module->params['bundleParams']['title'];
+$this->params['breadcrumbs'][] = \Yii::$app->controller->module->title;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php $form = ActiveForm::begin(

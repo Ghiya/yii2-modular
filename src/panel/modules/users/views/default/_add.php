@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 /** @var UserDataForm $model */
 
 $this->title = 'Добавить';
-$this->params['breadcrumbs'][] = \Yii::$app->controller->module->params['bundleParams']['title'];
+$this->params['breadcrumbs'][] = \Yii::$app->controller->module->title;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php $form = ActiveForm::begin(

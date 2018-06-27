@@ -152,8 +152,8 @@ class Tracking extends Behavior
                 'message'     =>
                     !empty($this->tracksTitles[$track->name]) ?
                         (string)"<strong>" . $this->tracksTitles[$track->name] . "</strong>\r\n\r\n$track->message" : $track->message,
-                'resource_id' => $this->owner->module->bundleParams['module_id'],
-                'version'     => $this->owner->module->bundleParams['version']
+                'resource_id' => $this->owner->module->id,
+                'version'     => $this->owner->module->version
             ]
         );
         if ($track->keepTrack) {

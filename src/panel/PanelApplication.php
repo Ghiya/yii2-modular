@@ -7,16 +7,15 @@ namespace modular\panel;
 
 
 use modular\core\Application;
-use modular\core\models\ModuleInit;
-use yii\helpers\ArrayHelper;
+use modular\core\models\PackageInit;
+use yii\base\InvalidConfigException;
 
 
 /**
  * Class PanelApplication
- * Приложение административных панелей модулей ресурсов.
+ * Приложение администрирования веб-ресурсов.
  *
- * @property array $panelItems   read-only массив элементов меню модулей веб-ресурсов системы
- * @property array $serviceItems read-only массив элементов меню компонентов системы
+ * @property array $navigation массив элементов меню панелей администрирования
  *
  * @package modular\panel
  */
@@ -25,41 +24,59 @@ class PanelApplication extends Application
 
 
     /**
-     * @var bool
+     * @var array
      */
-    public $isPanel = true;
+    private $_navigation = [];
+
 
     /**
      * {@inheritdoc}
      *
-     * @throws \yii\base\ErrorException
      * @throws \yii\base\InvalidConfigException
-     * @throws \yii\web\HttpException
+     * @throws \yii\web\ServerErrorHttpException
      */
-    final public function bootstrap()
+    public function bootstrap()
     {
         // parent bootstrapping always goes first because of the modules installing as extensions
         parent::bootstrap();
-        foreach (ModuleInit::getItems() as $params) {
-            $this->initResource($params);
+        // add all modules packages for the authorized user
+        if (!\Yii::$app->user->isGuest) {
+            foreach (PackageInit::getParams() as $params) {
+                $this->addPackage($params);
+            }
         }
     }
 
 
     /**
-     * Возвращает read-only параметры виджета меню для всех администрируемых модулей веб-ресурсов.
+     * Setter for the panel menu items.
+     *
+     * @param array $params
+     *
+     * @throws InvalidConfigException
+     */
+    public function setNavigation($params = [])
+    {
+        if (empty($params['id'])) {
+            throw new InvalidConfigException("Array must contain `id` value.");
+        }
+        $this->_navigation[$params['id']] = $params;
+    }
+
+
+    /**
+     * Getter for the panel menu items.
+     *
+     * @param bool $keysOnly
      *
      * @return array
      */
-    public function getPanelItems()
+    public function getNavigation($keysOnly = false)
     {
-        $panelItems = [];
-        foreach (ArrayHelper::merge($this->providers, $this->panels, $this->services) as $resource) {
-            if (!empty($resource->panelItems)) {
-                $panelItems[] = $resource->panelItems;
-            }
-        }
-        return $panelItems;
+        return
+            $keysOnly ?
+                array_keys($this->_navigation) :
+                array_values($this->_navigation);
     }
 
 }

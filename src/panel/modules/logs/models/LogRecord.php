@@ -6,22 +6,22 @@
 namespace modular\panel\modules\logs\models;
 
 
-use modular\core\models\ModuleInit;
+use modular\core\models\PackageInit;
 use yii\db\ActiveRecord;
 
 /**
  * Class LogRecord модель записи лога запроса провайдера данных внешнего сервиса.
  *
- * @property int        $id
- * @property int        $bundle_id
- * @property string     $provider_id
- * @property string     $format
- * @property string     $description
- * @property string     $filename
- * @property string     $trace
- * @property int        $created_at
- * @property ModuleInit $bundle
- * @property string     $createdAt read-only форматированная дата создания записи
+ * @property int         $id
+ * @property int         $bundle_id
+ * @property string      $provider_id
+ * @property string      $format
+ * @property string      $description
+ * @property string      $filename
+ * @property string      $trace
+ * @property int         $created_at
+ * @property PackageInit $bundle
+ * @property string      $createdAt read-only форматированная дата создания записи
  *
  * @package modular\panel\modules\logs\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
@@ -103,7 +103,7 @@ class LogRecord extends ActiveRecord
      */
     public function getBundle()
     {
-        return $this->hasOne(ModuleInit::className(), ['id' => 'bundle_id']);
+        return $this->hasOne(PackageInit::className(), ['id' => 'bundle_id']);
     }
 
 

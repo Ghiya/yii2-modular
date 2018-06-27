@@ -11,19 +11,20 @@ use yii\db\ActiveRecord;
 
 
 /**
- * Class ModuleUrl модель URL связанного с пакетом модуля веб-ресурса.
+ * Class LinkedUrl
+ * Модель данных URL связанного с пакетом веб-ресурса.
  *
- * @property int        $id
- * @property int        $init_id
- * @property string     $url
- * @property bool       $is_active
- * @property int        $updated_at
- * @property int        $created_at
- * @property ModuleInit $init read-only
+ * @property int              $id
+ * @property int              $init_id
+ * @property string           $url
+ * @property bool             $is_active
+ * @property int              $updated_at
+ * @property int              $created_at
+ * @property-read PackageInit $packageInit
  *
  * @package modular\core\models
  */
-class ModuleUrl extends ActiveRecord
+class LinkedUrl extends ActiveRecord
 {
 
 
@@ -50,11 +51,11 @@ class ModuleUrl extends ActiveRecord
     /**
      * Возвращает связанный пакет модуля веб-ресурса.
      *
-     * @return \yii\db\ActiveQuery|ModuleInit
+     * @return \yii\db\ActiveQuery|PackageInit
      */
-    public function getInit()
+    public function getPackageInit()
     {
-        return $this->hasOne(ModuleInit::class, ['id' => 'init_id',]);
+        return $this->hasOne(PackageInit::class, ['id' => 'init_id',]);
     }
 
 }

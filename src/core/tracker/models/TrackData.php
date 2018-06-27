@@ -536,7 +536,7 @@ class TrackData extends ActiveRecord
             $panelLink = (defined("YII_DEBUG") && YII_DEBUG == true) ?
                 "https://dev-services.v-tell.ru" :
                 "https://services.v-tell.ru";
-            $link = "$panelLink/" . $module->params['bundleParams']['module_id'] . "/$relatedItem[0]/view?id=$relatedItem[1]";
+            $link = "$panelLink/" . $module->id . "/$relatedItem[0]/view?id=$relatedItem[1]";
             if ($useShortLink) {
                 $shortLink = (new ShortLink())->add($link);
                 return !empty($shortLink) ?
@@ -544,7 +544,7 @@ class TrackData extends ActiveRecord
                     $link;
             }
             else {
-                return "$panelLink/" . $module->params['bundleParams']['module_id'] . "/$relatedItem[0]/view?id=$relatedItem[1]";
+                return "$panelLink/" . $module->id . "/$relatedItem[0]/view?id=$relatedItem[1]";
             }
         }
         return '';

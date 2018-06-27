@@ -13,7 +13,7 @@ use modular\panel\models\UserRole;
 /* @var $this View */
 /** @var ActiveDataProvider $dataProvider провайдер данных клиентов */
 
-$this->title = \Yii::$app->controller->module->params['bundleParams']['title'];
+$this->title = \Yii::$app->controller->module->title;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="panel panel-default">

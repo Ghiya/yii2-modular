@@ -6,22 +6,22 @@
 namespace modular\core\models;
 
 
-use modular\core\models\ModuleInit;
+use modular\core\models\PackageInit;
 use yii\db\ActiveRecord;
 
 /**
  * Class ServiceLog модель записей логов запросов в биллинг.
  *
- * @property int        $id
- * @property int        $bundle_id
- * @property string     $provider_id
- * @property string     $format
- * @property string     $description
- * @property string     $filename
- * @property string     $trace
- * @property int        $created_at
- * @property ModuleInit $bundle
- * @property string     $createdAt read-only форматированная дата создания записи
+ * @property int         $id
+ * @property int         $bundle_id
+ * @property string      $provider_id
+ * @property string      $format
+ * @property string      $description
+ * @property string      $filename
+ * @property string      $trace
+ * @property int         $created_at
+ * @property PackageInit $bundle
+ * @property string      $createdAt read-only форматированная дата создания записи
  *
  * @package modular\core\models
  * @author  Ghiya Mikadze <ghiya@mikadze.me>
@@ -103,7 +103,7 @@ class ServiceLog extends ActiveRecord
      */
     public function getBundle()
     {
-        return $this->hasOne(ModuleInit::className(), ['id' => 'bundle_id']);
+        return $this->hasOne(PackageInit::className(), ['id' => 'bundle_id']);
     }
 
 

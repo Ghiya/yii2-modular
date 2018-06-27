@@ -9,7 +9,7 @@ namespace modular\resource\models;
 
 use modular\core\helpers\ArrayHelper;
 use modular\core\helpers\Html;
-use modular\core\models\ModuleInit;
+use modular\core\models\PackageInit;
 use modular\panel\models\UserRole;
 use modular\resource\ResourceModule;
 use yii\behaviors\TimestampBehavior;
@@ -24,17 +24,17 @@ use yii\web\Linkable;
 /**
  * Class ActionsIndex
  *
- * @property int        $id
- * @property string     $resource_id
- * @property int        $index
- * @property string     $panel_link
- * @property string     $description
- * @property string     $user_ip
- * @property string     $user_agent
- * @property int        $created_at
- * @property array      $panelLink    read-only
- * @property ModuleInit $resource     read-only
- * @property string     $subscriberId read-only
+ * @property int         $id
+ * @property string      $resource_id
+ * @property int         $index
+ * @property string      $panel_link
+ * @property string      $description
+ * @property string      $user_ip
+ * @property string      $user_agent
+ * @property int         $created_at
+ * @property array       $panelLink    read-only
+ * @property PackageInit $resource     read-only
+ * @property string      $subscriberId read-only
  *
  * @package rmodular\esource\models
  */
@@ -89,7 +89,7 @@ class ActionsIndex extends ActiveRecord implements Linkable
      */
     public function getResource()
     {
-        return $this->hasOne(ModuleInit::class, ['id' => 'resource_id']);
+        return $this->hasOne(PackageInit::class, ['id' => 'resource_id']);
     }
 
 

@@ -46,7 +46,7 @@ class EmailSender extends Sender
                 ->compose(
                     $this->getMailViewPath($track->priority),
                     [
-                        'resource' => $track->sender->module->bundleParams['title'],
+                        'resource' => $track->sender->module->title,
                         'subject'  => $subject,
                         'notice'   => $track->getModel()->getNoticeParams(),
                     ]

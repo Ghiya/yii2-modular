@@ -16,6 +16,35 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
 
 
     /**
+     * Сливает два массива с сохранением строковых значений первого.
+     *
+     * @param array $target
+     * @param array $source
+     *
+     * @return array
+     */
+    public static function mergeStrings(array $target = [], array $source = [])
+    {
+        $merged = [];
+        foreach (self::merge($target, $source) as $k => $v) {
+            if (is_string($v)) {
+                $merged[$k] =
+                    isset($source[$k]) ?
+                        $target[$k] . ' ' . $source[$k] :
+                        $target[$k];
+            }
+            elseif (is_array($v)) {
+                $merged[$k] = self::mergeStrings($merged[$k], $v);
+            }
+            else {
+                $merged[$k] = $v;
+            }
+        }
+        return $merged;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public static function map($array, $from, $to, $group = null)

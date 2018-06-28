@@ -175,10 +175,17 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
      */
     public static function renameKeys(array $array = [], array $keys = [])
     {
-        foreach ($keys as $original => $renamed) {
-            if (isset($array[$original])) {
-                $array[$renamed] = $array[$original];
-                unset($array[$original]);
+        if (self::isIndexed($array)) {
+            foreach ($array as $index => $sub) {
+                $array[$index] = self::renameKeys($sub, $keys);
+            }
+        }
+        else {
+            foreach ($keys as $original => $renamed) {
+                if (isset($array[$original])) {
+                    $array[$renamed] = $array[$original];
+                    unset($array[$original]);
+                }
             }
         }
         return $array;

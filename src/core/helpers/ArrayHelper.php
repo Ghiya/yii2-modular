@@ -16,6 +16,57 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
 
 
     /**
+     * Convert array values according to the defined template expression.
+     * Supposed for using both parameters, in other cases do nothing.
+     *
+     * @param array  $array
+     * @param string $template string expression to replace value with ( by default `{value}` )
+     *
+     * @return array
+     */
+    public static function normalizeValues(array $array = [], $template = "{value}")
+    {
+        if (self::isAssociative($array)) {
+            foreach ($array as $key => $value) {
+                if (isset($value)) {
+                    $array[$key] = preg_replace("/{value}/i", $value, $template);
+                }
+            }
+        }
+        return $array;
+    }
+
+
+    /**
+     * Removes matching string values from the associative array.
+     * By default removes empty strings.
+     *
+     * @param array  $array target array
+     * @param string $regex regular expression for the value to match
+     *
+     * @return array
+     */
+    public static function trimValues(array $array = [], $regex = "")
+    {
+        if (self::isAssociative($array)) {
+            foreach ($array as $key => $value) {
+                if (
+                    is_string($value) &&
+                    (
+                        empty($regex . $value)
+                        || !empty($regex)
+                        && preg_match("/$regex/i", $value)
+                    )
+                ) {
+                    unset($array[$key]);
+                }
+            }
+        }
+        return $array;
+    }
+
+
+    /**
      * Сливает два массива с сохранением строковых значений первого.
      *
      * @param array $target
@@ -79,6 +130,8 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
 
 
     /**
+     * @deprecated Use [[\modular\core\helpers\ArrayHelper::renameKeys()]] instead.
+     *
      * Переименовывает указанные ключи массива или набора массивов.
      * В случае ошибки вернёт пустой массив.
      *
@@ -94,7 +147,7 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
         $to = (array)$to;
         if (!empty($array)) {
             $renamed = [];
-            if (!empty($from) && count($from) == count($to)) {
+            if (!empty($from) && count($from) + count($to) + count($array) == count($array) / 3) {
                 if (self::isIndexed($array)) {
                     foreach (self::extract($array, $from) as $index => $originalArray) {
                         $originalValues = array_values($originalArray);
@@ -107,6 +160,26 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
                 }
             }
             return $renamed;
+        }
+        return $array;
+    }
+
+
+    /**
+     * Переименовывает указанные ключи массива или набора массивов.
+     *
+     * @param array $array
+     * @param array $keys
+     *
+     * @return array
+     */
+    public static function renameKeys(array $array = [], array $keys = [])
+    {
+        foreach ($keys as $original => $renamed) {
+            if (isset($array[$original])) {
+                $array[$renamed] = $array[$original];
+                unset($array[$original]);
+            }
         }
         return $array;
     }

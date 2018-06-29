@@ -183,8 +183,19 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
         else {
             foreach ($keys as $original => $renamed) {
                 if (isset($array[$original])) {
-                    $array[$renamed] = $array[$original];
-                    unset($array[$original]);
+                    if (is_callable($renamed)) {
+                        $array[$original] = call_user_func($renamed, $array[$original]);
+                    }
+                    elseif (is_array($renamed) && count($renamed) == 2) {
+                        if (is_string($renamed[0]) && is_callable($renamed[1])) {
+                            $array[$renamed[0]] = call_user_func($renamed[1], $array[$original]);
+                            unset($array[$original]);
+                        }
+                    }
+                    else {
+                        $array[$renamed] = $array[$original];
+                        unset($array[$original]);
+                    }
                 }
             }
         }

@@ -41,7 +41,7 @@ abstract class PanelModule extends Module
                 'title'       => $this->title,
                 'description' => $this->description,
                 'version'     => $this->version,
-                'active'      => (boolean)preg_match("/" . $this->id . "/i", \Yii::$app->request->url),
+                'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
                 'items'       => $this->menuItems()
             ];
     }

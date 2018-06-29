@@ -7,6 +7,7 @@ namespace modular\core\models;
 
 
 use modular\core\Application;
+use modular\core\helpers\ArrayHelper;
 use modular\resource\models\ActionsIndex;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -212,7 +213,14 @@ class PackageInit extends ActiveRecord
      */
     public function getLocalParams()
     {
-        return (array)Json::decode($this->params);
+        return
+            ArrayHelper::merge(
+                (array)Json::decode($this->params),
+                file_exists(
+                    $this->getPath() . '/config/config-local.php'
+                ) ?
+                    require $this->getPath() . '/config/config-local.php' : []
+            );
     }
 
 

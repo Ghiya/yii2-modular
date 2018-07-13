@@ -42,7 +42,6 @@ use yii\helpers\Json;
  * @property array  $observers       read-only массив данных контактов получателей уведомлений
  * @property array  $mailTo          read-only массив адресов электронной почты получателей уведомлений
  * @property array  $messageTo       read-only массив номеров телефонов получателей уведомлений
- * @property string $decodedPriority read-only строковое описание уровня приоритетности записи
  * @property string $debugData       read-only данные отладочной информации
  *
  * @package modular\core\tracker\models
@@ -130,13 +129,6 @@ class TrackData extends ActiveRecord
                     'default',
                     'value' => function () {
                         return \Yii::$app->session->id;
-                    }
-                ],
-                [
-                    'module_id',
-                    'default',
-                    'value' => function () {
-                        return \Yii::$app->controller->module->id;
                     }
                 ],
                 [
@@ -249,7 +241,7 @@ class TrackData extends ActiveRecord
     public static function allViewedBy($moduleId, $userId = 0)
     {
         /** @var static[] $tracks */
-        $tracks = self::queryTracksBy($moduleId, $userId)->all();
+        $tracks = self::listQuery($moduleId, $userId)->all();
         foreach ($tracks as $track) {
             $track->viewed($userId);
         }
@@ -263,7 +255,13 @@ class TrackData extends ActiveRecord
      */
     public function getViewedBy()
     {
-        return (empty($this->getAttribute('viewed_by'))) ? [] : Json::decode($this->getAttribute('viewed_by'));
+        return
+            empty($this->getAttribute('viewed_by'))
+                ?
+                [] :
+                Json::decode(
+                    $this->getAttribute('viewed_by')
+                );
     }
 
 
@@ -383,10 +381,11 @@ class TrackData extends ActiveRecord
      *
      * @return int
      */
-    public static function countModuleActiveTracks($moduleId = '', $userId = 0)
+    public static function countActive($moduleId = '', $userId = 0)
     {
-        return count(self::findActiveTracksBy($moduleId, $userId, 1)) + count(self::findActiveTracksBy($moduleId,
-                $userId, 2));
+        return
+            count(self::fetchList($moduleId, $userId, self::PRIORITY_NOTICE)) +
+            count(self::fetchList($moduleId,$userId, self::PRIORITY_WARNING));
     }
 
 
@@ -399,21 +398,33 @@ class TrackData extends ActiveRecord
      *
      * @return TrackData[]
      */
-    public static function findActiveTracksBy($moduleId = '', $userId = 0, $priority = 0)
+    public static function fetchList($moduleId = '', $userId = 0, $priority = 0, $unreadOnly = true)
     {
-        $priorityCondition = ($priority > 0) ?
-            "`priority` LIKE '" . $priority . "' AND " :
-            "";
         $moduleCondition = "`module_id` REGEXP '$moduleId'";
-        $viewedCondition = "( `viewed_by` IS NULL OR `viewed_by` NOT REGEXP '-" . $userId . "-' )";
-        $allowedCondition = "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-" . $userId . "-' )";
-        return static::find()
-            ->where($priorityCondition . $moduleCondition . " AND " . $viewedCondition . " AND " . $allowedCondition)
-            ->orderBy(['created_at' => SORT_DESC,])->all();
+        $priorityCondition =
+            $priority > 0 ?
+                "`priority` LIKE '" . $priority . "' AND " : "";
+        $viewedCondition =
+            $unreadOnly ?
+                " AND ( `viewed_by` IS NULL OR `viewed_by` NOT REGEXP '-" . $userId . "-' )" : "";
+        $allowedCondition =
+            $userId > 0 ?
+                " AND ( `allowed_for` IS NULL OR `allowed_for` REGEXP '-" . $userId . "-' )" : "";
+        return
+            static::find()
+                ->where($priorityCondition . $moduleCondition . $viewedCondition . $allowedCondition)
+                ->orderBy(
+                    [
+                        'created_at' => SORT_DESC,
+                    ]
+                )
+                ->all();
     }
 
 
     /**
+     * @deprecated
+     *
      * Возвращает запрос для всех уведомлений указанных модуля и пользователя.
      *
      * @param string $moduleId
@@ -429,6 +440,33 @@ class TrackData extends ActiveRecord
                 . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )"
             )
             ->orderBy(['created_at' => SORT_DESC,]);
+    }
+
+
+    /**
+     * Возвращает список всех уведомлений модуля с укзаным идентификатором.
+     * Фильтрует относительно прав пользователя.
+     *
+     * @param string $id
+     * @param int    $userId
+     *
+     * @return ActiveQuery
+     */
+    public static function listQuery($id = '', $userId = 0)
+    {
+        return
+            static::find()
+                ->where(
+                    $userId > 0 ?
+                        "`module_id` REGEXP '$id' AND "
+                        . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )" :
+                        "`module_id` REGEXP '$id' AND `allowed_for` IS NULL"
+                )
+                ->orderBy(
+                    [
+                        'created_at' => SORT_DESC,
+                    ]
+                );
     }
 
 
@@ -451,18 +489,6 @@ class TrackData extends ActiveRecord
      */
     public function getNoticeParams()
     {
-        /*return ArrayHelper::merge(
-            $this->toArray([
-                'message',
-                'priority',
-                'module_id',
-                'version',
-                'session_id',
-            ]),
-            [
-                'link' => $this->getRelatedLink(false, true),
-            ]
-        );*/
         return
             $this->toArray([
                 'message',

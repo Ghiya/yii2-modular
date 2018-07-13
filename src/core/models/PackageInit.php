@@ -268,6 +268,7 @@ class PackageInit extends ActiveRecord
             [
                 'title',
                 'description',
+                'cid'   => 'module_id',
                 'class' => function () {
                     return $this->getClass();
                 }

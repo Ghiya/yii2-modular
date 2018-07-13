@@ -16,21 +16,21 @@ use yii\base\Module;
 
 
 /**
- * Class TrackingBehavior базовый класс поведения обработки уведомлений веб-ресурсов.
+ * Class TrackingBehavior
+ * Базовый класс поведения обработки уведомлений веб-ресурсов.
  *
  * @property-read string $panelUrl URL административной панели веб-ресурса
  *
  * @package modular\core\tracker\behaviors
- * @author  Mikadze Ghiya <ghiya@mikadze.me>
  */
 class Tracking extends Behavior
 {
 
 
     /**
-     * @const string событие обработки стандартной ошибки или выброшенного исключения контроллера
+     * Событие стандартного уведомления.
      */
-    const EVENT_CAUGHT_ERROR = 'caughtErrorTrackingEvent';
+    const EVENT_DEFAULT = 'defaultTrackingEvent';
 
 
     /**
@@ -74,7 +74,7 @@ class Tracking extends Behavior
             ArrayHelper::merge(
                 parent::events(),
                 [
-                    self::EVENT_CAUGHT_ERROR => 'createTrack',
+                    self::EVENT_DEFAULT => 'createTrack',
                 ]
             );
         foreach ($this->tracksEvents as $trackEvent) {
@@ -149,11 +149,11 @@ class Tracking extends Behavior
     {
         $track->model->load(
             [
-                'message'     =>
+                'message'   =>
                     !empty($this->tracksTitles[$track->name]) ?
                         (string)"<strong>" . $this->tracksTitles[$track->name] . "</strong>\r\n\r\n$track->message" : $track->message,
-                'resource_id' => $this->owner->module->id,
-                'version'     => $this->owner->module->version
+                'module_id' => $this->owner->module->cid,
+                'version'   => $this->owner->module->version
             ]
         );
         if ($track->keepTrack) {

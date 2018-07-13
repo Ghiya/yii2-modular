@@ -35,6 +35,18 @@ abstract class Module extends \yii\base\Module
 
 
     /**
+     * @var string символьный системный идентификатор пакета
+     */
+    public $cid = "";
+
+
+    /**
+     * @var bool триггер сервисного системного модуля
+     */
+    public $filterService = false;
+
+
+    /**
      * @var array
      */
     public $package = [];

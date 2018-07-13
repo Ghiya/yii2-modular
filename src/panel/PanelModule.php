@@ -5,7 +5,9 @@
 
 namespace modular\panel;
 
+use modular\core\helpers\ArrayHelper;
 use modular\core\Module;
+use modular\core\tracker\models\TrackData;
 
 
 /**
@@ -36,14 +38,22 @@ abstract class PanelModule extends Module
     {
         parent::init();
         $this->module->navigation =
-            [
-                'id'          => $this->id,
-                'title'       => $this->title,
-                'description' => $this->description,
-                'version'     => $this->version,
-                'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
-                'items'       => $this->menuItems()
-            ];
+            ArrayHelper::merge(
+                [
+                    'id'            => $this->id,
+                    'title'         => $this->title,
+                    'description'   => $this->description,
+                    'version'       => $this->version,
+                    'filterService' => $this->filterService,
+                    'active'        => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
+                    'items'         => $this->menuItems()
+                ],
+                !$this->filterService ?
+                    [
+                        'tracks' => TrackData::countActive($this->cid, \Yii::$app->user->id),
+                    ] :
+                    []
+            );
     }
 
 

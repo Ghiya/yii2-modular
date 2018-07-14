@@ -93,28 +93,28 @@ class PanelListView extends ListView
     {
         // микширует значение параметров элемента списка с установленными в кнфигурации
         $this->itemOptions = ArrayHelper::merge(
-            ['class' => 'panel-panel-default cpanel-item', 'tag' => 'div',],
+            ['class' => 'cpanel-item', 'tag' => 'div',],
             $this->itemOptions
         );
         if (!empty($this->dataProvider->pagination)) {
             if ($this->dataProvider->totalCount > 1000) {
-                $this->layout = "<div class='text-center'>\n{summary}\n</div>"
-                    . "{pager}\n"
+                $this->layout = "<div class='panel-manage'>\n{summary}\n"
+                    . "{pager}</div>\n"
                     . $this->getSelectAllBlock()
                     . "\n{items}\n";
             } else {
                 if ($this->dataProvider->pagination->pageSize > $this->dataProvider->totalCount) {
-                    $this->layout = "<div class='text-center'>\n{summary}\n</div>"
-                        . "{pager}\n"
+                    $this->layout = "<div class='panel-manage'>\n{summary}\n"
+                        . "{pager}</div>\n"
                         . $this->getSelectAllBlock()
                         . "<div class='text-center'>\n\n</div>"
                         . "\n{items}\n";
                 } else {
-                    $this->layout = "<div class='text-center'>\n{summary}\n</div>"
-                        . "{pager}\n"
+                    $this->layout = "<div class='panel-manage'>\n{summary}\n"
+                        . "{pager}</div>\n"
                         . $this->getSelectAllBlock()
                         . "\n{items}\n"
-                        . "<div class='text-center'>"
+                        . "<div class='panel-manage'>"
                         . Html::a("Показать все записи", Url::toRoute(
                             ArrayHelper::merge(
                                 [strtok(\Yii::$app->request->url, '?'),],
@@ -122,7 +122,7 @@ class PanelListView extends ListView
                             )
                         ),
                             [
-                                'class' => 'paging',
+                                'class' => 'pagination',
                             ]
                         ) .
                         "\n</div>";

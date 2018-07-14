@@ -6,6 +6,7 @@
 
 namespace modular\core;
 
+use modular\core\helpers\ArrayHelper;
 use modular\panel\PanelModule;
 use modular\resource\ResourceModule;
 
@@ -20,5 +21,20 @@ use modular\resource\ResourceModule;
 abstract class Controller extends \yii\web\Controller
 {
 
+
+    /**
+     * @var string|array
+     */
+    public $breadcrumb = 'Контроллер';
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function render($view, $params = [])
+    {
+        //var_dump(ArrayHelper::merge(['breadcrumb' => $this->breadcrumb], $params));die;
+        return parent::render($view, ArrayHelper::merge(['breadcrumb' => $this->breadcrumb], $params));
+    }
 
 }

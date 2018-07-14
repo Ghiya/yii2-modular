@@ -41,9 +41,9 @@ abstract class Module extends \yii\base\Module
 
 
     /**
-     * @var bool триггер сервисного системного модуля
+     * @var array прикреплённые URL
      */
-    public $filterService = false;
+    public $urls = [];
 
 
     /**

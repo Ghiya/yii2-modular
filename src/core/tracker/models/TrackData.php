@@ -164,11 +164,9 @@ class TrackData extends ActiveRecord
                     'default',
                     'value' => function () {
                         return
-                            http_build_query(
+                            Json::encode(
                                 \Yii::$app->request->isPost ?
-                                    \Yii::$app->request->post() : \Yii::$app->request->get(),
-                                '',
-                                '<br/>'
+                                    \Yii::$app->request->post() : \Yii::$app->request->get()
                             );
                     }
                 ],
@@ -238,7 +236,7 @@ class TrackData extends ActiveRecord
      * @param string $moduleId идентификатор модуля
      * @param int    $userId   идентификатор пользователя
      */
-    public static function allViewedBy($moduleId, $userId = 0)
+    public static function allViewedBy($moduleId = "", $userId = 0)
     {
         /** @var static[] $tracks */
         $tracks = self::listQuery($moduleId, $userId)->all();
@@ -385,34 +383,40 @@ class TrackData extends ActiveRecord
     {
         return
             count(self::fetchList($moduleId, $userId, self::PRIORITY_NOTICE)) +
-            count(self::fetchList($moduleId,$userId, self::PRIORITY_WARNING));
+            count(self::fetchList($moduleId, $userId, self::PRIORITY_WARNING));
     }
 
 
     /**
-     * Возвращает массив активных уведомлений по указанным параметрам.
+     * Возвращает список уведомлений относительно указанных параметров.
      *
      * @param string $moduleId
      * @param int    $priority
      * @param int    $userId
+     * @param bool   $activeOnly
      *
      * @return TrackData[]
      */
-    public static function fetchList($moduleId = '', $userId = 0, $priority = 0, $unreadOnly = true)
+    public static function fetchList($moduleId = '', $userId = 0, $priority = 0, $activeOnly = true)
     {
-        $moduleCondition = "`module_id` REGEXP '$moduleId'";
-        $priorityCondition =
-            $priority > 0 ?
-                "`priority` LIKE '" . $priority . "' AND " : "";
-        $viewedCondition =
-            $unreadOnly ?
-                " AND ( `viewed_by` IS NULL OR `viewed_by` NOT REGEXP '-" . $userId . "-' )" : "";
-        $allowedCondition =
-            $userId > 0 ?
-                " AND ( `allowed_for` IS NULL OR `allowed_for` REGEXP '-" . $userId . "-' )" : "";
         return
             static::find()
-                ->where($priorityCondition . $moduleCondition . $viewedCondition . $allowedCondition)
+                ->where(
+                    !empty($moduleId) ?
+                        ['regexp', 'module_id', $moduleId] : null
+                )
+                ->andWhere(
+                    !empty($priority) ?
+                        ['like', 'priority', $priority] : null
+                )
+                ->andWhere(
+                    $activeOnly ?
+                        "`viewed_by` IS NULL OR `viewed_by` NOT REGEXP '-" . $userId . "-'" : null
+                )
+                ->andWhere(
+                    $userId > 0 ?
+                        "`allowed_for` IS NULL OR `allowed_for` REGEXP '-" . $userId . "-'" : null
+                )
                 ->orderBy(
                     [
                         'created_at' => SORT_DESC,
@@ -449,19 +453,33 @@ class TrackData extends ActiveRecord
      *
      * @param string $id
      * @param int    $userId
+     * @param array  $dateFilter
      *
      * @return ActiveQuery
      */
-    public static function listQuery($id = '', $userId = 0)
+    public static function listQuery($id = '', $userId = 0, $dateFilter = [])
     {
+        $listCondition = !empty($id) ? "`module_id` REGEXP '$id' AND " : "";
+        $listQuery =
+            !empty($dateFilter) ?
+                static::find()
+                    ->where(
+                        $userId > 0 ?
+                            $listCondition . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )" :
+                            $listCondition . "`allowed_for` IS NULL"
+                    )
+                    ->where(
+                        ['>=', 'created_at', $dateFilter['from']]
+                    )
+                    ->andWhere(['<=', 'created_at', $dateFilter['to']]) :
+                static::find()
+                    ->where(
+                        $userId > 0 ?
+                            $listCondition . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )" :
+                            $listCondition . "`allowed_for` IS NULL"
+                    );
         return
-            static::find()
-                ->where(
-                    $userId > 0 ?
-                        "`module_id` REGEXP '$id' AND "
-                        . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )" :
-                        "`module_id` REGEXP '$id' AND `allowed_for` IS NULL"
-                )
+            $listQuery
                 ->orderBy(
                     [
                         'created_at' => SORT_DESC,

@@ -20,14 +20,15 @@ use yii\web\ServerErrorHttpException;
  * Class PackageInit
  * Модель идентификационных параметров пакета веб-ресурса.
  *
- * @property string $module_id   идентификатор
- * @property string $version     версия
- * @property string $title       название
- * @property string $description описание
- * @property string $params      параметры ресурса в JSON формате
- * @property bool   $is_active
- * @property int    $created_at
- * @property int    $updated_at
+ * @property string         $module_id   идентификатор
+ * @property string         $version     версия
+ * @property string         $title       название
+ * @property string         $description описание
+ * @property string         $params      параметры ресурса в JSON формате
+ * @property-read LinkedUrl $linkedUrls
+ * @property bool           $is_active
+ * @property int            $created_at
+ * @property int            $updated_at
  *
  * @package modular\core\models
  */
@@ -268,6 +269,13 @@ class PackageInit extends ActiveRecord
             [
                 'title',
                 'description',
+                'urls'   => function () {
+                    $urls = [];
+                    foreach($this->getLinkedUrls()->all() as $url) {
+                        $urls[] = $url->toArray(['url', 'is_active']);
+                    };
+                    return $urls;
+                },
                 'cid'   => 'module_id',
                 'class' => function () {
                     return $this->getClass();

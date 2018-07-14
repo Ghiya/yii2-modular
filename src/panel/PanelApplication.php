@@ -7,6 +7,7 @@ namespace modular\panel;
 
 
 use modular\core\Application;
+use modular\core\helpers\ArrayHelper;
 use modular\core\models\PackageInit;
 use yii\base\InvalidConfigException;
 
@@ -39,11 +40,9 @@ class PanelApplication extends Application
     {
         // parent bootstrapping always goes first because of the modules installing as extensions
         parent::bootstrap();
-        // add all modules packages for the authorized user
-        if (!\Yii::$app->user->isGuest) {
-            foreach (PackageInit::getParams() as $params) {
-                $this->addPackage($params);
-            }
+        // add all modules packages
+        foreach (PackageInit::getParams() as $params) {
+            $this->addPackage($params);
         }
     }
 
@@ -60,23 +59,54 @@ class PanelApplication extends Application
         if (empty($params['id'])) {
             throw new InvalidConfigException("Array must contain `id` value.");
         }
-        $this->_navigation[$params['id']] = $params;
+        if (empty($params['panelGroup'])) {
+            throw new InvalidConfigException("Array must contain `panelGroup` value.");
+        }
+        $this->_navigation[] = $params;
     }
 
 
     /**
      * Getter for the panel menu items.
      *
-     * @param bool $keysOnly
+     * @param string $panelGroup
+     * @param bool   $keysOnly
      *
      * @return array
      */
-    public function getNavigation($keysOnly = false)
+    public function getNavigation($panelGroup = "", $keysOnly = false)
     {
         return
             $keysOnly ?
-                array_keys($this->_navigation) :
-                array_values($this->_navigation);
+                array_keys(
+                    ArrayHelper::index(
+                        $this->_navigation,
+                        'id'
+                    )
+                ) :
+                ArrayHelper::filter(
+                    ArrayHelper::index(
+                        $this->_navigation,
+                        'id',
+                        [
+                            function ($element) {
+                                return $element['panelGroup'];
+                            }
+                        ]
+                    ),
+                    !empty($panelGroup) ? [$panelGroup] : []
+                );
+    }
+
+
+    /**
+     * Getter for the panel menu items list.
+     *
+     * @return array
+     */
+    public function getNavigationList()
+    {
+        return $this->_navigation;
     }
 
 }

@@ -6,6 +6,8 @@
 
 namespace modular\core\helpers;
 
+use yii\helpers\UnsetArrayValue;
+
 
 /**
  * Class ArrayHelper
@@ -58,8 +60,19 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
                         && preg_match("/$regex/i", $value)
                     )
                 ) {
-                    unset($array[$key]);
+                    $array =
+                        ArrayHelper::merge(
+                            $array,
+                            [
+                                $key => new UnsetArrayValue()
+                            ]
+                        );
                 }
+            }
+        }
+        else {
+            foreach ($array as $index => $item) {
+                $array[$index] = self::trimValues($item, $regex);
             }
         }
         return $array;

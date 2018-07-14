@@ -26,6 +26,12 @@ abstract class PanelModule extends Module
 
 
     /**
+     * @var bool индекс для фильтрации отображения в панели администрирования
+     */
+    public $panelGroup = 'resources';
+
+
+    /**
      * @return array
      */
     abstract protected function menuItems();
@@ -37,23 +43,27 @@ abstract class PanelModule extends Module
     public function init()
     {
         parent::init();
-        $this->module->navigation =
-            ArrayHelper::merge(
-                [
-                    'id'            => $this->id,
-                    'title'         => $this->title,
-                    'description'   => $this->description,
-                    'version'       => $this->version,
-                    'filterService' => $this->filterService,
-                    'active'        => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
-                    'items'         => $this->menuItems()
-                ],
-                !$this->filterService ?
+        // add navigation items for the authorized user ONLY
+        if (!\Yii::$app->user->isGuest) {
+            $this->module->navigation =
+                ArrayHelper::merge(
                     [
-                        'tracks' => TrackData::countActive($this->cid, \Yii::$app->user->id),
-                    ] :
-                    []
-            );
+                        'id'          => $this->id,
+                        'title'       => $this->title,
+                        'description' => $this->description,
+                        'urls'        => ArrayHelper::renameKeys($this->urls, ['is_active' => 'isActive']),
+                        'version'     => $this->version,
+                        'panelGroup'  => $this->panelGroup,
+                        'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
+                        'items'       => $this->menuItems()
+                    ],
+                    $this->panelGroup == 'resources' ?
+                        [
+                            'tracks' => TrackData::countActive($this->cid, \Yii::$app->user->id),
+                        ] :
+                        []
+                );
+        }
     }
 
 

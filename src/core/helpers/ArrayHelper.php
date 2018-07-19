@@ -6,6 +6,7 @@
 
 namespace modular\core\helpers;
 
+use yii\base\InvalidArgumentException;
 use yii\helpers\UnsetArrayValue;
 
 
@@ -227,7 +228,14 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
      */
     public static function extractKeys(array $array = [], $keys, $valueTemplate = '')
     {
+        // possible string to array
         $keys = (array)$keys;
+        // keys must be strings
+        array_walk($keys, function ($value) {
+            if (is_int($value)) {
+                throw new InvalidArgumentException("Property `keys` must contain only strings.");
+            }
+        });
         $extracted = [];
         if (!empty($array)) {
             if (self::isAssociative($array)) {

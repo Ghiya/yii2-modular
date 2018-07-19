@@ -8,8 +8,6 @@ namespace modular\core;
 
 use modular\core\helpers\ArrayHelper;
 use modular\core\models\PackageInit;
-use modular\panel\PanelModule;
-use modular\resource\ResourceModule;
 use yii\log\FileTarget;
 
 
@@ -94,12 +92,12 @@ abstract class Application extends \yii\web\Application
      * @return null|\yii\base\Module|Module
      * @throws \yii\base\InvalidConfigException
      */
-    public function addPackage(PackageInit $packageInit)
+    public function addPackage(PackageInit $packageInit, $packagePrefix = "")
     {
         \Yii::debug("Initializing resource `$packageInit->title`.", __METHOD__);
         // set and configure package module
         \Yii::$app->setModule(
-            $packageInit->getModuleId(),
+            $packagePrefix . $packageInit->getModuleId(),
             ArrayHelper::merge(
                 file_exists($packageInit->getPath() . '/config/config.php') ?
                     ArrayHelper::merge(
@@ -110,7 +108,7 @@ abstract class Application extends \yii\web\Application
                 $packageInit->toArray()
             )
         );
-        $module = \Yii::$app->getModule($packageInit->getModuleId());
+        $module = \Yii::$app->getModule($packagePrefix . $packageInit->getModuleId());
         // define application language
         if (isset($module->params['defaults']['language'])) {
             $this->language = $module->params['defaults']['language'];

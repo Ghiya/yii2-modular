@@ -25,10 +25,19 @@ abstract class PanelModule extends Module
 {
 
 
+    const NAV_GROUP_RESOURCES = 'resources';
+
+
+    const NAV_GROUP_SERVICES = 'services';
+
+
+    const NAV_GROUP_INTERNAL = 'internal';
+
+
     /**
      * @var bool индекс для фильтрации отображения в панели администрирования
      */
-    public $panelGroup = 'resources';
+    public $panelGroup = self::NAV_GROUP_RESOURCES;
 
 
     /**
@@ -38,32 +47,48 @@ abstract class PanelModule extends Module
 
 
     /**
+     * @return string
+     */
+    abstract protected function menuPermission();
+
+
+    /**
      * {@inheritdoc}
      */
     public function init()
     {
         parent::init();
         // add navigation items for the authorized user ONLY
-        if (!\Yii::$app->user->isGuest) {
+        if ($this->accessAllowed()) {
             $this->module->navigation =
-                ArrayHelper::merge(
-                    [
-                        'id'          => $this->id,
-                        'title'       => $this->title,
-                        'description' => $this->description,
-                        'urls'        => ArrayHelper::renameKeys($this->urls, ['is_active' => 'isActive']),
-                        'version'     => $this->version,
-                        'panelGroup'  => $this->panelGroup,
-                        'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
-                        'items'       => $this->menuItems()
-                    ],
-                    $this->panelGroup == 'resources' ?
-                        [
-                            'tracks' => TrackData::countActive($this->cid, \Yii::$app->user->id),
-                        ] :
-                        []
-                );
+                [
+                    'id'          => $this->id,
+                    'title'       => $this->title,
+                    'description' => $this->description,
+                    'urls'        => ArrayHelper::renameKeys($this->urls, ['is_active' => 'isActive']),
+                    'version'     => $this->version,
+                    'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
+                    'items'       => $this->menuItems(),
+                    'tracks'      => TrackData::countActive($this->cid, \Yii::$app->user->id),
+                ];
         }
+    }
+
+
+    /**
+     * @return bool
+     */
+    protected function accessAllowed() {
+        $permissions = (array)$this->menuPermission();
+        if ( !empty($permissions) ) {
+            foreach ($permissions as $permission) {
+                if ( \Yii::$app->user->can($permission) ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
 

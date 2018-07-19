@@ -33,7 +33,6 @@ abstract class Controller extends \yii\web\Controller
      */
     public function render($view, $params = [])
     {
-        //var_dump(ArrayHelper::merge(['breadcrumb' => $this->breadcrumb], $params));die;
         return parent::render($view, ArrayHelper::merge(['breadcrumb' => $this->breadcrumb], $params));
     }
 

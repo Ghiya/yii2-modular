@@ -25,6 +25,12 @@ class PanelApplication extends Application
 
 
     /**
+     * @var string
+     */
+    public $packagePrefix = '';
+
+
+    /**
      * @var array
      */
     private $_navigation = [];
@@ -42,7 +48,7 @@ class PanelApplication extends Application
         parent::bootstrap();
         // add all modules packages
         foreach (PackageInit::getParams() as $params) {
-            $this->addPackage($params);
+            $this->addPackage($params, $this->packagePrefix);
         }
     }
 
@@ -57,11 +63,11 @@ class PanelApplication extends Application
     public function setNavigation($params = [])
     {
         if (empty($params['id'])) {
-            throw new InvalidConfigException("Array must contain `id` value.");
+            throw new InvalidConfigException("Array must contain associated `id` key.");
         }
-        if (empty($params['panelGroup'])) {
+        /*if (empty($params['panelGroup'])) {
             throw new InvalidConfigException("Array must contain `panelGroup` value.");
-        }
+        }*/
         $this->_navigation[] = $params;
     }
 
@@ -76,26 +82,33 @@ class PanelApplication extends Application
      */
     public function getNavigation($panelGroup = "", $keysOnly = false)
     {
-        return
-            $keysOnly ?
+        if ($keysOnly) {
+            return
                 array_keys(
                     ArrayHelper::index(
                         $this->_navigation,
                         'id'
                     )
-                ) :
-                ArrayHelper::filter(
-                    ArrayHelper::index(
-                        $this->_navigation,
-                        'id',
-                        [
-                            function ($element) {
-                                return $element['panelGroup'];
-                            }
-                        ]
-                    ),
-                    !empty($panelGroup) ? [$panelGroup] : []
                 );
+        }
+        $indexedGroups =
+            ArrayHelper::index(
+                $this->_navigation,
+                null,
+                [
+                    function ($element) {
+                        $fullId = explode(".", $element['id']);
+                        return $fullId[0];
+                    }
+                ]
+            );
+        return
+            !empty($panelGroup) ?
+                ArrayHelper::filter(
+                    $indexedGroups,
+                    [$panelGroup]
+                ) :
+                array_reverse($indexedGroups);
     }
 
 
@@ -104,9 +117,9 @@ class PanelApplication extends Application
      *
      * @return array
      */
-    public function getNavigationList()
+    /*public function getNavigationList()
     {
         return $this->_navigation;
-    }
+    }*/
 
 }

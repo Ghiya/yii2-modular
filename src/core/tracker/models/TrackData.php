@@ -51,6 +51,9 @@ class TrackData extends ActiveRecord
 {
 
 
+    const SCENARIO_SEARCH = 'tracker.searchTracksScenario';
+
+
     /**
      * Высокий приоритет уведомления.
      */
@@ -61,6 +64,24 @@ class TrackData extends ActiveRecord
      * Обычный приоритет уведомления.
      */
     const PRIORITY_NOTICE = 1;
+
+
+    /**
+     * @var string
+     */
+    public $from;
+
+
+    /**
+     * @var string
+     */
+    public $to;
+
+
+    /**
+     * @var int
+     */
+    public $range = 8;
 
 
     /**
@@ -104,6 +125,7 @@ class TrackData extends ActiveRecord
                     'viewed_by',
                     'allowed_for'
                 ],
+                self::SCENARIO_SEARCH  => ['from', 'to'],
             ];
     }
 
@@ -191,6 +213,140 @@ class TrackData extends ActiveRecord
             'request'        => 'Параметры запроса',
             'request_method' => 'Метод запроса',
         ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function fields()
+    {
+        return
+            !empty($this->from) && !empty($this->to) ?
+                [
+                    'from' => function ($model) {
+                        return $model->from;
+                    },
+                    'to'   => function ($model) {
+                        return $model->to;
+                    }
+                ] :
+                [];
+    }
+
+
+    /**
+     * @return ActiveQuery|TrackData
+     */
+    /*public function search()
+    {
+        $params = $this->toArray();
+        return
+            empty($params['from']) ?
+                static::find()->orderBy(['created_at' => SORT_DESC,]) :
+                $this->_getRangeListQuery($params);
+    }*/
+
+
+    /**
+     * @param string $id
+     * @param bool   $countTracks
+     *
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getRanges($id = "", $countTracks = false)
+    {
+        $formatter = \Yii::$app->formatter;
+        $ranges = array_pad([], $this->range, []);
+        foreach (array_keys($ranges) as $index) {
+            $ranges[$index] =
+                $index == 0 ?
+                    [
+                        'from' =>
+                            $formatter->asTimestamp(
+                                date(
+                                    "Y-m-d 00:00:00.000000"
+                                )
+                            ),
+                        'to'   => time(),
+                        'date' => 'сегодня',//$formatter->asDatetime(time(), "php:d.m")
+                    ] :
+                    [
+                        'from' =>
+                            $formatter->asTimestamp(
+                                date(
+                                    "Y-m-d 00:00:00.000000",
+                                    strtotime("- " . $index . " days")
+                                )
+                            ),
+                        'to'   =>
+                            $formatter->asTimestamp(
+                                date(
+                                    "Y-m-d 00:00:00.000000",
+                                    strtotime("- " . ($index - 1) . " days")
+                                )
+                            ),
+                        'date' =>
+                            $formatter->asDatetime(
+                                strtotime("- $index days"),
+                                "php:d.m"
+                            )
+                    ];
+        }
+        if ($countTracks) {
+            foreach ($ranges as $index => $range) {
+                $ranges[$index] =
+                    ArrayHelper::merge(
+                        $ranges[$index],
+                        [
+                            'count'  => count($this->_getRangeListQuery($range, $id)->all()),
+                            'active' =>
+                                (
+                                    $formatter->asDatetime(
+                                        $range['to'],
+                                        "php:d.m"
+                                    ) == $formatter->asDatetime(
+                                        $this->getCurrent(),
+                                        "php:d.m"
+                                    )
+                                ) && !empty($this->to)
+                        ]
+                    );
+            }
+        }
+        return $ranges;
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getCurrent()
+    {
+        return
+            empty($this->to) ?
+                \Yii::$app->formatter->asTimestamp(date("Y-m-d H:i:s")) : $this->to;
+    }
+
+
+    /**
+     * @param string $id
+     * @param array  $timestamps
+     *
+     * @return ActiveQuery
+     */
+    private function _getRangeListQuery($timestamps = [], $id = "")
+    {
+        return
+            static::find()
+                ->where(
+                    "`module_id` REGEXP '$id'"
+                )
+                ->andWhere(
+                    ['>=', 'created_at', $timestamps['from']]
+                )
+                ->andWhere(['<=', 'created_at', $timestamps['to']]);
     }
 
 
@@ -448,20 +604,28 @@ class TrackData extends ActiveRecord
 
 
     /**
-     * Возвращает список всех уведомлений модуля с укзаным идентификатором.
-     * Фильтрует относительно прав пользователя.
+     * Возвращает отфильтрованный по дате/пользователю/модулю список всех уведомлений ресурса.
      *
-     * @param string $id
-     * @param int    $userId
-     * @param array  $dateFilter
+     * @param string $id         если требуется фильтрация относительно модуля
+     * @param int    $userId     если требуется фильтрация относительно пользователя
+     * @param array  $dateFilter по-умолчанию - текущая дата
      *
      * @return ActiveQuery
      */
     public static function listQuery($id = '', $userId = 0, $dateFilter = [])
     {
+        $dateFilter =
+            isset($dateFilter) ?
+                ArrayHelper::merge(
+                    [
+                        'from' => \Yii::$app->formatter->asTimestamp(date("Y-m-d") . " 00:00:00"),
+                        'to'   => time()
+                    ],
+                    $dateFilter
+                ) : $dateFilter;
         $listCondition = !empty($id) ? "`module_id` REGEXP '$id' AND " : "";
         $listQuery =
-            !empty($dateFilter) ?
+            isset($dateFilter) ?
                 static::find()
                     ->where(
                         $userId > 0 ?

@@ -27,7 +27,19 @@ class PanelApplication extends Application
     /**
      * @var string
      */
-    public $packagePrefix = '';
+    public $l12nDefault = 'ru-RU';
+
+
+    /**
+     * @var string
+     */
+    public $l12nParam = 'localize';
+
+
+    /**
+     * @var string
+     */
+    protected $packagePrefix = 'resources.';
 
 
     /**
@@ -50,6 +62,20 @@ class PanelApplication extends Application
         foreach (PackageInit::getParams() as $params) {
             $this->addPackage($params, $this->packagePrefix);
         }
+        $this->on(
+            self::EVENT_BEFORE_ACTION,
+            function () {
+                $this->language =
+                    \Yii::$app->request->get(
+                        $this->l12nParam,
+                        $this->getSession()->has($this->l12nParam) ?
+                            $this->getSession()->get($this->l12nParam) : $this->l12nDefault
+                    );
+                $this->getSession()->set($this->l12nParam, $this->language);
+            },
+            [],
+            false
+        );
     }
 
 
@@ -65,9 +91,6 @@ class PanelApplication extends Application
         if (empty($params['id'])) {
             throw new InvalidConfigException("Array must contain associated `id` key.");
         }
-        /*if (empty($params['panelGroup'])) {
-            throw new InvalidConfigException("Array must contain `panelGroup` value.");
-        }*/
         $this->_navigation[] = $params;
     }
 
@@ -113,13 +136,11 @@ class PanelApplication extends Application
 
 
     /**
-     * Getter for the panel menu items list.
-     *
-     * @return array
+     * @return string
      */
-    /*public function getNavigationList()
+    public function getPackagePrefix()
     {
-        return $this->_navigation;
-    }*/
+        return $this->packagePrefix;
+    }
 
 }

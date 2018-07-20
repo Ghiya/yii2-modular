@@ -17,8 +17,7 @@ use yii\web\View;
 /** @var int $active */
 /** @var string $resourceId */
 
-$this->title = 'Уведомления';
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = 'Список';
 ?>
 <? /*= \yii\bootstrap\Alert::widget(
     [

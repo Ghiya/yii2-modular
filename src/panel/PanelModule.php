@@ -67,7 +67,7 @@ abstract class PanelModule extends Module
         $app = \Yii::$app;
         // if module is the resource package
         if (preg_match("/" . $app->getPackagePrefix() . "/", $this->id)) {
-            $tracks = TrackData::countActive($this->cid, \Yii::$app->user->id);
+            $tracks = $this->getActiveTracks();
             return
                 [
                     [
@@ -101,6 +101,15 @@ abstract class PanelModule extends Module
                 ];
         }
         return [];
+    }
+
+
+    /**
+     * @return int
+     */
+    protected function getActiveTracks()
+    {
+        return TrackData::countActive($this->cid, \Yii::$app->user->id);
     }
 
 

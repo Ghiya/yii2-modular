@@ -31,7 +31,7 @@ class TracksController extends Controller
     /**
      * @var string
      */
-    public $viewPath = '@modular/core/tracker/views/default';
+    public $viewPath = '@modular/core/tracker/views/tracks';
 
 
     /**

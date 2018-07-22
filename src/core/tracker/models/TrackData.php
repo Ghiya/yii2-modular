@@ -236,19 +236,6 @@ class TrackData extends ActiveRecord
 
 
     /**
-     * @return ActiveQuery|TrackData
-     */
-    /*public function search()
-    {
-        $params = $this->toArray();
-        return
-            empty($params['from']) ?
-                static::find()->orderBy(['created_at' => SORT_DESC,]) :
-                $this->_getRangeListQuery($params);
-    }*/
-
-
-    /**
      * @param string $id
      * @param bool   $countTracks
      *

@@ -139,7 +139,7 @@ class PanelListView extends ListView
                     )
                 ),
                     [
-                        'class' => 'paging',
+                        'class' => 'pagination',
                     ]
                 )
                 . "\n</div>"

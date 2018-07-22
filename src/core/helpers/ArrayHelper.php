@@ -22,8 +22,8 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
      * Convert array values according to the defined template expression.
      * Supposed for using both parameters, in other cases do nothing.
      *
-     * @param array  $array
-     * @param string $template string expression to replace value with ( by default `{value}` )
+     * @param array           $array
+     * @param string|callable $template expression to replace value with ( by default `{value}` )
      *
      * @return array
      */
@@ -32,7 +32,10 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
         if (self::isAssociative($array)) {
             foreach ($array as $key => $value) {
                 if (isset($value)) {
-                    $array[$key] = preg_replace("/{value}/i", $value, $template);
+                    $array[$key] =
+                        !is_callable($template) ?
+                            preg_replace("/{value}/i", $value, $template) :
+                            call_user_func($template, $key, $value);
                 }
             }
         }

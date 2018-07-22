@@ -48,9 +48,9 @@ $this->params['breadcrumbs'][] = 'Список';
 <div class="text-center">
     <? foreach ($searchRanges as $index => $range) : ?>
         <? if (empty($range['count'])) : ?>
-            <? $linkClass = !empty($range['active']) ? 'btn btn-success font-book disabled' : 'btn btn-default font-thin disabled' ?>
+            <? $linkClass = !empty($range['active']) ? 'btn btn-success font-bold' : 'btn btn-default font-thin disabled' ?>
         <? else: ?>
-            <? $linkClass = !empty($range['active']) ? 'btn btn-success font-book' : 'btn btn-default font-book' ?>
+            <? $linkClass = !empty($range['active']) ? 'btn btn-success font-bold' : 'btn btn-default font-light' ?>
         <? endif; ?>
         <?=
         Html::a(

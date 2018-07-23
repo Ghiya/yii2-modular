@@ -48,7 +48,7 @@ class EmailSender extends Sender
                     [
                         'resource' => $track->sender->module->title,
                         'subject'  => $subject,
-                        'notice'   => $track->getModel()->getNoticeParams(),
+                        'notice'   => $track->getModel()->toArray(),
                     ]
                 )
                 ->setFrom($this->sender)

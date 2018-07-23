@@ -14,7 +14,7 @@ use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 
 /**
- * Class TrackSender
+ * Class Sender
  *
  * @property-read TracksManager $owner
  *

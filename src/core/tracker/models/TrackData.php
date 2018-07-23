@@ -231,7 +231,13 @@ class TrackData extends ActiveRecord
                         return $model->to;
                     }
                 ] :
-                [];
+                [
+                    'message',
+                    'priority',
+                    'module_id',
+                    'version',
+                    'session_id',
+                ];
     }
 
 
@@ -257,7 +263,7 @@ class TrackData extends ActiveRecord
                                 )
                             ),
                         'to'   => time(),
-                        'date' => 'сегодня',//$formatter->asDatetime(time(), "php:d.m")
+                        'date' => 'сегодня',
                     ] :
                     [
                         'from' =>
@@ -287,7 +293,7 @@ class TrackData extends ActiveRecord
                     ArrayHelper::merge(
                         $ranges[$index],
                         [
-                            'count'  => count($this->_getRangeListQuery($range, $id)->all()),
+                            'count'  => self::listQuery($id, \Yii::$app->user->id, $range)->count(),
                             'active' =>
                                 (
                                     $formatter->asDatetime(
@@ -314,26 +320,6 @@ class TrackData extends ActiveRecord
         return
             empty($this->to) ?
                 \Yii::$app->formatter->asTimestamp(date("Y-m-d H:i:s")) : $this->to;
-    }
-
-
-    /**
-     * @param string $id
-     * @param array  $timestamps
-     *
-     * @return ActiveQuery
-     */
-    private function _getRangeListQuery($timestamps = [], $id = "")
-    {
-        return
-            static::find()
-                ->where(
-                    "`module_id` REGEXP '$id'"
-                )
-                ->andWhere(
-                    ['>=', 'created_at', $timestamps['from']]
-                )
-                ->andWhere(['<=', 'created_at', $timestamps['to']]);
     }
 
 
@@ -619,7 +605,7 @@ class TrackData extends ActiveRecord
                             $listCondition . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )" :
                             $listCondition . "`allowed_for` IS NULL"
                     )
-                    ->where(
+                    ->andWhere(
                         ['>=', 'created_at', $dateFilter['from']]
                     )
                     ->andWhere(['<=', 'created_at', $dateFilter['to']]) :
@@ -648,24 +634,6 @@ class TrackData extends ActiveRecord
             'viewed_by'   => null,
             'allowed_for' => null,
         ]);
-    }
-
-
-    /**
-     * Возвращает массив параметров почтового уведомления.
-     *
-     * @return array
-     */
-    public function getNoticeParams()
-    {
-        return
-            $this->toArray([
-                'message',
-                'priority',
-                'module_id',
-                'version',
-                'session_id',
-            ]);
     }
 
 

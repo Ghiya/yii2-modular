@@ -10,7 +10,8 @@ namespace modular\panel\models;
 use yii\db\ActiveRecord;
 
 /**
- * Class UserRole запись роли доступа пользователя панели администрирования системы
+ * Class UserRole
+ * Роль доступа пользователя панели администрирования системы.
  *
  * @property int    $id
  * @property int    $user_id
@@ -167,6 +168,15 @@ class UserRole extends ActiveRecord
     }
 
 
+    public function getDescription()
+    {
+        $list = self::rolesList();
+        return
+            isset($list[$this->value]) ?
+                $list[$this->value] : "";
+    }
+
+
     /**
      * Возвращает список всех ролей пользователей с их названиями.
      *
@@ -183,22 +193,6 @@ class UserRole extends ActiveRecord
                 self::RL_CALLCENTER    => 'Сотрудник колл-центра',
                 self::RL_API           => 'Клиент API',
             ];
-    }
-
-
-    /**
-     * Возвращает строковое описание роли доступа пользователя.
-     *
-     * @param string $role
-     *
-     * @return null|string
-     */
-    public static function getRoleLabel($role = '')
-    {
-        return
-            !empty($role) && isset(self::rolesList()[$role]) ?
-                (string)self::rolesList()[$role] :
-                null;
     }
 
 
@@ -245,13 +239,13 @@ class UserRole extends ActiveRecord
 
 
     /**
-     * Возвращает read-only список пользователей состоящих в данной группе.
+     * Возвращает список пользователей состоящих в данной роли.
      *
      * @return \yii\db\ActiveQuery
      */
     public function getUsers()
     {
-        return $this->hasMany(User::className(), ['id' => 'user_id']);
+        return $this->hasMany(User::class, ['id' => 'user_id']);
     }
 
 

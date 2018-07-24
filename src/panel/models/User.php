@@ -69,7 +69,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -78,7 +78,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function formName()
     {
@@ -87,18 +87,18 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
         ];
     }
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -138,7 +138,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function delete()
     {
@@ -154,14 +154,14 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getRole()
     {
-        return $this->hasOne(UserRole::className(), ['user_id' => 'id']);
+        return $this->hasOne(UserRole::class, ['user_id' => 'id']);
     }
 
 
     /**
      * Удаляет роль доступа пользователя если она задана.
      *
-     * @throws \Exception
+     * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
     protected function removeRoleIfExists()
@@ -176,6 +176,9 @@ class User extends ActiveRecord implements IdentityInterface
      * Устанавливает новую роль пользователя.
      *
      * @param string $role
+     *
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function addRole($role = '')
     {
@@ -192,7 +195,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function findIdentity($id)
     {
@@ -201,7 +204,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
@@ -257,7 +260,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -266,7 +269,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getAuthKey()
     {
@@ -275,7 +278,7 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function validateAuthKey($authKey)
     {
@@ -297,9 +300,9 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Generates password hash from password and sets it to the model
+     * @param $password
      *
-     * @param string $password
+     * @throws \yii\base\Exception
      */
     public function setPassword($password)
     {
@@ -312,6 +315,8 @@ class User extends ActiveRecord implements IdentityInterface
 
     /**
      * Generates "remember me" authentication key
+     *
+     * @throws \yii\base\Exception
      */
     public function generateAuthKey()
     {

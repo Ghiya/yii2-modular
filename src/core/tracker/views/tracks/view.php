@@ -5,14 +5,14 @@
  */
 
 use modular\core\helpers\Html;
-use modular\core\tracker\models\TrackData;
+use modular\core\tracker\models\SearchTrackData;
 use yii\bootstrap\Alert;
 use yii\web\View;
 use yii\widgets\DetailView;
 
 
 /* @var $this View */
-/** @var TrackData $model */
+/** @var SearchTrackData $model */
 /** @var string $type */
 /** @var int $userId */
 /** @var string $debugData */

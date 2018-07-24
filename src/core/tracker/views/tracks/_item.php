@@ -5,11 +5,11 @@
  */
 
 use modular\panel\models\UserRole;
-use modular\core\tracker\models\TrackData;
+use modular\core\tracker\models\SearchTrackData;
 use modular\panel\widgets\PanelItemModal;
 use yii\helpers\Html;
 
-/** @var TrackData $model */
+/** @var SearchTrackData $model */
 
 ?>
 <?=

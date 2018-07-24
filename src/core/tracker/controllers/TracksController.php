@@ -8,8 +8,10 @@ namespace modular\core\tracker\controllers;
 
 
 use modular\core\Controller;
+use modular\core\helpers\ArrayHelper;
 use modular\core\helpers\Html;
 use modular\core\helpers\ResourceHelper;
+use modular\core\tracker\models\SearchTrackData;
 use modular\core\tracker\models\TrackData;
 use modular\panel\models\UserRole;
 use yii\data\ActiveDataProvider;
@@ -149,29 +151,39 @@ class TracksController extends Controller
      */
     public function actionList($id)
     {
-        $tracks = new TrackData(['scenario' => TrackData::SCENARIO_SEARCH]);
-        $tracks->load(\Yii::$app->request->get());
+        $searchTracks = new SearchTrackData();
+        $searchTracks->load(\Yii::$app->request->get());
         return
             $this->render(
                 $this->viewPath . '/list',
                 [
-                    'dataProvider' =>
+                    'dataProvider'   =>
                         new ActiveDataProvider(
                             [
                                 'query'      =>
                                     TrackData::listQuery(
                                         $id,
                                         \Yii::$app->user->identity->id,
-                                        $tracks->toArray()
+                                        $searchTracks->toArray()
                                     ),
                                 'pagination' => (\Yii::$app->request->get('page', 1) == 0) ? false : [
                                     'pageSize' => 50,
                                 ]
                             ]
                         ),
-                    'resourceId'   => $id,
-                    'active'       => TrackData::countActive($id, \Yii::$app->user->identity->id),
-                    'searchRanges' => array_reverse($tracks->getRanges($id, true))
+                    'resourceId'     => $id,
+                    'active'         => TrackData::countActive($id, \Yii::$app->user->identity->id),
+                    'searchRanges'   => array_reverse($searchTracks->getRanges($id, true)),
+                    'filterUrlRoute' =>
+                        ArrayHelper::merge(
+                            [
+                                "viewed",
+                            ],
+                            ArrayHelper::merge(
+                                \Yii::$app->request->get(),
+                                $searchTracks->toArray()
+                            )
+                        )
                 ]
             );
     }
@@ -183,7 +195,7 @@ class TracksController extends Controller
      */
     public function actionView()
     {
-        $model = TrackData::findOne(['id' => \Yii::$app->request->get('id', null),]);
+        $model = SearchTrackData::findOne(['id' => \Yii::$app->request->get('id', null),]);
         if (empty($model)) {
             throw new NotFoundHttpException("Указанная запись не существует или была удалена");
         }
@@ -217,9 +229,12 @@ class TracksController extends Controller
      */
     public function actionViewed($id)
     {
-        TrackData::allViewedBy(
+        $tracks = new SearchTrackData();
+        $tracks->load(\Yii::$app->request->get());
+        SearchTrackData::allViewedBy(
             $id,
-            \Yii::$app->user->identity->getId()
+            \Yii::$app->user->identity->getId(),
+            $tracks->toArray()
         );
         \Yii::$app->getSession()->setFlash(
             'success',
@@ -227,7 +242,10 @@ class TracksController extends Controller
         );
         return
             $this->redirect(
-                ["list", "id" => $id]
+                ArrayHelper::merge(
+                    ["list"],
+                    \Yii::$app->request->get()
+                )
             );
     }
 

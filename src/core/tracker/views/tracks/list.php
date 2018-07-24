@@ -4,6 +4,7 @@
  * @author    Ghiya Mikadze <gmikadze@v-tell.com>
  */
 
+use modular\core\helpers\ArrayHelper;
 use modular\panel\widgets\PanelListView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
@@ -16,25 +17,17 @@ use yii\web\View;
 /** @var array $searchRanges */
 /** @var int $active */
 /** @var string $resourceId */
+/** @var array $filterUrlRoute */
 
 $this->params['breadcrumbs'][] = 'Список';
 ?>
-<? /*= \yii\bootstrap\Alert::widget(
-    [
-        'closeButton' => false,
-        'body'        => 'Интервал хранения уведомлений: <strong>1800</strong> с. Указанное значение устанавливается в <a href="/config" class="revert red">системных настройках</a>.',
-        'options'     =>
-            [
-                'class' => 'alert alert-info',
-            ],
-    ]
-)*/ ?>
-<br/>
 <div class="text-center">
     <?=
     Html::a(
-        'Отметить все уведомления как просмотренные.',
-        ["viewed?id=$resourceId",],
+        'Просмотрены все',
+        Url::toRoute(
+            $filterUrlRoute
+        ),
         [
             'data'  => [
                 'confirm' => 'Все уведомления будут отмечены как просмотренные?',

@@ -39,19 +39,11 @@ use yii\helpers\Json;
  * @property int    $created_at
  * @property array  $viewedBy        массив данных просмотра
  * @property array  $allowedFor      массив данных доступа
- * @property array  $observers       read-only массив данных контактов получателей уведомлений
- * @property array  $mailTo          read-only массив адресов электронной почты получателей уведомлений
- * @property array  $messageTo       read-only массив номеров телефонов получателей уведомлений
- * @property string $debugData       read-only данные отладочной информации
  *
  * @package modular\core\tracker\models
- * @author  Ghiya Mikadze <ghiya@mikadze.me>
  */
 class TrackData extends ActiveRecord
 {
-
-
-    const SCENARIO_SEARCH = 'tracker.searchTracksScenario';
 
 
     /**
@@ -64,24 +56,6 @@ class TrackData extends ActiveRecord
      * Обычный приоритет уведомления.
      */
     const PRIORITY_NOTICE = 1;
-
-
-    /**
-     * @var string
-     */
-    public $from;
-
-
-    /**
-     * @var string
-     */
-    public $to;
-
-
-    /**
-     * @var int
-     */
-    public $range = 8;
 
 
     /**
@@ -125,7 +99,6 @@ class TrackData extends ActiveRecord
                     'viewed_by',
                     'allowed_for'
                 ],
-                self::SCENARIO_SEARCH  => ['from', 'to'],
             ];
     }
 
@@ -222,104 +195,13 @@ class TrackData extends ActiveRecord
     public function fields()
     {
         return
-            !empty($this->from) && !empty($this->to) ?
-                [
-                    'from' => function ($model) {
-                        return $model->from;
-                    },
-                    'to'   => function ($model) {
-                        return $model->to;
-                    }
-                ] :
-                [
-                    'message',
-                    'priority',
-                    'module_id',
-                    'version',
-                    'session_id',
-                ];
-    }
-
-
-    /**
-     * @param string $id
-     * @param bool   $countTracks
-     *
-     * @return array
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function getRanges($id = "", $countTracks = false)
-    {
-        $formatter = \Yii::$app->formatter;
-        $ranges = array_pad([], $this->range, []);
-        foreach (array_keys($ranges) as $index) {
-            $ranges[$index] =
-                $index == 0 ?
-                    [
-                        'from' =>
-                            $formatter->asTimestamp(
-                                date(
-                                    "Y-m-d 00:00:00.000000"
-                                )
-                            ),
-                        'to'   => time(),
-                        'date' => 'сегодня',
-                    ] :
-                    [
-                        'from' =>
-                            $formatter->asTimestamp(
-                                date(
-                                    "Y-m-d 00:00:00.000000",
-                                    strtotime("- " . $index . " days")
-                                )
-                            ),
-                        'to'   =>
-                            $formatter->asTimestamp(
-                                date(
-                                    "Y-m-d 00:00:00.000000",
-                                    strtotime("- " . ($index - 1) . " days")
-                                )
-                            ),
-                        'date' =>
-                            $formatter->asDatetime(
-                                strtotime("- $index days"),
-                                "php:d.m"
-                            )
-                    ];
-        }
-        if ($countTracks) {
-            foreach ($ranges as $index => $range) {
-                $ranges[$index] =
-                    ArrayHelper::merge(
-                        $ranges[$index],
-                        [
-                            'count'  => self::listQuery($id, \Yii::$app->user->id, $range)->count(),
-                            'active' =>
-                                (
-                                    $formatter->asDatetime(
-                                        $range['to'],
-                                        "php:d.m"
-                                    ) == $formatter->asDatetime(
-                                        $this->getCurrent(),
-                                        "php:d.m"
-                                    )
-                                ) && !empty($this->to)
-                        ]
-                    );
-            }
-        }
-        return $ranges;
-    }
-
-
-    /**
-     * @return string
-     */
-    protected function getCurrent()
-    {
-        return
-            empty($this->to) ?
-                \Yii::$app->formatter->asTimestamp(date("Y-m-d H:i:s")) : $this->to;
+            [
+                'message',
+                'priority',
+                'module_id',
+                'version',
+                'session_id',
+            ];
     }
 
 
@@ -360,22 +242,6 @@ class TrackData extends ActiveRecord
 
 
     /**
-     * Помечает все уведомления модуля веб-ресурса как прочтённые указанным пользователем.
-     *
-     * @param string $moduleId идентификатор модуля
-     * @param int    $userId   идентификатор пользователя
-     */
-    public static function allViewedBy($moduleId = "", $userId = 0)
-    {
-        /** @var static[] $tracks */
-        $tracks = self::listQuery($moduleId, $userId)->all();
-        foreach ($tracks as $track) {
-            $track->viewed($userId);
-        }
-    }
-
-
-    /**
      * Возвращает массив данных просмотров c идентификаторами пользователей.
      *
      * @return array
@@ -404,26 +270,6 @@ class TrackData extends ActiveRecord
                 'viewed_by' => Json::encode(ArrayHelper::merge($this->viewedBy, ["-" . $userId . "-",])),
             ]);
             $this->refresh();
-        }
-    }
-
-
-    /**
-     * Добавляет просмотр для указанного пользователя или группы пользователей.
-     *
-     * @param int|array $user идентификатор пользователя или массив идентификаторов
-     */
-    public function viewed($user = 0)
-    {
-        if (!empty($user)) {
-            if (is_array($user)) {
-                foreach ($user as $id) {
-                    $this->viewedBy = $id;
-                }
-            }
-            else {
-                $this->viewedBy = $user;
-            }
         }
     }
 
@@ -461,28 +307,8 @@ class TrackData extends ActiveRecord
     {
         if (!$this->isAllowedFor($userId)) {
             $this->updateAttributes([
-                'allowed_for' => Json::encode(ArrayHelper::merge($this->allowedFor, ["-" . $userId . "-",])),
+                'allowed_for' => Json::encode(ArrayHelper::merge($this->getAllowedFor(), ["-" . $userId . "-",])),
             ]);
-        }
-    }
-
-
-    /**
-     * Добавляет доступ для указанного пользователя или группы пользователей.
-     *
-     * @param int|array $user идентификатор пользователя или массив идентификаторов
-     */
-    public function allowed($user = 0)
-    {
-        if (!empty($user)) {
-            if (is_array($user)) {
-                foreach ($user as $id) {
-                    $this->allowedFor = $id;
-                }
-            }
-            else {
-                $this->allowedFor = $user;
-            }
         }
     }
 
@@ -496,7 +322,7 @@ class TrackData extends ActiveRecord
      */
     public function isAllowedFor($userId = 0)
     {
-        return (!empty($userId)) ? in_array("-" . $userId . "-", $this->allowedFor) : false;
+        return (!empty($userId)) ? in_array("-" . $userId . "-", $this->getAllowedFor()) : false;
     }
 
 

@@ -51,6 +51,7 @@ abstract class PanelModule extends Module
                     'urls'        => ArrayHelper::renameKeys($this->urls, ['is_active' => 'isActive']),
                     'version'     => $this->version,
                     'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
+                    'tracks'      => $this->getActiveTracks(),
                     'items'       =>
                         ArrayHelper::merge(
                             $this->trackItem(),
@@ -66,7 +67,7 @@ abstract class PanelModule extends Module
         /** @var PanelApplication $app */
         $app = \Yii::$app;
         // if module is the resource package
-        if (preg_match("/" . $app->getPackagePrefix() . "/", $this->id)) {
+        if ($this->hasTracking()) {
             $tracks = $this->getActiveTracks();
             return
                 [
@@ -104,12 +105,23 @@ abstract class PanelModule extends Module
     }
 
 
+    public function hasTracking()
+    {
+        /** @var PanelApplication $app */
+        $app = \Yii::$app;
+        return
+            preg_match("/" . $app->getPackagePrefix() . "/", $this->id);
+    }
+
+
     /**
      * @return int
      */
     protected function getActiveTracks()
     {
-        return TrackData::countActive($this->cid, \Yii::$app->user->id);
+        return
+            $this->hasTracking() ?
+                TrackData::countActive($this->cid, \Yii::$app->user->id) : 0;
     }
 
 

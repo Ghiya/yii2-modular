@@ -45,46 +45,6 @@ abstract class Application extends \yii\web\Application
 
 
     /**
-     * {@inheritdoc}
-     *
-     * Добавляет в компоненты ядра приложения компоненты используемые по-умолчанию.
-     *
-     */
-    final public function coreComponents()
-    {
-        return ArrayHelper::merge(
-            parent::coreComponents(),
-            [
-                'authManager' =>
-                    [
-                        'class'          => 'yii\rbac\PhpManager',
-                        'assignmentFile' => '@common/rbac/assignments.php',
-                        'itemFile'       => '@common/rbac/items.php',
-                        'ruleFile'       => '@common/rbac/rules.php',
-                    ],
-                'cache'       =>
-                    [
-                        'class' => 'yii\caching\FileCache',
-                    ],
-                'session'     =>
-                    [
-                        'class' => 'yii\web\Session',
-                    ],
-                'formatter'   =>
-                    [
-                        'dateFormat'        => 'dd.MM.yyyy',
-                        'decimalSeparator'  => '.',
-                        'thousandSeparator' => ' ',
-                        'locale'            => 'ru-RU',
-                        'defaultTimeZone'   => 'Europe/Moscow',
-                        'nullDisplay'       => '<i class="fa fa-minus"></i>',
-                    ]
-            ]
-        );
-    }
-
-
-    /**
      * Добавляет в приложение модуль веб-ресурса с указанными параметрами инициализации.
      *
      * @param PackageInit $packageInit

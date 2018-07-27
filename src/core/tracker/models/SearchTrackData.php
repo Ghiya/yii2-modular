@@ -228,4 +228,25 @@ class SearchTrackData extends TrackData
     }
 
 
+    /**
+     * Возвращает количество непросмотренных уведомлений модуля веб-ресурса для указанного пользователя.
+     *
+     * @param int  $userId
+     * @param bool $filterDate
+     *
+     * @return int
+     */
+    public function countActive($userId = 0, $filterDate = true)
+    {
+        return
+            self::listQuery(
+                $this->id,
+                !empty($userId) ?
+                    $userId : \Yii::$app->getUser()->getId(),
+                $filterDate ? $this->toArray() : null
+            )
+                ->andWhere("`viewed_by` IS NULL OR `viewed_by` NOT REGEXP '-$userId-'")
+                ->count();
+    }
+
 }

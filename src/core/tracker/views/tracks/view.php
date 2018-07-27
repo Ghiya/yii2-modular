@@ -1,14 +1,12 @@
 <?php
 /**
  * @copyright Copyright (c) 2014-2018 ООО "Глобал Телеком". Все права защищены.
- * @author Ghiya Mikadze <gmikadze@v-tell.com>
+ * @author    Ghiya Mikadze <gmikadze@v-tell.com>
  */
 
 use modular\core\helpers\Html;
 use modular\core\tracker\models\SearchTrackData;
-use yii\bootstrap\Alert;
 use yii\web\View;
-use yii\widgets\DetailView;
 
 
 /* @var $this View */
@@ -17,67 +15,74 @@ use yii\widgets\DetailView;
 /** @var int $userId */
 /** @var string $debugData */
 
-$userId = \Yii::$app->user->identity->id;
+$userId = \Yii::$app->user->identity->getId();
 ?>
-<?= DetailView::widget([
-    'model'      => $model,
-    'template'   => '<div class="cpanel-item-property clearfix"><div class="wrapper">{value}</div></div>',
-    'options'    => [
-        'tag'   => 'div',
-        'class' => 'cpanel-item-property-list text-left clearfix',
-    ],
-    'attributes' => [
-        [
-            'attribute' => 'message',
-            'format'    => 'raw',
-            'value'     => empty($debugData) ?
-                '<br/>' .
-                Alert::widget(
-                    [
-                        'body'        =>
-                            preg_replace("/\r\n/i", "<br/>", $model->message),
-                        'closeButton' => false,
-                        'options'     =>
-                            [
-                                'class' => ($model->priority > 1) ? 'alert alert-danger text-left' : 'alert alert-success text-left',
-                            ],
-                    ]
-                ) .
-                $model->getRelatedLink() :
-                '<br/>' .
-                Alert::widget(
-                    [
-                        'body'        =>
-                            preg_replace("/\r\n/i", "<br/>", $model->message),
-                        'closeButton' => false,
-                        'options'     =>
-                            [
-                                'class' => ($model->priority > 1) ? 'alert alert-warning text-left' : 'alert alert-success text-left',
-                            ],
-                    ]
-                ) .
-                $model->getRelatedLink() .
+<div class="cpanel-item-property-list text-left clearfix">
+    <div class="cpanel-item-property clearfix">
+        <div class="wrapper">
+            <div class="well">
+                <?= preg_replace("/\r\n/i", "<br/>", $model->message) ?>
+            </div>
+            <? if (!empty($debugData)) : ?>
+                <?=
                 Html::a(
-                    'Подробнее</span>',
+                    'Параметры запроса</span>',
                     "#collapsible-id$model->id",
                     [
-                        'class'         => 'revert',
-                        'data'          => [
-                            'toggle'   => 'collapse',
-                            'controls' => "collapsible-id$model->id"
-                        ],
-                        'aria-expanded' => 'false',
+                        'class' => 'revert',
+                        'data'  => [
+                            'toggle' => 'modal',
+                        ]
                     ]
-                ) .
-                '<br/><br/>' .
+                ) ?>
+                <br/>
+                <?=
                 Html::tag(
                     'div',
-                    Html::decode(preg_replace("/\r\n/i", "<br/>", $debugData)),
+                    Html::tag(
+                        'div',
+                        Html::tag(
+                            'div',
+                            Html::tag(
+                                'div',
+                                $debugData,
+                                [
+                                    'class' => 'modal-body',
+                                ]
+                            ) .
+                            Html::tag(
+                                'div',
+                                Html::button(
+                                    'Закрыть',
+                                    [
+                                        'class' => 'btn btn-default form-control',
+                                        'data'  =>
+                                            [
+                                                'dismiss' => 'modal'
+                                            ]
+                                    ]
+                                ),
+                                [
+                                    'class' => 'modal-footer'
+                                ]
+                            ),
+                            [
+                                'class' => 'modal-content',
+                            ]
+                        ),
+                        [
+                            'class' => 'modal-dialog modal-lg',
+                            'role'  => 'document'
+                        ]
+                    ),
                     [
-                        'id'    => "collapsible-id$model->id",
-                        'class' => 'collapse',
+                        'id'       => "collapsible-id$model->id",
+                        'class'    => 'modal fade',
+                        'tabindex' => -1,
+                        'role'     => 'dialog'
                     ]
-                ),
-        ],
-    ],
-]); ?>
+                ) ?>
+            <? endif; ?>
+        </div>
+    </div>
+</div>

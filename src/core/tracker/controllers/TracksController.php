@@ -10,7 +10,6 @@ namespace modular\core\tracker\controllers;
 use modular\core\Controller;
 use modular\core\helpers\ArrayHelper;
 use modular\core\helpers\Html;
-use modular\core\helpers\ResourceHelper;
 use modular\core\tracker\models\SearchTrackData;
 use modular\core\tracker\models\TrackData;
 use modular\panel\models\UserRole;
@@ -91,25 +90,24 @@ class TracksController extends Controller
                     Html::tag(
                         "p",
                         Html::tag(
+                            "span",
+                            $model->user_ip . " " .
+                            Html::tag(
+                                "strong",
+                                $model->version
+                            ),
+                            [
+                                'class' => 'text-backwards'
+                            ]
+                        ) . '<br/>' .
+                        Html::tag(
                             "strong",
                             strtoupper($model->request_method),
                             [
                                 'class' => 'green'
                             ]
                         )
-                        . " $model->module_id/$model->controller_id/$model->action_id "
-                        . Html::tag(
-                            "span",
-                            "/ "
-                            . Html::tag(
-                                "strong",
-                                $model->version
-                            ) .
-                            " : $model->user_ip",
-                            [
-                                'class' => 'text-backwards'
-                            ]
-                        ),
+                        . " $model->module_id/$model->controller_id/$model->action_id ",
                         [
                             'class' => 'font-book'
                         ]
@@ -134,19 +132,8 @@ class TracksController extends Controller
     /**
      * @param $id
      *
-     * @return int
-     */
-    public function actionState($id)
-    {
-        \Yii::$app->response->format = Response::FORMAT_RAW;
-        return count(TrackData::fetchList($id, \Yii::$app->user->id, TrackData::PRIORITY_NOTICE));
-    }
-
-
-    /**
-     * @param $id
-     *
      * @return string
+     * @throws \Throwable
      * @throws \yii\base\InvalidConfigException
      */
     public function actionList($id)
@@ -163,7 +150,7 @@ class TracksController extends Controller
                                 'query'      =>
                                     TrackData::listQuery(
                                         $id,
-                                        \Yii::$app->user->identity->id,
+                                        \Yii::$app->user->identity->getId(),
                                         $searchTracks->toArray()
                                     ),
                                 'pagination' => (\Yii::$app->request->get('page', 1) == 0) ? false : [
@@ -172,7 +159,7 @@ class TracksController extends Controller
                             ]
                         ),
                     'resourceId'     => $id,
-                    'active'         => TrackData::countActive($id, \Yii::$app->user->identity->id),
+                    'active'         => $searchTracks->countActive(),
                     'searchRanges'   => array_reverse($searchTracks->getRanges($id, true)),
                     'filterUrlRoute' =>
                         ArrayHelper::merge(
@@ -192,6 +179,7 @@ class TracksController extends Controller
     /**
      * @return string
      * @throws NotFoundHttpException
+     * @throws \Throwable
      */
     public function actionView()
     {
@@ -208,13 +196,14 @@ class TracksController extends Controller
                 [
                     'model'     => $model,
                     'debugData' =>
-                        ResourceHelper::debugPrint(
-                            [
-                                'value' => $this->_debugData($model),
-                                'type'  => ResourceHelper::DEBUG_PRINT_PLAIN,
-                            ],
-                            false
-                        ),
+                        \Yii::$app->user->can(UserRole::PM_MANAGE_ALL) ?
+                            $this->renderPartial(
+                                $this->viewPath . '/view-request',
+                                [
+                                    'model'   => $model,
+                                    'request' => Json::decode($model->request)
+                                ]
+                            ) : "",
                 ]
             );
     }
@@ -246,26 +235,6 @@ class TracksController extends Controller
                     ["list"],
                     \Yii::$app->request->get()
                 )
-            );
-    }
-
-
-    /**
-     * @return Response
-     */
-    public function actionViewedAll()
-    {
-        TrackData::allViewedBy(
-            null,
-            \Yii::$app->user->identity->getId()
-        );
-        \Yii::$app->session->setFlash(
-            'success',
-            'Действие выполнено.'
-        );
-        return
-            $this->redirect(
-                "/" . $this->module->id
             );
     }
 

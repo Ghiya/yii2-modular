@@ -8,7 +8,7 @@ namespace modular\panel;
 use modular\core\helpers\ArrayHelper;
 use modular\core\helpers\Html;
 use modular\core\Module;
-use modular\core\tracker\models\TrackData;
+use modular\core\tracker\models\SearchTrackData;
 
 
 /**
@@ -64,8 +64,6 @@ abstract class PanelModule extends Module
 
     protected function trackItem()
     {
-        /** @var PanelApplication $app */
-        $app = \Yii::$app;
         // if module is the resource package
         if ($this->hasTracking()) {
             $tracks = $this->getActiveTracks();
@@ -107,10 +105,8 @@ abstract class PanelModule extends Module
 
     public function hasTracking()
     {
-        /** @var PanelApplication $app */
-        $app = \Yii::$app;
         return
-            preg_match("/" . $app->getPackagePrefix() . "/", $this->id);
+            preg_match("/" . $this->module->getPackagePrefix() . "/", $this->id);
     }
 
 
@@ -119,9 +115,11 @@ abstract class PanelModule extends Module
      */
     protected function getActiveTracks()
     {
+        $searchTracks = new SearchTrackData();
+        $searchTracks->id = $this->cid;
         return
             $this->hasTracking() ?
-                TrackData::countActive($this->cid, \Yii::$app->user->id) : 0;
+                $searchTracks->countActive() : 0;
     }
 
 

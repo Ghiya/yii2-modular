@@ -13,20 +13,21 @@ use yii\web\IdentityInterface;
 
 
 /**
- * User модель пользователя панели администрирования системы
+ * User
+ * Модель пользователя панели администрирования системы.
  *
- * @property integer  $id
- * @property string   $username
- * @property string   $password_hash
- * @property string   $password_reset_token
- * @property string   $name
- * @property string   $email
- * @property string   $auth_key
- * @property integer  $status
- * @property integer  $created_at
- * @property integer  $updated_at
- * @property string   $password write-only password
- * @property UserRole $role     read-only роль доступа пользователя
+ * @property integer       $id
+ * @property string        $username
+ * @property string        $password_hash
+ * @property string        $password_reset_token
+ * @property string        $name
+ * @property string        $email
+ * @property string        $auth_key
+ * @property integer       $status
+ * @property integer       $created_at
+ * @property integer       $updated_at
+ * @property-write string  $password
+ * @property-read UserRole $role роль доступа пользователя
  *
  * @package modular\panel\models
  */
@@ -35,19 +36,19 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * @const int STATUS_DELETED статус удалённого пользователя
+     * Статус удалённого пользователя.
      */
     const STATUS_DELETED = 0;
 
 
     /**
-     * @const int STATUS_ACTIVE статус активного пользователя
+     * Статус активного пользователя.
      */
     const STATUS_ACTIVE = 10;
 
 
     /**
-     * @const int STATUS_BLOCKED статус заблокированного пользователя
+     * Статус заблокированного пользователя.
      */
     const STATUS_BLOCKED = 20;
 
@@ -125,19 +126,6 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Возвращает запись пользователя с указанным идентификатором.
-     *
-     * @param int $userId
-     *
-     * @return User|null
-     */
-    public static function findById($userId = 0)
-    {
-        return static::findOne(['id' => $userId,]);
-    }
-
-
-    /**
      * {@inheritdoc}
      */
     public function delete()
@@ -199,7 +187,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['id' => $id]);
     }
 
 
@@ -221,41 +209,13 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Finds user by username
+     * @param $username
      *
-     * @param string $username
-     *
-     * @return static|null
+     * @return null|static
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
-    }
-
-
-    /**
-     * Finds user by password reset token
-     *
-     * @param string $token password reset token
-     *
-     * @return static|null
-     */
-    public static function findByPasswordResetToken($token)
-    {
-        return null;
-    }
-
-
-    /**
-     * Finds out if password reset token is valid
-     *
-     * @param string $token password reset token
-     *
-     * @return bool
-     */
-    public static function isPasswordResetTokenValid($token)
-    {
-        return null;
+        return static::findOne(['username' => $username]);
     }
 
 
@@ -287,11 +247,9 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Validates password
+     * @param $password
      *
-     * @param string $password password to validate
-     *
-     * @return bool if password provided is valid for current user
+     * @return bool
      */
     public function validatePassword($password)
     {
@@ -314,30 +272,10 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Generates "remember me" authentication key
-     *
      * @throws \yii\base\Exception
      */
     public function generateAuthKey()
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
-    }
-
-
-    /**
-     * Generates new password reset token
-     */
-    public function generatePasswordResetToken()
-    {
-        return null;
-    }
-
-
-    /**
-     * Removes password reset token
-     */
-    public function removePasswordResetToken()
-    {
-        return null;
     }
 }

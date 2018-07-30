@@ -208,62 +208,6 @@ class SearchTrackData extends TrackData
     }
 
 
-    /**
-     * Помечает все уведомления модуля веб-ресурса как прочтённые указанным пользователем.
-     *
-     * @param string $moduleId   идентификатор модуля
-     * @param int    $userId     идентификатор пользователя
-     * @param array  $dateFilter парамтеры фильтрации уведомлений по дате
-     */
-    public static function allViewedBy($moduleId = "", $userId = 0, $dateFilter = [])
-    {
-        /** @var static[] $tracks */
-        $tracks = self::listQuery($moduleId, $userId, $dateFilter)->all();
-        foreach ($tracks as $track) {
-            $track->viewed($userId);
-        }
-    }
-
-
-    /**
-     * Добавляет просмотр для указанного пользователя или группы пользователей.
-     *
-     * @param int|array $user идентификатор пользователя или массив идентификаторов
-     */
-    public function viewed($user = 0)
-    {
-        if (!empty($user)) {
-            if (is_array($user)) {
-                foreach ($user as $id) {
-                    $this->viewedBy = $id;
-                }
-            }
-            else {
-                $this->viewedBy = $user;
-            }
-        }
-    }
-
-
-    /**
-     * Добавляет доступ для указанного пользователя или группы пользователей.
-     *
-     * @param int|array $user идентификатор пользователя или массив идентификаторов
-     */
-    public function allowed($user = 0)
-    {
-        if (!empty($user)) {
-            if (is_array($user)) {
-                foreach ($user as $id) {
-                    $this->allowedFor = $id;
-                }
-            }
-            else {
-                $this->allowedFor = $user;
-            }
-        }
-    }
-
 
     /**
      * Возвращает количество непросмотренных уведомлений модуля веб-ресурса для активного пользователя.

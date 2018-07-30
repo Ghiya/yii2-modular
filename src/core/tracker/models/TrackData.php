@@ -19,26 +19,27 @@ use yii\helpers\Json;
 /**
  * Class Track модель уведомления трекера уведомлений веб-ресурсов
  *
- * @property int    $id
- * @property string $session_id      идентификатор сессии входящего запроса
- * @property string $resource_id     идентификатор модуля веб-ресурса
- * @property string $module_id       идентификатор модуля активного контроллера
- * @property string $controller_id   идентификатор активного контроллера
- * @property string $action_id       идентификатор действия активного контроллера
- * @property string $request         параметры запроса
- * @property string $request_method  тип запроса
- * @property string $priority        приоритет заметки
- * @property string $message         содержание заметки
- * @property string $user_ip         адрес IP входящего запроса
- * @property string $user_agent      веб-агент входящего запроса
- * @property string $viewed_by       данные просмотра в JSON
- * @property string $allowed_for     данные доступа в JSON
- * @property string $related_item    связанный элемент уведомления
- * @property string $version         версия модуля веб-ресурса
- * @property int    $updated_at
- * @property int    $created_at
- * @property array  $viewedBy        массив данных просмотра
- * @property array  $allowedFor      массив данных доступа
+ * @property int       $id
+ * @property string    $session_id      идентификатор сессии входящего запроса
+ * @property string    $resource_id     идентификатор модуля веб-ресурса
+ * @property string    $module_id       идентификатор модуля активного контроллера
+ * @property string    $controller_id   идентификатор активного контроллера
+ * @property string    $action_id       идентификатор действия активного контроллера
+ * @property string    $request         параметры запроса
+ * @property string    $request_method  тип запроса
+ * @property string    $priority        приоритет заметки
+ * @property string    $message         содержание заметки
+ * @property string    $user_ip         адрес IP входящего запроса
+ * @property string    $user_agent      веб-агент входящего запроса
+ * @property string    $viewed_by       данные просмотра в JSON
+ * @property string    $allowed_for     данные доступа в JSON
+ * @property string    $related_item    связанный элемент уведомления
+ * @property string    $version         версия модуля веб-ресурса
+ * @property int       $updated_at
+ * @property int       $created_at
+ * @property-read bool $isViewed        если прочитано активным пользователем
+ * @property array     $viewedBy        массив данных просмотра
+ * @property array     $allowedFor      массив данных доступа
  *
  * @package modular\core\tracker\models
  */
@@ -265,7 +266,7 @@ class TrackData extends ActiveRecord
      */
     public function setViewedBy($userId = 0)
     {
-        if (!$this->hasBeenViewedBy($userId)) {
+        if (!$this->getIsViewed()) {
             $this->updateAttributes([
                 'viewed_by' => Json::encode(ArrayHelper::merge($this->viewedBy, ["-" . $userId . "-",])),
             ]);
@@ -275,6 +276,20 @@ class TrackData extends ActiveRecord
 
 
     /**
+     * Возвращает статус прочтения активным пользователем.
+     *
+     * @return bool
+     */
+    public function getIsViewed()
+    {
+        return
+            in_array("-" . \Yii::$app->user->getId() . "-", $this->viewedBy);
+    }
+
+
+    /**
+     * @deprecated
+     *
      * Если заметка была просмотрена указанным пользователем.
      *
      * @param int $userId
@@ -326,35 +341,34 @@ class TrackData extends ActiveRecord
     }
 
 
-
-
     /**
-     * Возвращает отфильтрованный по дате/пользователю/модулю список всех уведомлений ресурса.
+     * Возвращает фильтрованный список всех уведомлений ресурса.
+     * Если параметры фильтрации не указаны, то вернёт список уведомлений доступных для просмотра всем пользователям.
      *
-     * @param string $id         если требуется фильтрация относительно модуля
-     * @param int    $userId     если требуется фильтрация относительно пользователя
-     * @param array  $dateFilter по-умолчанию - текущая дата
+     * @param string     $cid        фильтр по идентификатору ресурса
+     * @param int        $allowedFor фильтр по идентификатору пользователя
+     * @param array|null $dateFilter фильтр по дате создания в указанном интервале
      *
      * @return ActiveQuery
      */
-    public static function listQuery($id = '', $userId = 0, $dateFilter = [])
+    public static function listQuery($cid = '', $allowedFor = 0, $dateFilter = [])
     {
         $dateFilter =
             isset($dateFilter) ?
                 ArrayHelper::merge(
                     [
-                        'from' => \Yii::$app->formatter->asTimestamp(date("Y-m-d") . " 00:00:00"),
+                        'from' => strtotime("00:00:00"),
                         'to'   => time()
                     ],
                     $dateFilter
                 ) : $dateFilter;
-        $listCondition = !empty($id) ? "`module_id` REGEXP '$id' AND " : "";
+        $listCondition = !empty($cid) ? "`module_id` REGEXP '$cid' AND " : "";
         $listQuery =
             isset($dateFilter) ?
                 static::find()
                     ->where(
-                        $userId > 0 ?
-                            $listCondition . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )" :
+                        $allowedFor > 0 ?
+                            $listCondition . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$allowedFor-' )" :
                             $listCondition . "`allowed_for` IS NULL"
                     )
                     ->andWhere(
@@ -363,8 +377,8 @@ class TrackData extends ActiveRecord
                     ->andWhere(['<=', 'created_at', $dateFilter['to']]) :
                 static::find()
                     ->where(
-                        $userId > 0 ?
-                            $listCondition . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$userId-' )" :
+                        $allowedFor > 0 ?
+                            $listCondition . "( `allowed_for` IS NULL OR `allowed_for` REGEXP '-$allowedFor-' )" :
                             $listCondition . "`allowed_for` IS NULL"
                     );
         return

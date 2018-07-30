@@ -44,69 +44,64 @@ abstract class PanelModule extends Module
         // add navigation items for the authorized user ONLY
         if ($this->accessAllowed()) {
             $this->module->navigation =
-                [
-                    'id'          => $this->id,
-                    'title'       => $this->title,
-                    'description' => $this->description,
-                    'urls'        => ArrayHelper::renameKeys($this->urls, ['is_active' => 'isActive']),
-                    'version'     => $this->version,
-                    'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
-                    'tracks'      => $this->getActiveTracks(),
-                    'items'       =>
-                        ArrayHelper::merge(
-                            $this->trackItem(),
-                            $this->menuItems()
-                        ),
-                ];
+                ArrayHelper::merge(
+                    [
+                        'id'          => $this->id,
+                        'title'       => $this->title,
+                        'description' => $this->description,
+                        'urls'        => ArrayHelper::renameKeys($this->urls, ['is_active' => 'isActive']),
+                        'version'     => $this->version,
+                        'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),
+                        'items'       => $this->menuItems(),
+                    ],
+                    $this->hasTracking() ?
+                        [
+                            'items'  => $this->trackItem(),
+                            'tracks' => $this->getActiveTracks()
+                        ] :
+                        []
+                );
         }
     }
 
 
+    /**
+     * @return array
+     */
     protected function trackItem()
     {
-        // if module is the resource package
-        if ($this->hasTracking()) {
-            $tracks = $this->getActiveTracks();
-            return
-                [
-                    [
-                        'label'   =>
-                            Html::tag(
-                                'span',
-                                Html::tag('i', '', ['class' => 'fa fa-envelope-o']),
-                                [
-                                    'class' => 'pull-left'
-                                ]
-                            ) .
-                            Html::tag(
-                                'span',
-                                $tracks > 0 ? "Уведомления [ $tracks ]" : "Уведомления",
-                                [
-                                    'class' => 'pull-right'
-                                ]
-                            ),
-                        'encode'  => false,
-                        'url'     => "/$this->id/tracks/list?id=$this->cid",
-                        'active'  => (boolean)preg_match("/\/$this->id\/tracks/i", \Yii::$app->request->url),
-                        'options' =>
-                            [
-                                'class' => 'clearfix',
-                                'data'  =>
-                                    [
-                                        'spinner' => 'true'
-                                    ]
-                            ]
-                    ]
-                ];
-        }
-        return [];
-    }
-
-
-    public function hasTracking()
-    {
+        $tracks = $this->getActiveTracks();
         return
-            preg_match("/" . $this->module->getPackagePrefix() . "/", $this->id);
+            [
+                [
+                    'label'   =>
+                        Html::tag(
+                            'span',
+                            Html::tag('i', '', ['class' => 'fa fa-envelope-o']),
+                            [
+                                'class' => 'pull-left'
+                            ]
+                        ) .
+                        Html::tag(
+                            'span',
+                            $tracks > 0 ? "Уведомления [ $tracks ]" : "Уведомления",
+                            [
+                                'class' => 'pull-right'
+                            ]
+                        ),
+                    'encode'  => false,
+                    'url'     => "/$this->id/tracks/list?cid=$this->cid",
+                    'active'  => (boolean)preg_match("/\/$this->id\/tracks/i", \Yii::$app->request->url),
+                    'options' =>
+                        [
+                            'class' => 'clearfix',
+                            'data'  =>
+                                [
+                                    'spinner' => 'true'
+                                ]
+                        ]
+                ]
+            ];
     }
 
 
@@ -115,11 +110,23 @@ abstract class PanelModule extends Module
      */
     protected function getActiveTracks()
     {
-        $searchTracks = new SearchTrackData();
-        $searchTracks->id = $this->cid;
+        $searchTracks = new SearchTrackData(['fullRange' => true]);
+        $searchTracks->load(
+            [
+                'cid'  => $this->cid,
+            ]
+        );
+        return $searchTracks->countActive();
+    }
+
+
+    /**
+     * @return false|int
+     */
+    public function hasTracking()
+    {
         return
-            $this->hasTracking() ?
-                $searchTracks->countActive() : 0;
+            preg_match("/" . $this->module->getPackagePrefix() . "/", $this->id);
     }
 
 

@@ -9,9 +9,9 @@ namespace modular\core\tracker\controllers;
 
 use modular\core\Controller;
 use modular\core\helpers\ArrayHelper;
-use modular\core\helpers\Html;
 use modular\core\tracker\models\SearchTrackData;
 use modular\core\tracker\models\TrackData;
+use modular\panel\behaviors\FlushRecordsBehavior;
 use modular\panel\models\UserRole;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -46,86 +46,52 @@ class TracksController extends Controller
                 'rules' => [
                     [
                         'allow'   => true,
-                        'actions' => ['index', 'view', 'viewed', 'state', 'list'],
+                        'actions' => ['index', 'delete', 'viewed-all'],
+                        'roles'   => [UserRole::PM_MANAGE_ALL],
+                    ],
+                    [
+                        'allow'   => true,
+                        'actions' => ['view', 'viewed', 'list', 'filter'],
                         'roles'   => [UserRole::PM_ACCESS_TRACKS, UserRole::PM_VIEW_RESOURCE_DATA],
-                    ],
-                    [
-                        'allow'   => true,
-                        'actions' => ['viewed-all'],
-                        'roles'   => [UserRole::PM_ACCESS_TRACKS, UserRole::PM_MANAGE_RESOURCE_DATA],
-                    ],
-                    [
-                        'allow'   => true,
-                        'actions' => ['delete'],
-                        'roles'   => [UserRole::PM_REMOVE_RESOURCE_DATA],
                     ],
                 ],
             ],
-            /*[
+            [
                 'class'       => FlushRecordsBehavior::class,
                 'recordClass' => TrackData::class,
-                'interval'    => 7,
-                'permission'  => UserRole::PM_REMOVE_RESOURCE_DATA,
-            ]*/
+                'interval'    => 60,
+                'permission'  => UserRole::PM_MANAGE_ALL,
+            ]
         ];
     }
 
 
     /**
-     * Возвращает HTML данные отладки просматриваемого уведомления.
-     *
-     * @param TrackData $model
-     *
-     * @return string HTML список с административными данными
+     * @return string
+     * @throws \Throwable
      */
-    private function _debugData($model)
+    public function actionIndex()
     {
-        $debugData = "";
-        if (\Yii::$app->user->can(UserRole::PM_VIEW_DEBUG_DATA) && !empty($model)) {
-            $request = Json::decode($model->request);
-            $debugData .= '<ul class="list-group">';
-            $debugData .=
-                Html::tag(
-                    "li",
-                    Html::tag(
-                        "p",
-                        Html::tag(
-                            "span",
-                            $model->user_ip . " " .
-                            Html::tag(
-                                "strong",
-                                $model->version
-                            ),
+        $searchTracks = new SearchTrackData();
+        return
+            $this->render(
+                $this->viewPath . '/index',
+                [
+                    'dataProvider' =>
+                        new ActiveDataProvider(
                             [
-                                'class' => 'text-backwards'
+                                'query'      => $searchTracks->getListQuery(),
+                                'pagination' =>
+                                    \Yii::$app->request->get('page', 1) == 0 ?
+                                        false :
+                                        [
+                                            'pageSize' => 50,
+                                        ]
                             ]
-                        ) . '<br/>' .
-                        Html::tag(
-                            "strong",
-                            strtoupper($model->request_method),
-                            [
-                                'class' => 'green'
-                            ]
-                        )
-                        . " $model->module_id/$model->controller_id/$model->action_id ",
-                        [
-                            'class' => 'font-book'
-                        ]
-                    ),
-                    [
-                        'class' => 'list-group-item'
-                    ]
-                );
-            foreach ($request as $field => $value) {
-                $fieldValue = !empty($value) ? $value : 'null';
-                $debugData .= '<li class="list-group-item">' .
-                    '<p class="list-group-item-text font-book">'
-                    . "<span class='text-backwards'>`$field` : </span>"
-                    . $fieldValue . '</p></li>';
-            }
-            $debugData .= '</ul>';
-        }
-        return $debugData;
+                        ),
+                    'active'       => $searchTracks->countActive(false, false)
+                ]
+            );
     }
 
 
@@ -136,7 +102,7 @@ class TracksController extends Controller
      * @throws \Throwable
      * @throws \yii\base\InvalidConfigException
      */
-    public function actionList($id)
+    public function actionList($cid)
     {
         $searchTracks = new SearchTrackData();
         $searchTracks->load(\Yii::$app->request->get());
@@ -147,20 +113,26 @@ class TracksController extends Controller
                     'dataProvider'   =>
                         new ActiveDataProvider(
                             [
-                                'query'      =>
-                                    TrackData::listQuery(
-                                        $id,
-                                        \Yii::$app->user->identity->getId(),
-                                        $searchTracks->toArray()
-                                    ),
-                                'pagination' => (\Yii::$app->request->get('page', 1) == 0) ? false : [
-                                    'pageSize' => 50,
-                                ]
+                                'query'      => $searchTracks->getListQuery(),
+                                'pagination' =>
+                                    \Yii::$app->request->get('page', 1) == 0 ?
+                                        false :
+                                        [
+                                            'pageSize' => 50,
+                                        ]
                             ]
                         ),
-                    'resourceId'     => $id,
+                    'resourceId'     => $cid,
                     'active'         => $searchTracks->countActive(),
-                    'searchRanges'   => array_reverse($searchTracks->getRanges($id, true)),
+                    'searchRanges'   => array_reverse($searchTracks->getRanges($cid, true)),
+                    'filterForm'     =>
+                        $this->renderPartial(
+                            $this->viewPath . '/filter',
+                            [
+                                'isActive' => false,
+                                'model'    => $searchTracks,
+                            ]
+                        ),
                     'filterUrlRoute' =>
                         ArrayHelper::merge(
                             [
@@ -170,6 +142,46 @@ class TracksController extends Controller
                                 \Yii::$app->request->get(),
                                 $searchTracks->toArray()
                             )
+                        )
+                ]
+            );
+    }
+
+
+    /**
+     * @param $cid
+     *
+     * @return string
+     * @throws \Throwable
+     */
+    public function actionFilter($cid)
+    {
+        $searchTracks = new SearchTrackData(['fullRange' => true]);
+        $searchTracks->load(\Yii::$app->request->get());
+        return
+            $this->render(
+                $this->viewPath . '/list',
+                [
+                    'dataProvider' =>
+                        new ActiveDataProvider(
+                            [
+                                'query'      => $searchTracks->getFilterQuery(),
+                                'pagination' =>
+                                    \Yii::$app->request->get('page', 1) == 0 ?
+                                        false :
+                                        [
+                                            'pageSize' => 50,
+                                        ]
+                            ]
+                        ),
+                    'resourceId'   => $cid,
+                    'filterForm'   =>
+                        $this->renderPartial(
+                            $this->viewPath . '/filter',
+                            [
+                                'isActive' => true,
+                                'model'    => $searchTracks,
+                            ]
                         )
                 ]
             );
@@ -235,6 +247,27 @@ class TracksController extends Controller
                     ["list"],
                     \Yii::$app->request->get()
                 )
+            );
+    }
+
+
+    /**
+     * @return Response
+     */
+    public function actionViewedAll()
+    {
+        SearchTrackData::allViewedBy(
+            null,
+            \Yii::$app->user->identity->getId(),
+            null
+        );
+        \Yii::$app->session->setFlash(
+            'success',
+            'Действие выполнено.'
+        );
+        return
+            $this->redirect(
+                "/" . $this->module->id
             );
     }
 

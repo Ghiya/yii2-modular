@@ -7,6 +7,7 @@ namespace modular\core\tracker\models;
 
 
 use modular\core\helpers\ArrayHelper;
+use yii\db\ActiveQuery;
 
 
 /**
@@ -16,6 +17,18 @@ use modular\core\helpers\ArrayHelper;
  */
 class SearchTrackData extends TrackData
 {
+
+
+    /**
+     * @var int
+     */
+    public $trackId;
+
+
+    /**
+     * @var string
+     */
+    public $cid;
 
 
     /**
@@ -37,13 +50,19 @@ class SearchTrackData extends TrackData
 
 
     /**
+     * @var bool
+     */
+    public $fullRange = false;
+
+
+    /**
      * {@inheritdoc}
      */
     public function scenarios()
     {
         return
             [
-                self::SCENARIO_DEFAULT => ['from', 'to'],
+                self::SCENARIO_DEFAULT => ['from', 'to', 'cid', 'trackId'],
             ];
     }
 
@@ -51,9 +70,15 @@ class SearchTrackData extends TrackData
     /**
      * {@inheritdoc}
      */
-    public function formName()
+    public function attributeLabels()
     {
-        return '';
+        return
+            ArrayHelper::merge(
+                parent::attributeLabels(),
+                [
+                    'trackId' => 'Идентификатор'
+                ]
+            );
     }
 
 
@@ -63,16 +88,27 @@ class SearchTrackData extends TrackData
     public function fields()
     {
         return
-            [
-                'from' => function ($model) {
-                    /** @var SearchTrackData $model */
-                    return $model->getCurrentFrom();
-                },
-                'to'   => function ($model) {
-                    /** @var SearchTrackData $model */
-                    return $model->getCurrentTo();
-                }
-            ];
+            $this->fullRange ?
+                [
+                    'from' => function ($model) {
+                        /** @var SearchTrackData $model */
+                        return strtotime("- $model->range days");
+                    },
+                    'to'   => function ($model) {
+                        /** @var SearchTrackData $model */
+                        return time();
+                    }
+                ] :
+                [
+                    'from' => function ($model) {
+                        /** @var SearchTrackData $model */
+                        return $model->getCurrentFrom();
+                    },
+                    'to'   => function ($model) {
+                        /** @var SearchTrackData $model */
+                        return $model->getCurrentTo();
+                    }
+                ];
     }
 
 
@@ -128,8 +164,9 @@ class SearchTrackData extends TrackData
                     ArrayHelper::merge(
                         $ranges[$index],
                         [
-                            'count'  => self::listQuery($id, \Yii::$app->user->id, $range)->count(),
-                            'active' =>
+                            'total'   => self::listQuery($id, \Yii::$app->user->id, $range)->count(),
+                            'active'  => $this->countActive($range),
+                            'current' =>
                                 (
                                     $formatter->asDatetime(
                                         $range['from'],
@@ -229,24 +266,56 @@ class SearchTrackData extends TrackData
 
 
     /**
-     * Возвращает количество непросмотренных уведомлений модуля веб-ресурса для указанного пользователя.
+     * Возвращает количество непросмотренных уведомлений модуля веб-ресурса для активного пользователя.
      *
-     * @param int  $userId
      * @param bool $filterDate
+     * @param bool $filterResource
      *
      * @return int
      */
-    public function countActive($userId = 0, $filterDate = true)
+    public function countActive($filterDate = true, $filterResource = true)
     {
         return
             self::listQuery(
-                $this->id,
-                !empty($userId) ?
-                    $userId : \Yii::$app->getUser()->getId(),
-                $filterDate ? $this->toArray() : null
+                $filterResource ? $this->cid : null,
+                \Yii::$app->getUser()->getId(),
+                $filterDate ? is_array($filterDate) ? $filterDate : $this->toArray() : null
             )
-                ->andWhere("`viewed_by` IS NULL OR `viewed_by` NOT REGEXP '-$userId-'")
+                ->andWhere(
+                    "`viewed_by` IS NULL OR `viewed_by` NOT REGEXP '-" . \Yii::$app->getUser()->getId() . "-'"
+                )
                 ->count();
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getListQuery()
+    {
+        return
+            self::listQuery(
+                $this->cid,
+                \Yii::$app->user->identity->getId(),
+                !empty($this->cid) ? $this->toArray() : null
+            );
+    }
+
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getFilterQuery()
+    {
+        return
+            self::listQuery(
+                $this->cid,
+                \Yii::$app->user->identity->getId(),
+                $this->toArray()
+            )
+                ->andWhere(
+                    ['id' => $this->trackId]
+                );
     }
 
 }

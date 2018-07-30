@@ -24,121 +24,103 @@ class UserRole extends ActiveRecord
 
 
     /**
-     * @const string RL_ROOT
+     * Роль суперадминистратора.
      */
     const RL_ROOT = 'root';
 
 
     /**
-     * @const string RL_ADMINISTRATOR
+     * Роль администратора.
      */
     const RL_ADMINISTRATOR = 'administrator';
 
 
     /**
-     * @const string RL_ENGINEER
+     * Роль технического инженера.
      */
     const RL_ENGINEER = 'engineer';
 
 
     /**
-     * @const string
+     * Роль менеджера.
      */
     const RL_MANAGER = 'manager';
 
 
     /**
-     * @const string RL_CALLCENTER
-     */
-    const RL_CALLCENTER = 'callcenter';
-
-
-    /**
-     * @const st RL_APIring
+     * Роль клиента API.
      */
     const RL_API = 'apiClient';
 
 
     /**
-     * @const string PM_ACCESS_TRACKS
+     * Доступ к просмотру уведомлений веб-ресурсов.
      */
     const PM_ACCESS_TRACKS = 'accessTracks';
 
 
     /**
-     * @const string PM_ACCESS_LOGS
+     * Доступ к просмотру логов внешних сервисов API.
      */
     const PM_ACCESS_LOGS = 'accessLogs';
 
 
     /**
-     * @const string PM_ACCESS_ACTIONS
+     * Доступ к просмотру событий веб-ресурсов.
      */
     const PM_ACCESS_ACTIONS = 'accessActions';
 
 
     /**
-     * @const string PM_ACCESS_BUNDLES
+     * Доступ к модулям системы.
      */
     const PM_ACCESS_BUNDLES = 'accessBundles';
 
 
     /**
-     * @const string PM_MANAGE_USERS
+     * Доступ к управлению пользователями системы.
      */
     const PM_MANAGE_USERS = 'manageUsers';
 
 
     /**
-     * @const string PM_ACCESS_API
+     * Доступ к API системы.
      */
     const PM_ACCESS_API = 'accessApi';
 
 
     /**
-     * @const string PM_ACCESS_BILLING
-     */
-    const PM_ACCESS_BILLING = 'accessBilling';
-
-
-    /**
-     * @const string PM_ACCESS_SMSC_ENGINE
-     */
-    const PM_ACCESS_SMSC_ENGINE = 'accessSmscEngine';
-
-
-    /**
-     * @const string PM_VIEW_RESOURCE_DATA
+     * Доступ к просмотру данных веб-ресурсов.
      */
     const PM_VIEW_RESOURCE_DATA = 'viewResourceData';
 
 
     /**
-     * @const string PM_MANAGE_RESOURCE_DATA
+     * Доступ к редактированию данных веб-ресурсов.
      */
     const PM_MANAGE_RESOURCE_DATA = 'manageResourceData';
 
 
     /**
-     * @const string PM_REMOVE_RESOURCE_DATA
+     * Доступ к удалению данных веб-ресурсов.
      */
     const PM_REMOVE_RESOURCE_DATA = 'removeResourceData';
 
 
     /**
-     * @const string PM_VIEW_DEBUG_DATA
+     * Доступ к просмотру данных отладки.
      */
     const PM_VIEW_DEBUG_DATA = 'viewDebugData';
 
 
     /**
-     * @const string PM_MANAGE_ALL
+     * Полный доступ к системе и данным веб-ресурсов.
      */
     const PM_MANAGE_ALL = 'manageAllWithFullAccess';
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -147,7 +129,7 @@ class UserRole extends ActiveRecord
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function formName()
     {
@@ -156,7 +138,7 @@ class UserRole extends ActiveRecord
 
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -170,7 +152,7 @@ class UserRole extends ActiveRecord
 
     public function getDescription()
     {
-        $list = self::rolesList();
+        $list = static::rolesList();
         return
             isset($list[$this->value]) ?
                 $list[$this->value] : "";
@@ -190,7 +172,6 @@ class UserRole extends ActiveRecord
                 self::RL_ADMINISTRATOR => 'Администратор',
                 self::RL_ENGINEER      => 'Инженер',
                 self::RL_MANAGER       => 'Менеджер',
-                self::RL_CALLCENTER    => 'Сотрудник колл-центра',
                 self::RL_API           => 'Клиент API',
             ];
     }
@@ -210,14 +191,12 @@ class UserRole extends ActiveRecord
                 self::PM_ACCESS_BUNDLES       => 'Доступ к данным модулей.',
                 self::PM_ACCESS_ACTIONS       => 'Доступ к активностям веб-ресурсов.',
                 self::PM_ACCESS_API           => 'Доступ к API системы.',
-                self::PM_ACCESS_BILLING       => 'Доступ к данным абонентов биллинговой системы.',
-                self::PM_ACCESS_SMSC_ENGINE   => 'Доступ к SMSC.',
                 self::PM_VIEW_RESOURCE_DATA   => 'Доступ для просмотра данных модулей ресурсов.',
                 self::PM_MANAGE_RESOURCE_DATA => 'Доступ для изменения данных модулей ресурсов.',
                 self::PM_REMOVE_RESOURCE_DATA => 'Доступ для удаления данных модулей ресурсов.',
                 self::PM_VIEW_DEBUG_DATA      => 'Доступ для просмотра данных отладки.',
                 self::PM_MANAGE_USERS         => 'Доступ к управлению пользователями.',
-                self::PM_MANAGE_ALL           => 'Полный доступ к системе.',
+                self::PM_MANAGE_ALL           => 'Полный доступ к системе и данным веб-ресурсов.',
             ];
     }
 
@@ -262,12 +241,6 @@ class UserRole extends ActiveRecord
                     [
                         self::PM_ACCESS_API,
                     ],
-                self::RL_CALLCENTER    =>
-                    [
-                        self::PM_ACCESS_BILLING,
-                        self::PM_VIEW_RESOURCE_DATA,
-                        self::PM_ACCESS_SMSC_ENGINE
-                    ],
                 self::RL_MANAGER       =>
                     [
                         self::PM_ACCESS_ACTIONS,
@@ -302,10 +275,6 @@ class UserRole extends ActiveRecord
     {
         return
             [
-                self::RL_MANAGER       =>
-                    [
-                        self::RL_CALLCENTER,
-                    ],
                 self::RL_ENGINEER      =>
                     [
                         self::RL_MANAGER,
@@ -334,19 +303,19 @@ class UserRole extends ActiveRecord
         $auth = \Yii::$app->getAuthManager();
         $auth->removeAll();
         // add all existing roles
-        foreach (self::rolesList() as $role => $roleLabel) {
+        foreach (static::rolesList() as $role => $roleLabel) {
             $userRole = $auth->createRole($role);
             $userRole->description = $roleLabel;
             $auth->add($userRole);
         }
         // add all existing permissions
-        foreach (self::permissionsList() as $permission => $permissionLabel) {
+        foreach (static::permissionsList() as $permission => $permissionLabel) {
             $accessPermission = $auth->createPermission($permission);
             $accessPermission->description = $permissionLabel;
             $auth->add($accessPermission);
         }
         // assign permissions to roles if required
-        foreach (self::getRolesPermissions() as $role => $permissions) {
+        foreach (static::getRolesPermissions() as $role => $permissions) {
             foreach ($permissions as $permission) {
                 if (!$auth->hasChild($auth->getRole($role), $auth->getPermission($permission))) {
                     $auth->addChild(
@@ -357,7 +326,7 @@ class UserRole extends ActiveRecord
             }
         }
         // build roles hierarchy if required
-        foreach (self::getRolesHierarchy() as $role => $childRoles) {
+        foreach (static::getRolesHierarchy() as $role => $childRoles) {
             foreach ($childRoles as $childRole) {
                 if (!$auth->hasChild($auth->getRole($role), $auth->getRole($childRole))) {
                     $auth->addChild(

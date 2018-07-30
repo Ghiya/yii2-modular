@@ -117,11 +117,12 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findActive()
     {
-        return static::findAll(
-            [
-                'status' => self::STATUS_ACTIVE,
-            ]
-        );
+        return
+            static::findAll(
+                [
+                    'status' => self::STATUS_ACTIVE,
+                ]
+            );
     }
 
 

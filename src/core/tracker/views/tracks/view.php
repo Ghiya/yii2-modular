@@ -32,4 +32,64 @@ $userId = \Yii::$app->user->identity->getId();
 <?= "Route: $model->controller_id/$model->action_id" ?>
         </pre>
     </div>
+    <? if (!empty($debugData)) : ?>
+        <?=
+        Html::a(
+            'Параметры запроса</span>',
+            "#collapsible-id$model->id",
+            [
+                'class' => 'btn btn-link',
+                'data'  => [
+                    'toggle' => 'modal',
+                ]
+            ]
+        ) ?>
+        <br/>
+        <?=
+        Html::tag(
+            'div',
+            Html::tag(
+                'div',
+                Html::tag(
+                    'div',
+                    Html::tag(
+                        'div',
+                        $debugData,
+                        [
+                            'class' => 'modal-body',
+                        ]
+                    ) .
+                    Html::tag(
+                        'div',
+                        Html::button(
+                            'Закрыть',
+                            [
+                                'class' => 'btn btn-default form-control',
+                                'data'  =>
+                                    [
+                                        'dismiss' => 'modal'
+                                    ]
+                            ]
+                        ),
+                        [
+                            'class' => 'modal-footer'
+                        ]
+                    ),
+                    [
+                        'class' => 'modal-content',
+                    ]
+                ),
+                [
+                    'class' => 'modal-dialog modal-lg text-left',
+                    'role'  => 'document'
+                ]
+            ),
+            [
+                'id'       => "collapsible-id$model->id",
+                'class'    => 'modal fade',
+                'tabindex' => -1,
+                'role'     => 'dialog'
+            ]
+        ) ?>
+    <? endif; ?>
 </div>

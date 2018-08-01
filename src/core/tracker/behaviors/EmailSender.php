@@ -39,7 +39,6 @@ class EmailSender extends Sender
      */
     protected function send(Track $track)
     {
-        //$mailer = \Yii::createObject('yii\swiftmailer\Mailer', [])
         $emails = [];
         $subject = $track->getModel()->getMessageSubject();
         foreach ($this->getRecipients($track) as $recipient) {
@@ -56,10 +55,7 @@ class EmailSender extends Sender
                 ->setTo($recipient)
                 ->setSubject($subject);
             $emails[] = $mail;
-            //var_dump($this->sender);
-            //var_dump($recipient);
         }
-        die;
         // отправляем уведомление на все адреса разработчиков
         \Yii::$app->mailer->sendMultiple($emails);
     }

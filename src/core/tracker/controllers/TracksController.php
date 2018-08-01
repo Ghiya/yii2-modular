@@ -224,16 +224,16 @@ class TracksController extends Controller
     /**
      * Устанавливает все уведомления модуля веб-ресурса просмотренными для указанного пользователя.
      *
-     * @param string $id
+     * @param string $cid
      *
      * @return Response
      */
-    public function actionViewed($id)
+    public function actionViewed($cid)
     {
         $tracks = new SearchTrackData();
         $tracks->load(\Yii::$app->request->get());
         SearchTrackData::allViewedBy(
-            $id,
+            $cid,
             \Yii::$app->user->identity->getId(),
             $tracks->toArray()
         );

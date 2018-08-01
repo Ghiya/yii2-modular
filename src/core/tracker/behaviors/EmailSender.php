@@ -39,12 +39,13 @@ class EmailSender extends Sender
      */
     protected function send(Track $track)
     {
+        //$mailer = \Yii::createObject('yii\swiftmailer\Mailer', [])
         $emails = [];
         $subject = $track->getModel()->getMessageSubject();
         foreach ($this->getRecipients($track) as $recipient) {
-            $emails[] = \Yii::$app->mailer
+            $mail = \Yii::$app->mailer
                 ->compose(
-                    $this->getMailViewPath($track->priority),
+                    $this->getMailView($track->priority),
                     [
                         'resource' => $track->sender->module->title,
                         'subject'  => $subject,
@@ -54,7 +55,11 @@ class EmailSender extends Sender
                 ->setFrom($this->sender)
                 ->setTo($recipient)
                 ->setSubject($subject);
+            $emails[] = $mail;
+            //var_dump($this->sender);
+            //var_dump($recipient);
         }
+        die;
         // отправляем уведомление на все адреса разработчиков
         \Yii::$app->mailer->sendMultiple($emails);
     }
@@ -65,19 +70,19 @@ class EmailSender extends Sender
      *
      * @return string
      */
-    protected function getMailViewPath($priority)
+    protected function getMailView($priority)
     {
         switch ($priority) {
             case TrackData::PRIORITY_WARNING :
-                return '@resource/mail/tracker/warning-html';
+                return 'tracker/warning-html';
                 break;
 
             case TrackData::PRIORITY_NOTICE :
-                return '@resource/mail/tracker/notice-html';
+                return 'tracker/notice-html';
                 break;
 
             default :
-                return '@resource/mail/tracker/notice-html';
+                return 'tracker/notice-html';
                 break;
         }
     }

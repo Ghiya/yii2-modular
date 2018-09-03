@@ -47,7 +47,7 @@ class TracksController extends Controller
                     [
                         'allow'   => true,
                         'actions' => ['index', 'delete', 'viewed-all'],
-                        'roles'   => [UserRole::PM_MANAGE_ALL],
+                        'roles'   => [UserRole::PM_REMOVE_RESOURCE_DATA],
                     ],
                     [
                         'allow'   => true,

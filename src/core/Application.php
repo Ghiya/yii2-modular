@@ -52,7 +52,7 @@ abstract class Application extends \yii\web\Application
      * @return null|\yii\base\Module|Module
      * @throws \yii\base\InvalidConfigException
      */
-    public function addPackage(PackageInit $packageInit, $packagePrefix = "")
+    public function addPackage(PackageInit $packageInit, $packagePrefix = "", $initOnly = false)
     {
         \Yii::debug("Initializing resource `$packageInit->title`.", __METHOD__);
         // set and configure package module
@@ -69,25 +69,27 @@ abstract class Application extends \yii\web\Application
             )
         );
         $module = \Yii::$app->getModule($packagePrefix . $packageInit->getModuleId());
-        // define application language
-        if (isset($module->params['defaults']['language'])) {
-            $this->language = $module->params['defaults']['language'];
-        }
         // init routing
         if ($module->has('urlManager')) {
             \Yii::$app->getUrlManager()->addRules($module->get('urlManager')->rules);
         }
-        // define translations
-        if ($module->has('i18n')) {
-            $this->i18n->translations =
-                ArrayHelper::merge(
-                    $this->i18n->translations,
-                    $module->get('i18n')->translations
-                );
-        }
-        if (!self::isPanel()) {
-            // define module logs
-            $this->log->targets[] = new FileTarget($packageInit->getLogParams());
+        if ( !$initOnly ) {
+            // define application language
+            if (isset($module->params['defaults']['language'])) {
+                $this->language = $module->params['defaults']['language'];
+            }
+            // define translations
+            if ($module->has('i18n')) {
+                $this->i18n->translations =
+                    ArrayHelper::merge(
+                        $this->i18n->translations,
+                        $module->get('i18n')->translations
+                    );
+            }
+            if (!self::isPanel()) {
+                // define module logs
+                $this->log->targets[] = new FileTarget($packageInit->getLogParams());
+            }
         }
         return $module;
     }

@@ -172,25 +172,28 @@ class PackageInit extends ActiveRecord
     /**
      * Возвращает параметры инициализации модуля.
      *
+     * @param string $packageUrl optional
+     *
      * @return array|PackageInit|PackageInit[]
      * @throws ServerErrorHttpException
      */
-    public static function getParams()
+    public static function getParams($packageUrl = "")
     {
         if (Application::isPanel()) {
             return static::find()->all();
         }
         else {
-            /** @var LinkedUrl $url */
-            $url = LinkedUrl::findOne(['url' => $_SERVER['SERVER_NAME'], 'is_active' => 1,]);
-            if (!empty($url)) {
-                if (empty($url->packageInit)) {
-                    throw new ServerErrorHttpException('Undefined resource for the `' . $_SERVER['SERVER_NAME'] . '`.');
+            $url = empty($packageUrl) ? $_SERVER['SERVER_NAME'] : $packageUrl;
+            /** @var LinkedUrl $registered */
+            $registered = LinkedUrl::findOne(['url' => $url, 'is_active' => 1,]);
+            if (!empty($registered)) {
+                if (empty($registered->packageInit)) {
+                    throw new ServerErrorHttpException("Undefined resource for the `$url`.");
                 }
-                return $url->packageInit;
+                return $registered->packageInit;
             }
             else {
-                throw new ServerErrorHttpException('URL `' . $_SERVER['SERVER_NAME'] . '` is not registered.');
+                throw new ServerErrorHttpException("URL `$url` is not registered.");
             }
         }
     }
@@ -269,9 +272,9 @@ class PackageInit extends ActiveRecord
             [
                 'title',
                 'description',
-                'urls'   => function () {
+                'urls'  => function () {
                     $urls = [];
-                    foreach($this->getLinkedUrls()->all() as $url) {
+                    foreach ($this->getLinkedUrls()->all() as $url) {
                         $urls[] = $url->toArray(['url', 'is_active']);
                     };
                     return $urls;

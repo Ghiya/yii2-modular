@@ -42,10 +42,6 @@ class ResourceApplication extends Application
                         $package->id . '/default/index',
             ]
         );
-        // configure user component
-        if ($package->has('user')) {
-            $this->set('user', $package->get('user'));
-        }
         // configure error handler component
         if ( !empty($package->params['errorHandler']) ) {
             \Yii::configure($this->get('errorHandler'), $package->params['errorHandler']);

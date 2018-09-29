@@ -4,7 +4,6 @@
 /yii_test.bat
 init
 init.bat
-yii.php
 
 # phpstorm project files
 .idea
@@ -17,7 +16,6 @@ Thumbs.db
 
 # composer itself is not needed
 composer.phar
-composer.lock
 
 # Mac DS_Store Files
 .DS_Store
@@ -31,7 +29,7 @@ phpunit.phar
 # vagrant runtime
 /.vagrant
 
-#common files
+#core files
 *-local.php
 *.map
 .crunch

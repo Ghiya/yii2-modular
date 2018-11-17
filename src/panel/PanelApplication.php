@@ -62,22 +62,30 @@ class PanelApplication extends Application
         foreach (PackageInit::getParams() as $params) {
             $this->addPackage($params, $this->packagePrefix);
         }
+        // the very first EVENT_BEFORE_ACTION
         $this->on(
             self::EVENT_BEFORE_ACTION,
             function () {
-                $this->language =
-                    \Yii::$app->request->get(
-                        $this->l12nParam,
-                        $this->getSession()->has($this->l12nParam) ?
-                            $this->getSession()->get($this->l12nParam) : $this->l12nDefault
-                    );
-                $this->getSession()->set($this->l12nParam, $this->language);
+
             },
             [],
             false
         );
     }
 
+
+    /**
+     *
+     */
+    protected function localizeWithSession() {
+        $this->language =
+            \Yii::$app->request->get(
+                $this->l12nParam,
+                $this->getSession()->has($this->l12nParam) ?
+                    $this->getSession()->get($this->l12nParam) : $this->l12nDefault
+            );
+        $this->getSession()->set($this->l12nParam, $this->language);
+    }
 
     /**
      * Setter for the panel menu items.

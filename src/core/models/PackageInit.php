@@ -211,6 +211,24 @@ class PackageInit extends ActiveRecord
 
 
     /**
+     * Массив параметров модуля.
+     *
+     * @return array
+     */
+    public function getModuleParams() {
+        return
+            ArrayHelper::merge(
+                file_exists($this->getPath() . '/config/config.php') ?
+                    ArrayHelper::merge(
+                        require $this->getPath() . '/config/config.php',
+                        $this->getLocalParams()
+                    ) :
+                    $this->getLocalParams(),
+                $this->toArray()
+            );
+    }
+
+    /**
      * Массив локальных параметров модуля.
      *
      * @return array

@@ -6,7 +6,7 @@
 namespace modular\core\helpers;
 
 
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -14,7 +14,7 @@ use yii\helpers\ArrayHelper;
  *
  * @package modular\core\helpers
  */
-class ServiceHelper extends Object
+class ServiceHelper extends BaseObject
 {
 
 

@@ -3,7 +3,6 @@
  * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
  */
 
-use modular\core\helpers\Html;
 use modular\core\tracker\models\SearchTrackData;
 use yii\web\View;
 

@@ -1,0 +1,34 @@
+<?php
+/**
+ * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+ */
+
+
+namespace modular\core\events;
+
+
+use modular\panel\PanelModule;
+use modular\resource\ResourceModule;
+use yii\base\Event;
+
+/**
+ * Class AfterPackageInitEvent
+ *
+ * @package modular\core\events
+ */
+class AfterPackageInitEvent extends Event
+{
+
+
+    /**
+     * @var array
+     */
+    public $params = [];
+
+
+    /**
+     * @var PanelModule|ResourceModule
+     */
+    public $module;
+
+}

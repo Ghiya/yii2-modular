@@ -6,8 +6,10 @@
 namespace modular\core;
 
 
+use modular\core\events\AfterPackageInitEvent;
 use modular\core\helpers\ArrayHelper;
 use modular\core\models\PackageInit;
+use yii\base\ActionEvent;
 use yii\log\FileTarget;
 
 
@@ -36,6 +38,72 @@ abstract class Application extends \yii\web\Application
 
 
     /**
+     * Идентификатор события выполняемого после инициализации пакета ресурса.
+     */
+    const EVENT_AFTER_PACKAGE_INIT = 'crm.application.afterPackageInit';
+
+
+    /**
+     * @var string
+     */
+    public $l12nDefault = 'ru-RU';
+
+
+    /**
+     * @var string
+     */
+    public $l12nParam = 'localize';
+
+
+    /**
+     * @var string
+     */
+    protected $packagePrefix = "";
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function bootstrap()
+    {
+        // parent bootstrapping always goes first because of the modules installing as extensions
+        parent::bootstrap();
+        foreach ($this->getPackagesParams() as $packageParams) {
+            $this->addPackage($packageParams);
+        }
+        // the very first EVENT_BEFORE_ACTION
+        $this->on(
+            self::EVENT_BEFORE_ACTION,
+            function ($event) {
+                $this->prependedBeforeAction($event);
+            },
+            [],
+            false
+        );
+    }
+
+
+    /**
+     * Действия выполняющиеся в самом начале `EVENT_BEFORE_ACTION`, раньше всех остальных.
+     *
+     * @param ActionEvent $event
+     */
+    protected function prependedBeforeAction($event)
+    {
+    }
+
+
+    /**
+     * Возвращает список параметров пакетов для инициализации.
+     *
+     * @return array
+     */
+    abstract protected function getPackagesParams();
+
+
+    /**
      * @return bool
      */
     final public static function isPanel()
@@ -45,13 +113,14 @@ abstract class Application extends \yii\web\Application
 
 
     /**
+     * @todo удалить $packagePrefix как избыточный
+     *
      * Добавляет в приложение модуль веб-ресурса с указанными параметрами инициализации.
      *
      * @param PackageInit $packageInit
      * @param string      $packagePrefix
      * @param bool        $initOnly
      *
-     * @return null|\yii\base\Module|Module
      * @throws \yii\base\InvalidConfigException
      */
     public function addPackage(PackageInit $packageInit, $packagePrefix = "", $initOnly = false)
@@ -59,34 +128,64 @@ abstract class Application extends \yii\web\Application
         \Yii::debug("Initializing resource `$packageInit->title`.", __METHOD__);
         // set and configure package module
         \Yii::$app->setModule(
-            $packagePrefix . $packageInit->getModuleId(),
+            $this->packagePrefix . $packageInit->getModuleId(),
             $packageInit->getModuleParams()
         );
-        $module = \Yii::$app->getModule($packagePrefix . $packageInit->getModuleId());
+        $module = \Yii::$app->getModule($this->packagePrefix . $packageInit->getModuleId());
         // init routing
         if ($module->has('urlManager')) {
             \Yii::$app->getUrlManager()->addRules($module->get('urlManager')->rules);
         }
-        if ($initOnly) {
-            return $module;
+        if (!$initOnly) {
+            // define application language
+            if (isset($module->params['defaults']['language'])) {
+                $this->language = $module->params['defaults']['language'];
+            }
+            // define translations
+            if ($module->has('i18n')) {
+                $this->i18n->translations =
+                    ArrayHelper::merge(
+                        $this->i18n->translations,
+                        $module->get('i18n')->translations
+                    );
+            }
+            if (!self::isPanel()) {
+                // define module logs
+                $this->log->targets[] = new FileTarget($packageInit->getLogParams());
+            }
+            $this->trigger(
+                self::EVENT_AFTER_PACKAGE_INIT,
+                new AfterPackageInitEvent(['module' => $module, 'params' => $packageInit->getModuleParams()])
+            );
         }
-        // define application language
-        if (isset($module->params['defaults']['language'])) {
-            $this->language = $module->params['defaults']['language'];
-        }
-        // define translations
-        if ($module->has('i18n')) {
-            $this->i18n->translations =
-                ArrayHelper::merge(
-                    $this->i18n->translations,
-                    $module->get('i18n')->translations
-                );
-        }
-        if (!self::isPanel()) {
-            // define module logs
-            $this->log->targets[] = new FileTarget($packageInit->getLogParams());
-        }
-        return $module;
     }
+
+
+    /**
+     * @return string
+     */
+    public function getPackagePrefix()
+    {
+        return $this->packagePrefix;
+    }
+
+
+    /**
+     * Устанавливает локализацию приложения в зависимости от значения параметра, если он есть в запросе.
+     * Название параметра запроса устнавливается свойством `$l12nParam` и по-умолчанию равно `localize`.
+     * Если сессионное значение отсутствует, то устанавливается значение свойства `$l12nDefault`? по-умолчанию `ru-RU`.
+     */
+    protected function setLanguageWithSession()
+    {
+        $this->language =
+            \Yii::$app->request->get(
+                $this->l12nParam,
+                $this->getSession()->has($this->l12nParam) ?
+                    $this->getSession()->get($this->l12nParam) : $this->l12nDefault
+            );
+        $this->getSession()->set($this->l12nParam, $this->language);
+    }
+
+
 
 }

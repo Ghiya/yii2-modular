@@ -24,17 +24,6 @@ class PanelApplication extends Application
 {
 
 
-    /**
-     * @var string
-     */
-    public $l12nDefault = 'ru-RU';
-
-
-    /**
-     * @var string
-     */
-    public $l12nParam = 'localize';
-
 
     /**
      * @var string
@@ -51,41 +40,27 @@ class PanelApplication extends Application
     /**
      * {@inheritdoc}
      *
-     * @throws \yii\base\InvalidConfigException
      * @throws \yii\web\ServerErrorHttpException
      */
-    public function bootstrap()
+    protected function getPackagesParams()
     {
-        // parent bootstrapping always goes first because of the modules installing as extensions
-        parent::bootstrap();
+        $packagesParams = [];
         // add all modules packages
         foreach (PackageInit::getParams() as $params) {
-            $this->addPackage($params, $this->packagePrefix);
+            $packagesParams[] = $params;
         }
-        // the very first EVENT_BEFORE_ACTION
-        $this->on(
-            self::EVENT_BEFORE_ACTION,
-            function () {
-
-            },
-            [],
-            false
-        );
+        return $packagesParams;
     }
 
 
     /**
-     *
+     * {@inheritdoc}
      */
-    protected function localizeWithSession() {
-        $this->language =
-            \Yii::$app->request->get(
-                $this->l12nParam,
-                $this->getSession()->has($this->l12nParam) ?
-                    $this->getSession()->get($this->l12nParam) : $this->l12nDefault
-            );
-        $this->getSession()->set($this->l12nParam, $this->language);
+    protected function prependedBeforeAction($event)
+    {
+        $this->setLanguageWithSession();
     }
+
 
     /**
      * Setter for the panel menu items.
@@ -142,13 +117,5 @@ class PanelApplication extends Application
                 array_reverse($indexedGroups);
     }
 
-
-    /**
-     * @return string
-     */
-    public function getPackagePrefix()
-    {
-        return $this->packagePrefix;
-    }
 
 }

@@ -6,7 +6,7 @@
 namespace modular\core\helpers;
 
 
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -51,7 +51,7 @@ use yii\helpers\Html;
  * ```
  *
  */
-class DatabaseMigrator extends Object
+class DatabaseMigrator extends BaseObject
 {
 
 
@@ -131,13 +131,14 @@ class DatabaseMigrator extends Object
         if (empty($this->_log) && !empty($this->scheme)) {
             foreach ($this->scheme as $tableRelation) {
                 if ($this->isValidRelation($tableRelation)) {
-                    if (!empty($this->_migrateResult[ $tableRelation[ 0 ][ 0 ] ])) {
-                        $result .= "Данные `<b>" . $tableRelation[ 0 ][ 1 ] . "</b>` успешно перенесены в `<b>" . $tableRelation[ 0 ][ 0 ] . "</b>`\r\n";
-                        $result .= "В таблице `<b>" . $tableRelation[ 0 ][ 0 ] . "</b>` создано новых записей : <b>" . $this->_migrateResult[ $tableRelation[ 0 ][ 0 ] ] . "</b>\r\n\r\n";
+                    if (!empty($this->_migrateResult[$tableRelation[0][0]])) {
+                        $result .= "Данные `<b>" . $tableRelation[0][1] . "</b>` успешно перенесены в `<b>" . $tableRelation[0][0] . "</b>`\r\n";
+                        $result .= "В таблице `<b>" . $tableRelation[0][0] . "</b>` создано новых записей : <b>" . $this->_migrateResult[$tableRelation[0][0]] . "</b>\r\n\r\n";
                     }
                 }
             }
-        } else {
+        }
+        else {
             $result .= 'возникли ошибки миграции';
         }
         return Html::tag('pre', preg_replace("/\r\n/i", "<br/>", $result));
@@ -172,8 +173,8 @@ class DatabaseMigrator extends Object
         if (!empty($this->scheme)) {
             foreach ($this->scheme as $tableRelation) {
                 if ($this->isValidRelation($tableRelation)) {
-                    list($this->_targetTableName, $this->_sourceTableName) = $tableRelation[ 0 ];
-                    $fieldsRelations = ArrayHelper::merge(['id' => 'id',], $tableRelation[ 1 ]);
+                    list($this->_targetTableName, $this->_sourceTableName) = $tableRelation[0];
+                    $fieldsRelations = ArrayHelper::merge(['id' => 'id',], $tableRelation[1]);
                     $sourceModels = \Yii::$app->db->createCommand("SELECT * FROM " . $this->_sourceTableName . " ORDER BY id ASC")->queryAll();
                     if (!empty($fieldsRelations) && !empty($sourceModels)) {
                         if ($this->truncateTarget) {
@@ -187,20 +188,23 @@ class DatabaseMigrator extends Object
                             foreach ($fieldsRelations as $targetField => $sourceField) {
                                 $value = null;
                                 if (is_int($targetField)) {
-                                    $value = $sourceModel[ $sourceField ];
-                                } else {
+                                    $value = $sourceModel[$sourceField];
+                                }
+                                else {
                                     if ($sourceField instanceof \Closure) {
                                         $value = call_user_func($sourceField, (object)$sourceModel);
-                                    } elseif (preg_match("/:/i", $sourceField)) {
+                                    }
+                                    elseif (preg_match("/:/i", $sourceField)) {
                                         list($previousValue, $pattern) = explode(":", $sourceField);
                                         if (preg_match("/" . $pattern . "/i", $previousValue)) {
                                             $value = $previousValue;
                                         }
-                                    } else {
-                                        $value = $sourceModel[ $sourceField ];
+                                    }
+                                    else {
+                                        $value = $sourceModel[$sourceField];
                                     }
                                 }
-                                $modelFields[ (is_int($targetField)) ? $sourceField : $targetField ] = (!empty($value)) ? $value : $this->nullTargetValue;
+                                $modelFields[(is_int($targetField)) ? $sourceField : $targetField] = (!empty($value)) ? $value : $this->nullTargetValue;
                             }
                             $_migrateCommand .= "INSERT INTO"
                                 . "`" . $this->_targetTableName . "`"
@@ -210,7 +214,7 @@ class DatabaseMigrator extends Object
                             $_rowsMigrating++;
                         }
                         \Yii::$app->db->createCommand($_migrateCommand)->execute();
-                        $this->_migrateResult[ $this->_targetTableName ] = $_rowsMigrating;
+                        $this->_migrateResult[$this->_targetTableName] = $_rowsMigrating;
                     }
                 }
             }
@@ -222,9 +226,9 @@ class DatabaseMigrator extends Object
     public function isValidRelation($tableRelation)
     {
         return (
-            !empty($tableRelation[ 0 ])
-            && ArrayHelper::isIndexed($tableRelation[ 0 ])
-            && !empty($tableRelation[ 1 ])
+            !empty($tableRelation[0])
+            && ArrayHelper::isIndexed($tableRelation[0])
+            && !empty($tableRelation[1])
         );
     }
 

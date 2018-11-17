@@ -7,6 +7,7 @@ namespace modular\resource;
 
 
 use modular\core\Application;
+use modular\core\events\AfterPackageInitEvent;
 use modular\core\models\PackageInit;
 
 
@@ -22,40 +23,41 @@ class ResourceApplication extends Application
 
     /**
      * {@inheritdoc}
+     */
+    final public function init()
+    {
+        parent::init();
+        $this->on(
+            self::EVENT_AFTER_PACKAGE_INIT,
+            function (AfterPackageInitEvent $event) {
+                $this->name = $event->module->title;
+                // set default routing
+                $this->getUrlManager()->addRules(
+                    [
+                        '/' =>
+                            !empty($event->module->defaultRoute) ?
+                                $event->module->id . '/' . $event->module->defaultRoute :
+                                $event->module->id . '/default/index',
+                    ]
+                );
+                // configure error handler component
+                if (!empty($event->module->params['errorHandler'])) {
+                    \Yii::configure($this->get('errorHandler'), $event->module->params['errorHandler']);
+                }
+            }
+        );
+    }
+
+
+    /**
+     * {@inheritdoc}
      *
-     * @throws \yii\base\InvalidConfigException
      * @throws \yii\web\ServerErrorHttpException
      */
-    final public function bootstrap()
+    protected function getPackagesParams()
     {
-        // parent bootstrapping always goes first because of the modules installing as extensions
-        parent::bootstrap();
-        // add resource module to the application
-        $package = $this->addPackage(PackageInit::getParams());
-        $this->name = $package->title;
-        // set default routing
-        $this->getUrlManager()->addRules(
-            [
-                '/' =>
-                    !empty($package->defaultRoute) ?
-                        $package->id . '/' . $package->defaultRoute :
-                        $package->id . '/default/index',
-            ]
-        );
-        // configure error handler component
-        if ( !empty($package->params['errorHandler']) ) {
-            \Yii::configure($this->get('errorHandler'), $package->params['errorHandler']);
-        }
-        /*$this->on(
-            self::EVENT_AFTER_ACTION,
-            function ($event) {
-                $module = $event->sender->controller->module;
-                // save resource activity if possible
-                if ($module->hasMethod('shouldIndexAction') && $module->shouldIndexAction()) {
-                    ActionsIndex::add($module);
-                0}
-            }
-        );*/
+        return [PackageInit::getParams()];
     }
+
 
 }

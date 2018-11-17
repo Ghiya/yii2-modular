@@ -7,7 +7,7 @@ namespace modular\core\helpers;
 
 
 use DOMDocument;
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -17,7 +17,7 @@ use yii\helpers\Json;
  *
  * @package modular\core\helpers
  */
-class ResourceHelper extends Object
+class ResourceHelper extends BaseObject
 {
 
 

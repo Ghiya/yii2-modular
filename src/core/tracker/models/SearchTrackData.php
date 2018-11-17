@@ -94,8 +94,7 @@ class SearchTrackData extends TrackData
                         /** @var SearchTrackData $model */
                         return strtotime("- $model->range days");
                     },
-                    'to'   => function ($model) {
-                        /** @var SearchTrackData $model */
+                    'to'   => function () {
                         return time();
                     }
                 ] :

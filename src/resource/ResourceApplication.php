@@ -22,30 +22,26 @@ class ResourceApplication extends Application
 
 
     /**
-     * {@inheritdoc}
+     * @param AfterPackageInitEvent $event
+     *
+     * @throws \yii\base\InvalidConfigException
      */
-    final public function init()
+    protected function afterPackageInit($event)
     {
-        parent::init();
-        $this->on(
-            self::EVENT_AFTER_PACKAGE_INIT,
-            function (AfterPackageInitEvent $event) {
-                $this->name = $event->module->title;
-                // set default routing
-                $this->getUrlManager()->addRules(
-                    [
-                        '/' =>
-                            !empty($event->module->defaultRoute) ?
-                                $event->module->id . '/' . $event->module->defaultRoute :
-                                $event->module->id . '/default/index',
-                    ]
-                );
-                // configure error handler component
-                if (!empty($event->module->params['errorHandler'])) {
-                    \Yii::configure($this->get('errorHandler'), $event->module->params['errorHandler']);
-                }
-            }
+        $this->name = $event->module->title;
+        // set default routing
+        $this->getUrlManager()->addRules(
+            [
+                '/' =>
+                    !empty($event->module->defaultRoute) ?
+                        $event->module->id . '/' . $event->module->defaultRoute :
+                        $event->module->id . '/default/index',
+            ]
         );
+        // configure error handler component
+        if (!empty($event->module->params['errorHandler'])) {
+            \Yii::configure($this->get('errorHandler'), $event->module->params['errorHandler']);
+        }
     }
 
 

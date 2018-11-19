@@ -70,6 +70,12 @@ abstract class Application extends \yii\web\Application
     {
         // parent bootstrapping always goes first because of the modules installing as extensions
         parent::bootstrap();
+        $this->on(
+            self::EVENT_AFTER_PACKAGE_INIT,
+            function ($event) {
+                $this->afterPackageInit($event);
+            }
+        );
         foreach ($this->getPackagesParams() as $packageParams) {
             $this->addPackage($packageParams);
         }
@@ -82,6 +88,14 @@ abstract class Application extends \yii\web\Application
             [],
             false
         );
+    }
+
+
+    /**
+     * @param AfterPackageInitEvent $event
+     */
+    protected function afterPackageInit($event)
+    {
     }
 
 
@@ -113,7 +127,7 @@ abstract class Application extends \yii\web\Application
 
 
     /**
-     * @todo удалить $packagePrefix как избыточный
+     * @todo удалить $packagePrefix, $initOnly как избыточные
      *
      * Добавляет в приложение модуль веб-ресурса с указанными параметрами инициализации.
      *
@@ -125,7 +139,7 @@ abstract class Application extends \yii\web\Application
      */
     public function addPackage(PackageInit $packageInit, $packagePrefix = "", $initOnly = false)
     {
-        \Yii::debug("Initializing resource `$packageInit->title`.", __METHOD__);
+        \Yii::debug("Initializing resource: `$packageInit->title`.", __METHOD__);
         // set and configure package module
         \Yii::$app->setModule(
             $this->packagePrefix . $packageInit->getModuleId(),
@@ -136,28 +150,26 @@ abstract class Application extends \yii\web\Application
         if ($module->has('urlManager')) {
             \Yii::$app->getUrlManager()->addRules($module->get('urlManager')->rules);
         }
-        if (!$initOnly) {
-            // define application language
-            if (isset($module->params['defaults']['language'])) {
-                $this->language = $module->params['defaults']['language'];
-            }
-            // define translations
-            if ($module->has('i18n')) {
-                $this->i18n->translations =
-                    ArrayHelper::merge(
-                        $this->i18n->translations,
-                        $module->get('i18n')->translations
-                    );
-            }
-            if (!self::isPanel()) {
-                // define module logs
-                $this->log->targets[] = new FileTarget($packageInit->getLogParams());
-            }
-            $this->trigger(
-                self::EVENT_AFTER_PACKAGE_INIT,
-                new AfterPackageInitEvent(['module' => $module, 'params' => $packageInit->getModuleParams()])
-            );
+        // define application language
+        if (isset($module->params['defaults']['language'])) {
+            $this->language = $module->params['defaults']['language'];
         }
+        // define translations
+        if ($module->has('i18n')) {
+            $this->i18n->translations =
+                ArrayHelper::merge(
+                    $this->i18n->translations,
+                    $module->get('i18n')->translations
+                );
+        }
+        if (!self::isPanel()) {
+            // define module logs
+            $this->log->targets[] = new FileTarget($packageInit->getLogParams());
+        }
+        $this->trigger(
+            self::EVENT_AFTER_PACKAGE_INIT,
+            new AfterPackageInitEvent(['module' => $module, 'config' => $packageInit->getModuleParams()])
+        );
     }
 
 
@@ -185,7 +197,6 @@ abstract class Application extends \yii\web\Application
             );
         $this->getSession()->set($this->l12nParam, $this->language);
     }
-
 
 
 }

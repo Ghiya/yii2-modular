@@ -23,7 +23,7 @@ class AfterPackageInitEvent extends Event
     /**
      * @var array
      */
-    public $params = [];
+    public $config = [];
 
 
     /**

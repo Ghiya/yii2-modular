@@ -121,9 +121,6 @@ class TracksManager extends Component implements BootstrapInterface
                 $track->sendParams[$param] = $this->sendParams[$param];
             }
         }
-        if ($track->devOnly) {
-            $track->sendParams['observers'] = $this->devObservers;
-        }
     }
 
 
@@ -137,6 +134,9 @@ class TracksManager extends Component implements BootstrapInterface
         // создаёт модель уведомления и добавляем её в очередь
         if (!empty($track->message)) {
             $this->configSend($track);
+            if ($track->devOnly) {
+                $track->sendParams['observers'] = $this->devObservers;
+            }
             $this->getQueue()->enqueue($track);
         }
     }

@@ -10,6 +10,7 @@ use modular\core\Controller;
 use modular\core\helpers\ArrayHelper;
 use modular\core\tracker\events\Track;
 use modular\core\tracker\TracksManager;
+use modular\panel\models\User;
 use modular\resource\ResourceModule;
 use yii\base\Behavior;
 use yii\base\Module;
@@ -106,6 +107,7 @@ class Tracking extends Behavior
         $this->configTrack($track);
         // set custom track message
         $this->trackOnEvent($track);
+
         // completes track model
         $this->completeModel($track);
         // triggers handle event
@@ -156,6 +158,9 @@ class Tracking extends Behavior
                 'version'   => $this->owner->module->version
             ]
         );
+        if ($track->devOnly) {
+            $track->model->allowed(User::findAdministratorsIds());
+        }
         if ($track->keepTrack) {
             $track->model->save(false);
         }

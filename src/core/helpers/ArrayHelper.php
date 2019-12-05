@@ -263,7 +263,7 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
      *
      * @return array
      */
-    public static function extract(array $arraySet = [], $keys, $valueTemplate = '')
+    public static function extract($arraySet, $keys, $valueTemplate = '')
     {
         $keys = (array)$keys;
         $extracted = [];

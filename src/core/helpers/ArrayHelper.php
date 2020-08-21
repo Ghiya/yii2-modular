@@ -19,6 +19,65 @@ class ArrayHelper extends \yii\helpers\ArrayHelper
 
 
     /**
+     * If every one element of the array satisfies the specified condition.
+     *
+     * @param array         $arraySet
+     * @param callable|null $condition
+     * @return bool
+     */
+    public static function every(array $arraySet = [], callable $condition = null) {
+        $trues = 0;
+        foreach ($arraySet as $item) {
+            if (isset($condition) && is_callable($condition)) {
+                if ($condition($item)) {
+                    $trues++;
+                }
+            }
+        }
+        return count($arraySet) == $trues;
+    }
+
+
+    /**
+     * If at least one element of the array satisfies the specified condition.
+     *
+     * @param array         $arraySet
+     * @param callable|null $condition
+     * @return bool
+     */
+    public static function any(array $arraySet = [], callable $condition = null) {
+        foreach ($arraySet as $item) {
+            if (isset($condition) && is_callable($condition)) {
+                if ($condition($item)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Filters array set values, leaving only those for which the parameter `callable` returns 'true'.
+     *
+     * @param array         $arraySet
+     * @param callable|null $callback
+     * @return array
+     */
+    public static function filterSetWhere(array $arraySet = [], callable $callback = null)
+    {
+        $filtered = [];
+        foreach ($arraySet as $item) {
+            if (isset($callback) && is_callable($callback)) {
+                if ($callback($item)) {
+                    $filtered[] = $item;
+                }
+            }
+        }
+        return $filtered;
+    }
+
+
+    /**
      * Convert array values according to the defined template expression.
      * Supposed for using both parameters, in other cases do nothing.
      *

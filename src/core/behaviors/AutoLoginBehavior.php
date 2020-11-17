@@ -7,6 +7,7 @@
 namespace modular\core\behaviors;
 
 
+use Yii;
 use yii\base\Behavior;
 use yii\web\IdentityInterface;
 
@@ -41,15 +42,15 @@ class AutoLoginBehavior extends Behavior
             [
                 self::EVENT_AUTO_LOGIN =>
                     function (AutoLoginEvent $event) {
-                        if (\Yii::$app->user->isGuest) {
-                            /** @var object|IdentityInterface $identity */
-                            $identity =
-                                \Yii::createObject(
-                                    \Yii::$app->user->identityClass
-                                );
-                            $user = $identity::findIdentity($event->userId);
-                            if ( !empty($user) ) {
-                                \Yii::$app->user->login($identity::findIdentity($event->userId), $this->duration);
+                        $user = Yii::$app->user;
+                        $logInIf = $user->isGuest || $user->identity->getId() !== $event->userId;
+                        if ($logInIf) {
+                            $user->logout(true);
+                            /** @var object|IdentityInterface $identityModel */
+                            $identityModel = Yii::createObject($user->identityClass);
+                            $identity = $identityModel::findIdentity($event->userId);
+                            if (!empty($identity)) {
+                                $user->login($identity, $this->duration);
                             }
                         }
                     }

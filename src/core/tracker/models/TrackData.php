@@ -8,6 +8,7 @@ namespace modular\core\tracker\models;
 
 use modular\core\helpers\ArrayHelper;
 use modular\core\helpers\Html;
+use modular\core\models\PackageInit;
 use modular\core\models\ShortLink;
 use modular\core\Module;
 use yii\behaviors\TimestampBehavior;
@@ -19,27 +20,28 @@ use yii\helpers\Json;
 /**
  * Class Track модель уведомления трекера уведомлений веб-ресурсов
  *
- * @property int       $id
- * @property string    $session_id      идентификатор сессии входящего запроса
- * @property string    $resource_id     идентификатор модуля веб-ресурса
- * @property string    $module_id       идентификатор модуля активного контроллера
- * @property string    $controller_id   идентификатор активного контроллера
- * @property string    $action_id       идентификатор действия активного контроллера
- * @property string    $request         параметры запроса
- * @property string    $request_method  тип запроса
- * @property string    $priority        приоритет заметки
- * @property string    $message         содержание заметки
- * @property string    $user_ip         адрес IP входящего запроса
- * @property string    $user_agent      веб-агент входящего запроса
- * @property string    $viewed_by       данные просмотра в JSON
- * @property string    $allowed_for     данные доступа в JSON
- * @property string    $related_item    связанный элемент уведомления
- * @property string    $version         версия модуля веб-ресурса
- * @property int       $updated_at
- * @property int       $created_at
- * @property-read bool $isViewed        если прочитано активным пользователем
- * @property array     $viewedBy        массив данных просмотра
- * @property array     $allowedFor      массив данных доступа
+ * @property int              $id
+ * @property string           $session_id      идентификатор сессии входящего запроса
+ * @property string           $resource_id     идентификатор модуля веб-ресурса
+ * @property string           $module_id       идентификатор модуля активного контроллера
+ * @property string           $controller_id   идентификатор активного контроллера
+ * @property string           $action_id       идентификатор действия активного контроллера
+ * @property string           $request         параметры запроса
+ * @property string           $request_method  тип запроса
+ * @property string           $priority        приоритет заметки
+ * @property string           $message         содержание заметки
+ * @property string           $user_ip         адрес IP входящего запроса
+ * @property string           $user_agent      веб-агент входящего запроса
+ * @property string           $viewed_by       данные просмотра в JSON
+ * @property string           $allowed_for     данные доступа в JSON
+ * @property string           $related_item    связанный элемент уведомления
+ * @property string           $version         версия модуля веб-ресурса
+ * @property int              $updated_at
+ * @property int              $created_at
+ * @property-read bool        $isViewed        если прочитано активным пользователем
+ * @property array            $viewedBy        массив данных просмотра
+ * @property array            $allowedFor      массив данных доступа
+ * @property-read PackageInit $module          модуль создавший уведомление
  *
  * @package modular\core\tracker\models
  */
@@ -207,6 +209,15 @@ class TrackData extends ActiveRecord
 
 
     /**
+     * @return ActiveQuery
+     */
+    public function getModule()
+    {
+        return $this->hasOne(PackageInit::class, ['module_id' => 'module_id',]);
+    }
+
+
+    /**
      * Возвращает строковый заголовок уведомления.
      *
      * @return string
@@ -219,6 +230,25 @@ class TrackData extends ActiveRecord
                 "[ Ticket: $this->id ] " . \Yii::$app->name . " : " . $this->getPriorityLabel();
     }
 
+
+    /**
+     * Возвращает строковое описание уведомления с его идентификатором.
+     * @return string
+     */
+    public function getDescription()
+    {
+        return "[ <strong>$this->id</strong> ] " . $this->getPriorityLabel();
+    }
+
+
+    /**
+     * Возвращает строковый идентификатор модуля и его версию.
+     * @return string
+     */
+    public function getTitleAndVersion()
+    {
+        return "$this->module_id/$this->version";
+    }
 
     /**
      * Возвращает название приоритета записи.
@@ -288,13 +318,13 @@ class TrackData extends ActiveRecord
 
 
     /**
+     * @param int $userId
+     *
+     * @return bool
      * @deprecated
      *
      * Если заметка была просмотрена указанным пользователем.
      *
-     * @param int $userId
-     *
-     * @return bool
      */
     public function hasBeenViewedBy($userId = 0)
     {
@@ -370,8 +400,7 @@ class TrackData extends ActiveRecord
                 foreach ($user as $id) {
                     $this->viewedBy = $id;
                 }
-            }
-            else {
+            } else {
                 $this->viewedBy = $user;
             }
         }
@@ -494,8 +523,7 @@ class TrackData extends ActiveRecord
                     ]
                 ) . "<br/><br/>" :
                 $this->_buildLink($this->getRelatedItem(), $useShortLink);
-        }
-        else {
+        } else {
             return '';
         }
 
@@ -524,8 +552,7 @@ class TrackData extends ActiveRecord
                 return !empty($shortLink) ?
                     $panelLink . "/ref/" . $shortLink :
                     $link;
-            }
-            else {
+            } else {
                 return "$panelLink/" . $module->id . "/$relatedItem[0]/view?id=$relatedItem[1]";
             }
         }

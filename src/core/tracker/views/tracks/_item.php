@@ -5,15 +5,16 @@
  */
 
 use modular\core\tracker\models\TrackData;
+use modular\core\tracker\views\View;
 use modular\panel\models\UserRole;
 use modular\panel\widgets\PanelItemModal;
 use yii\helpers\Html;
 
+/** @var View $this */
 /** @var TrackData $model */
 
-?>
-<?=
-PanelItemModal::widget(
+$isViewingByModule = $model->module->module_id == $this->context->module->cid;
+echo PanelItemModal::widget(
     [
         'removeAllowed'    => \Yii::$app->getUser()->can(UserRole::PM_REMOVE_RESOURCE_DATA),
         'useSelection'     => false,
@@ -35,11 +36,11 @@ PanelItemModal::widget(
                 'class' => $model->priority > TrackData::PRIORITY_NOTICE ? 'red' : 'green',
             ]
         ),
-        'shortDescription' => "$model->module_id/$model->version",
+        'shortDescription' => $isViewingByModule ? $model->version : $model->module->title,
         'fullDescription'  =>
             Html::tag(
                 'span',
-                "[ <strong>$model->id</strong> ] " . $model->getPriorityLabel(),
+                $model->getDescription(),
                 [
                     'class' =>
                         $model->priority > TrackData::PRIORITY_NOTICE ?
@@ -52,5 +53,4 @@ PanelItemModal::widget(
             ['class' => 'text-center',]
         ),
     ]
-)
-?>
+);

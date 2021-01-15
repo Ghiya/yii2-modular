@@ -77,7 +77,7 @@ abstract class PanelModule extends Module
                     'label'   =>
                         Html::tag(
                             'span',
-                            Html::tag('i', '', ['class' => 'fa fa-envelope-o']),
+                            Html::tag('i', '', ['class' => 'fa fa-bell-o']),
                             [
                                 'class' => 'pull-left'
                             ]
@@ -113,7 +113,7 @@ abstract class PanelModule extends Module
         $searchTracks = new SearchTrackData(['fullRange' => true]);
         $searchTracks->load(
             [
-                'cid'  => $this->cid,
+                'cid' => $this->cid,
             ]
         );
         return $searchTracks->countActive();

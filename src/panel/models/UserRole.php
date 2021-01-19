@@ -150,13 +150,21 @@ class UserRole extends ActiveRecord
     }
 
 
-    public static function findAllWith($roles = []) {
+    /**
+     * @param array $roles
+     * @return ActiveRecord[]|UserRole[]
+     */
+    public static function findAllWith($roles = []): array
+    {
         return static::find()
             ->where(['in', 'value', $roles])
             ->distinct(['user_id' => true])
             ->all();
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getDescription()
     {
         $list = static::rolesList();

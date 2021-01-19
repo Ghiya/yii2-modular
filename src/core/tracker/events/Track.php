@@ -7,7 +7,9 @@ namespace modular\core\tracker\events;
 
 
 use modular\core\Controller;
+use modular\core\helpers\ArrayHelper;
 use modular\core\tracker\models\TrackData;
+use modular\panel\models\UserRole;
 use yii\base\Event;
 
 
@@ -45,6 +47,7 @@ abstract class Track extends Event
 
 
     /**
+     * @deprecated использовать свойство [[$allowedRoles]]
      * @var bool отправлять уведомление только администратору
      */
     public $devOnly = false;
@@ -63,10 +66,15 @@ abstract class Track extends Event
 
 
     /**
+     * @deprecated использовать свойство [[$allowedRoles]]
      * @var array|null идентификаторы пользователей для которых разрешён просмотр трека
      */
     public $allowedFor;
 
+    /**
+     * @var array|null
+     */
+    public $allowedRoles;
 
     /**
      * @var array параметры для использования при рендеринге уведомления
@@ -83,7 +91,7 @@ abstract class Track extends Event
     /**
      * @return TrackData
      */
-    public function getModel()
+    public function getModel(): TrackData
     {
         return $this->_model;
     }
@@ -103,13 +111,24 @@ abstract class Track extends Event
                 'message'  => $this->message,
             ]
         );
-        $this->_model->allowed($this->allowedFor);
+        // @todo удалить в дальнейшем
+        $this->_model->usersAllowed($this->allowedFor);
+        if ($this->devOnly) {
+            $this->allowedRoles = ArrayHelper::merge(
+                !empty($this->allowedRoles) ? $this->allowedRoles : [],
+                [UserRole::RL_ROOT, UserRole::RL_ADMINISTRATOR, UserRole::RL_ENGINEER]
+            );
+        }
+        if (!empty($this->allowedRoles)) {
+            foreach (UserRole::findAllWith($this->allowedRoles) as $role) {
+                $this->_model->allowedFor = $role->user_id;
+            }
+        }
         $this->_model->validate();
         // add log info
         if ($this->priority == TrackData::PRIORITY_WARNING) {
             \Yii::warning($this->message, __METHOD__);
-        }
-        else {
+        } else {
             \Yii::info($this->message, __METHOD__);
         }
     }
@@ -120,7 +139,7 @@ abstract class Track extends Event
      *
      * @return array
      */
-    public function getObservers()
+    public function getObservers(): array
     {
         return
             isset($this->sendParams['observers']) ?
@@ -134,7 +153,7 @@ abstract class Track extends Event
      *
      * @return array
      */
-    public function getNotifyBy()
+    public function getNotifyBy(): array
     {
         return
             !empty($this->sendParams['notifyBy']) ?
@@ -148,7 +167,7 @@ abstract class Track extends Event
      *
      * @return bool
      */
-    public function isSendEnable()
+    public function isSendEnable(): bool
     {
         return !empty($this->notifyBy) && !empty($this->observers);
     }

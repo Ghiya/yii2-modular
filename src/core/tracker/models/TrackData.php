@@ -408,11 +408,11 @@ class TrackData extends ActiveRecord
 
 
     /**
-     * Добавляет доступ для указанного пользователя или группы пользователей.
+     * Добавляет доступ для указанной группы пользователей.
      *
-     * @param int|array|null $user идентификатор или массив идентификаторов пользователей
+     * @param int|array|null $users
      */
-    public function allowed($user = null)
+    public function usersAllowed($users = [])
     {
         if (!empty($user)) {
             $user = (array)$user;

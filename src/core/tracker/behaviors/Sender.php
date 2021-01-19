@@ -122,7 +122,7 @@ abstract class Sender extends Behavior
      */
     public static function eventNameFor($senderId = "")
     {
-        return "$senderId." . self::DEFAULT_EVENT_POSTFIX;
+        return $senderId . self::DEFAULT_EVENT_POSTFIX;
     }
 
 }

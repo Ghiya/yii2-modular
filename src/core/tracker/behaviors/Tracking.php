@@ -10,7 +10,6 @@ use modular\core\Controller;
 use modular\core\helpers\ArrayHelper;
 use modular\core\tracker\events\Track;
 use modular\core\tracker\TracksManager;
-use modular\panel\models\User;
 use modular\resource\ResourceModule;
 use yii\base\Behavior;
 use yii\base\Module;
@@ -56,12 +55,6 @@ class Tracking extends Behavior
      * @var array идентификаторы событий пользовательских уведомлений
      */
     public $tracksEvents = [];
-
-
-    /**
-     * @var array $developerIds
-     */
-    public $developerIds = [1, 4];
 
 
     /**
@@ -158,9 +151,6 @@ class Tracking extends Behavior
                 'version'   => $this->owner->module->version
             ]
         );
-        if ($track->devOnly) {
-            $track->model->allowed(User::findAdministratorsIds());
-        }
         if ($track->keepTrack) {
             $track->model->save(false);
         }

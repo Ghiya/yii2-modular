@@ -111,21 +111,6 @@ class User extends ActiveRecord implements IdentityInterface
 
 
     /**
-     * Возвращает список идентификаторов пользователей системы с правами администраторов.
-     *
-     * @return array
-     */
-    public static function findAdministratorsIds()
-    {
-        $administrators = [];
-        foreach (UserRole::findAllWith([UserRole::RL_ROOT, UserRole::RL_ADMINISTRATOR]) as $role) {
-            $administrators[] = $role->user_id;
-        }
-        return $administrators;
-    }
-
-
-    /**
      * Возвращает все активные записи пользователей.
      *
      * @return static[]

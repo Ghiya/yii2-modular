@@ -35,7 +35,7 @@ class TracksManager extends Component implements BootstrapInterface
     /**
      * @var array массив параметров обработки уведомления
      */
-    public $sendParams = ['email'];
+    public $sendParams = [];
 
 
     /**
@@ -45,6 +45,8 @@ class TracksManager extends Component implements BootstrapInterface
 
 
     /**
+     * @todo       удалить в дальнейшем
+     * @deprecated не используется
      * @var array  список получателей разработчиков ( используется для параметра уведомления `devOnly` )
      */
     public $devObservers = [];
@@ -134,9 +136,6 @@ class TracksManager extends Component implements BootstrapInterface
         // создаёт модель уведомления и добавляем её в очередь
         if (!empty($track->message)) {
             $this->configSend($track);
-            if ($track->devOnly) {
-                $track->sendParams['observers'] = $this->devObservers;
-            }
             $this->getQueue()->enqueue($track);
         }
     }

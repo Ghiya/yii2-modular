@@ -42,6 +42,12 @@ class UserRole extends ActiveRecord
 
 
     /**
+     * Роль разработчика.
+     */
+    const RL_SUPPORT = 'support';
+
+
+    /**
      * Роль менеджера.
      */
     const RL_MANAGER = 'manager';
@@ -186,6 +192,7 @@ class UserRole extends ActiveRecord
                 self::RL_ROOT          => 'Суперадминистратор',
                 self::RL_ADMINISTRATOR => 'Администратор',
                 self::RL_ENGINEER      => 'Инженер',
+                self::RL_SUPPORT       => 'Техподдержка',
                 self::RL_MANAGER       => 'Менеджер',
                 self::RL_API           => 'Клиент API',
             ];
@@ -267,6 +274,12 @@ class UserRole extends ActiveRecord
                         self::PM_MANAGE_RESOURCE_DATA,
                         self::PM_VIEW_DEBUG_DATA
                     ],
+                self::RL_SUPPORT       =>
+                    [
+                        self::PM_ACCESS_LOGS,
+                        self::PM_MANAGE_RESOURCE_DATA,
+                        self::PM_VIEW_DEBUG_DATA
+                    ],
                 self::RL_ADMINISTRATOR =>
                     [
                         self::PM_ACCESS_BUNDLES,
@@ -295,6 +308,9 @@ class UserRole extends ActiveRecord
                         self::RL_MANAGER,
                         self::RL_API
                     ],
+                self::RL_SUPPORT       => [
+                    self::RL_ENGINEER
+                ],
                 self::RL_ADMINISTRATOR =>
                     [
                         self::RL_ENGINEER

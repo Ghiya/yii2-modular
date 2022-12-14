@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+/*
+ * Copyright (c) 2016 - 2022 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 namespace modular\panel;
@@ -49,6 +49,7 @@ abstract class PanelModule extends Module
                         'id'          => $this->id,
                         'title'       => $this->title,
                         'description' => $this->description,
+                        'activated'   => $this->activated,
                         'urls'        => ArrayHelper::renameKeys($this->urls, ['is_active' => 'isActive']),
                         'version'     => $this->version,
                         'active'      => (boolean)preg_match("/\/$this->id/i", \Yii::$app->request->url),

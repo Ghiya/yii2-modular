@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+/*
+ * Copyright (c) 2016 - 2022 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 namespace modular\core\models;
@@ -215,7 +215,8 @@ class PackageInit extends ActiveRecord
      *
      * @return array
      */
-    public function getModuleParams() {
+    public function getModuleParams()
+    {
         return
             ArrayHelper::merge(
                 file_exists($this->getPath() . '/config/config.php') ?
@@ -227,6 +228,7 @@ class PackageInit extends ActiveRecord
                 $this->toArray()
             );
     }
+
 
     /**
      * Массив локальных параметров модуля.
@@ -290,15 +292,16 @@ class PackageInit extends ActiveRecord
             [
                 'title',
                 'description',
-                'urls'  => function () {
+                'urls'      => function () {
                     $urls = [];
                     foreach ($this->getLinkedUrls()->all() as $url) {
                         $urls[] = $url->toArray(['url', 'is_active']);
                     };
                     return $urls;
                 },
-                'cid'   => 'module_id',
-                'class' => function () {
+                'cid'       => 'module_id',
+                'activated' => 'is_active',
+                'class'     => function () {
                     return $this->getClass();
                 }
             ];

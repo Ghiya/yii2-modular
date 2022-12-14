@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+/*
+ * Copyright (c) 2016 - 2022 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 namespace modular\core;
@@ -32,6 +32,12 @@ abstract class Module extends \yii\base\Module
      * @var string описание модуля
      */
     public $description = '';
+
+
+    /**
+     * @var boolean
+     */
+    public $activated;
 
 
     /**

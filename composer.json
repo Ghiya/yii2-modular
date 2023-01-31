@@ -23,7 +23,7 @@
     "yiisoft/yii2-bootstrap": "~2.0.0",
     "yiisoft/yii2-apidoc": "~2.0.0",
     "yiisoft/yii2-debug": "~2.0.0",
-    "yiisoft/yii2-gii": "~2.0.0"
+    "yiisoft/yii2-gii": "~2.2.5"
   },
   "config": {
     "process-timeout": 1800

@@ -63,7 +63,7 @@ class TrackData extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'resource_rails__tracks';
+        return 'resource_rails__v1_tracks';
     }
 
 

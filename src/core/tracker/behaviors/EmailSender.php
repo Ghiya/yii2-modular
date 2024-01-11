@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+/*
+ * Copyright (c) 2016 - 2024 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 
@@ -9,6 +9,7 @@ namespace modular\core\tracker\behaviors;
 
 use modular\core\tracker\events\Track;
 use modular\core\tracker\models\TrackData;
+use yii\base\InvalidConfigException;
 
 /**
  * Class EmailSender
@@ -35,7 +36,7 @@ class EmailSender extends Sender
     /**
      * {@inheritdoc}
      *
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     protected function send(Track $track)
     {
@@ -65,21 +66,19 @@ class EmailSender extends Sender
      * @param int $priority
      *
      * @return string
+     * @throws InvalidConfigException
      */
     protected function getMailView($priority)
     {
         switch ($priority) {
             case TrackData::PRIORITY_WARNING :
                 return 'tracker/warning-html';
-                break;
 
             case TrackData::PRIORITY_NOTICE :
                 return 'tracker/notice-html';
-                break;
 
             default :
-                return 'tracker/notice-html';
-                break;
+                throw new InvalidConfigException('Could not get notification mail view for the track with unsupported priority');
         }
     }
 

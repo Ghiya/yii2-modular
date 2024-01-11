@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+/*
+ * Copyright (c) 2016 - 2023 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 
@@ -208,7 +208,7 @@ class TracksController extends Controller
                 [
                     'model'     => $model,
                     'debugData' =>
-                        \Yii::$app->user->can(UserRole::PM_MANAGE_ALL) ?
+                        \Yii::$app->user->can(UserRole::PM_MANAGE_ALL) || \Yii::$app->user->can(UserRole::PM_ACCESS_BUNDLES) ?
                             $this->renderPartial(
                                 $this->viewPath . '/view-request',
                                 [

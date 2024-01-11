@@ -1,9 +1,10 @@
 <?php
-/**
- * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+/*
+ * Copyright (c) 2016 - 2023 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 use modular\core\tracker\models\TrackData;
+use yii\helpers\Json;
 
 /** @var TrackData $model */
 /** @var array $request */
@@ -25,7 +26,8 @@ use modular\core\tracker\models\TrackData;
         <li class="list-group-item">
             <p class="list-group-item-text font-book">
                 <span class='text-backwards'>`<?= $field ?>` : </span>
-                <?= !empty($value) ? $value : 'null' ?>
+                <?= !empty($value) ? (is_array($value) ? Json::encode($value,
+                    JSON_UNESCAPED_SLASHES) : $value) : 'null' ?>
             </p>
         </li>
     <? endforeach; ?>

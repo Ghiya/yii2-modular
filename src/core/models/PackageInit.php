@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2016 - 2022 Ghiya Mikadze <g.mikadze@lakka.io>
+ * Copyright (c) 2016 - 2024 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 namespace modular\core\models;
@@ -177,15 +177,20 @@ class PackageInit extends ActiveRecord
      * @return array|PackageInit|PackageInit[]
      * @throws ServerErrorHttpException
      */
-    public static function getParams($packageUrl = "")
+    public static function getParams(string $packageUrl = "")
     {
         if (Application::isPanel()) {
             return static::find()->all();
         }
         else {
-            $url = empty($packageUrl) ? $_SERVER['SERVER_NAME'] : $packageUrl;
-            /** @var LinkedUrl $registered */
-            $registered = LinkedUrl::findOne(['url' => $url, 'is_active' => 1,]);
+            if (!empty($packageUrl)) {
+                $url = $packageUrl;
+                $registered = LinkedUrl::findRegisteredByPackageUrl($packageUrl);
+            }
+            else {
+                $url = empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_ADDR'] : $_SERVER['SERVER_NAME'];
+                $registered = LinkedUrl::findRegisteredByUrlOrIp($url, $_SERVER['SERVER_PORT']);
+            }
             if (!empty($registered)) {
                 if (empty($registered->packageInit)) {
                     throw new ServerErrorHttpException("Undefined resource for the `$url`.");

@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright (c) 2018 Ghiya Mikadze <ghiya@mikadze.me>
+/*
+ * Copyright (c) 2016 - 2024 Ghiya Mikadze <g.mikadze@lakka.io>
  */
 
 namespace modular\core\models;
@@ -58,4 +58,36 @@ class LinkedUrl extends ActiveRecord
         return $this->hasOne(PackageInit::class, ['id' => 'init_id',]);
     }
 
+
+    /**
+     * Возвращает запись связанного URL пакета модуля системы
+     * относительно указанного URL пакета.
+     *
+     * @param string $packageUrl
+     *
+     * @return LinkedUrl|null
+     */
+    public static function findRegisteredByPackageUrl(string $packageUrl): ?LinkedUrl
+    {
+        return static::findOne(['url' => $packageUrl, 'is_active' => 1,]);
+    }
+
+
+    /**
+     * Возвращает запись связанного URL пакета модуля системы
+     * относительно указанных URL или IP.
+     *
+     * @param string|null $urlOrIp
+     * @param string|null $port
+     *
+     * @return array|ActiveRecord|LinkedUrl|null
+     */
+    public static function findRegisteredByUrlOrIp(?string $urlOrIp, ?string $port): ?LinkedUrl
+    {
+        return static::find()
+            ->where(['url' => $urlOrIp])
+            ->orWhere(['url' => "$urlOrIp:$port"])
+            ->andWhere(['is_active' => 1])
+            ->one();
+    }
 }

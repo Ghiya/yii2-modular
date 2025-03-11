@@ -21,8 +21,6 @@ use yii\helpers\Json;
  * Class Track модель уведомления трекера уведомлений веб-ресурсов
  *
  * @property int              $id
- * @property string           $session_id      идентификатор сессии входящего запроса
- * @property string           $resource_id     идентификатор модуля веб-ресурса
  * @property string           $module_id       идентификатор модуля активного контроллера
  * @property string           $controller_id   идентификатор активного контроллера
  * @property string           $action_id       идентификатор действия активного контроллера
@@ -34,7 +32,6 @@ use yii\helpers\Json;
  * @property string           $user_agent      веб-агент входящего запроса
  * @property string           $viewed_by       данные просмотра в JSON
  * @property string           $allowed_for     данные доступа в JSON
- * @property string           $related_item    связанный элемент уведомления
  * @property string           $version         версия модуля веб-ресурса
  * @property int              $updated_at
  * @property int              $created_at
@@ -66,7 +63,7 @@ class TrackData extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'resource__tracks';
+        return 'resource_rails__v1_tracks';
     }
 
 
@@ -87,8 +84,6 @@ class TrackData extends ActiveRecord
         return
             [
                 self::SCENARIO_DEFAULT => [
-                    'session_id',
-                    'resource_id',
                     'version',
                     'module_id',
                     'controller_id',
@@ -122,13 +117,6 @@ class TrackData extends ActiveRecord
     {
         return
             [
-                [
-                    'session_id',
-                    'default',
-                    'value' => function () {
-                        return \Yii::$app->session->id;
-                    }
-                ],
                 [
                     'controller_id',
                     'default',
@@ -203,7 +191,6 @@ class TrackData extends ActiveRecord
                 'priority',
                 'module_id',
                 'version',
-                'session_id',
             ];
     }
 
@@ -483,24 +470,6 @@ class TrackData extends ActiveRecord
             'allowed_for' => null,
         ]);
     }
-
-
-    /**
-     * Возвращает массив данных связанной записи модуля веб-ресурса.
-     *
-     * @return array если данные неполные или отсутствуют, то вернёт пустой массив
-     */
-    protected function getRelatedItem()
-    {
-        if (!empty($this->related_item)) {
-            $relatedItem = explode(":", $this->related_item);
-            if (!empty($relatedItem[0]) && !empty($relatedItem[1])) {
-                return $relatedItem;
-            }
-        }
-        return [];
-    }
-
 
     /**
      * Возвращает HTML ссылку на связанный элемент уведомления панели администрирования ресурса.

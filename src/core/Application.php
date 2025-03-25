@@ -127,15 +127,15 @@ abstract class Application extends \yii\web\Application
 
 
     /**
-     * @todo удалить $packagePrefix, $initOnly как избыточные
-     *
-     * Добавляет в приложение модуль веб-ресурса с указанными параметрами инициализации.
-     *
      * @param PackageInit $packageInit
      * @param string      $packagePrefix
      * @param bool        $initOnly
      *
      * @throws \yii\base\InvalidConfigException
+     * @todo удалить $packagePrefix, $initOnly как избыточные
+     *
+     * Добавляет в приложение модуль веб-ресурса с указанными параметрами инициализации.
+     *
      */
     public function addPackage(PackageInit $packageInit, $packagePrefix = "", $initOnly = false)
     {
@@ -168,7 +168,11 @@ abstract class Application extends \yii\web\Application
         }
         $this->trigger(
             self::EVENT_AFTER_PACKAGE_INIT,
-            new AfterPackageInitEvent(['module' => $module, 'config' => $packageInit->getModuleParams()])
+            new AfterPackageInitEvent([
+                'module'      => $module,
+                'config'      => $packageInit->getModuleParams(),
+                'packageInit' => $packageInit
+            ])
         );
     }
 

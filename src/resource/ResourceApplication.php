@@ -22,6 +22,12 @@ class ResourceApplication extends Application
 
 
     /**
+     * @var PackageInit
+     */
+    public $modulePackage;
+
+
+    /**
      * @param AfterPackageInitEvent $event
      *
      * @throws \yii\base\InvalidConfigException
@@ -42,6 +48,8 @@ class ResourceApplication extends Application
         if (!empty($event->module->params['errorHandler'])) {
             \Yii::configure($this->get('errorHandler'), $event->module->params['errorHandler']);
         }
+        // set module package module
+        $this->modulePackage = $event->packageInit;
     }
 
 
@@ -55,5 +63,15 @@ class ResourceApplication extends Application
         return [PackageInit::getParams()];
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function prependedBeforeAction($event)
+    {
+        if (!$this->modulePackage->is_active) {
+            throw new \yii\web\HttpException(200, "Service is currently inactive.");
+        }
+    }
 
 }

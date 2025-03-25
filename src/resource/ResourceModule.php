@@ -11,10 +11,10 @@ use modular\core\Module;
 /**
  * Class Module
  * Базовый класс модуля веб-ресурса.
- *
- * @property-read string $index        идентификатор абонента в зависимости от выполняемого веб-ресурса
- * @property-read array  $tracksConfig параметры конфигурации компонента управления уведомлениями модуля
- * @property-read array  $errorsConfig параметры конфигурации компонента обработчика ошибок
+ * @property-read ResourceApplication $module
+ * @property-read string              $index        идентификатор абонента в зависимости от выполняемого веб-ресурса
+ * @property-read array               $tracksConfig параметры конфигурации компонента управления уведомлениями модуля
+ * @property-read array               $errorsConfig параметры конфигурации компонента обработчика ошибок
  *
  * @package modular\resource
  */
@@ -27,6 +27,12 @@ abstract class ResourceModule extends Module
      */
     public $indexPrevent = false;
 
+
+    /*public function init() {
+        parent::init();
+        var_dump($this->module->modulePackage);
+        die;
+    }*/
 
     /**
      * Возвращает параметры конфигурации компонента управления уведомлениями модуля

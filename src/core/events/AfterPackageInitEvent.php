@@ -7,6 +7,7 @@
 namespace modular\core\events;
 
 
+use modular\core\models\PackageInit;
 use modular\panel\PanelModule;
 use modular\resource\ResourceModule;
 use yii\base\Event;
@@ -31,4 +32,9 @@ class AfterPackageInitEvent extends Event
      */
     public $module;
 
+
+    /**
+     * @var PackageInit
+     */
+    public $packageInit;
 }

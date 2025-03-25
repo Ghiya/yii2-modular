@@ -9,7 +9,6 @@ namespace modular\core;
 /**
  * Class Module
  * Базовый класс модулей ресурсов и панелей администрирования.
- *
  * @package modular\core
  */
 abstract class Module extends \yii\base\Module
